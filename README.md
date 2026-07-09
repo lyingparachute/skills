@@ -7,11 +7,15 @@ My Claude skills + global agent rules. Sync across machines.
 `AGENTS.md` — one source of truth for global agent rules. Symlink it into each harness:
 
 ```sh
-for dest in ~/.agents/AGENTS.md ~/.codex/AGENTS.md ~/.claude/CLAUDE.md ~/.config/opencode/AGENTS.md; do
+for dest in ~/.agents/AGENTS.md ~/.codex/AGENTS.md ~/.claude/CLAUDE.md ~/.config/opencode/AGENTS.md ~/.grok/AGENTS.md; do
   mkdir -p "$(dirname "$dest")"
   ln -sfn "$PWD/AGENTS.md" "$dest"
 done
 ```
+
+Harness global-rules paths: Codex `~/.codex/AGENTS.md`, Claude `~/.claude/CLAUDE.md`, OpenCode `~/.config/opencode/AGENTS.md`, Grok `~/.grok/AGENTS.md`.
+
+Cursor has no global rules *file* — the IDE keeps user rules in Settings → Rules, and the CLI only reads a project-root `AGENTS.md`. For per-project coverage, symlink into a repo root: `ln -sfn "$PWD/AGENTS.md" <project>/AGENTS.md`.
 
 ## Skills
 
