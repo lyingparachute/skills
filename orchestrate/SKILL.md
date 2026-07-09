@@ -69,7 +69,7 @@ Least powerful model that can do the role; **always specify it explicitly** (an 
 3. `plan-retire` — extract durable decisions, delete the rest.
 4. Commit plan progress and update the plans index if there is one.
 5. **Report:** what changed, what tests ran (with output), any deviation from the plan, any follow-up findings.
-6. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once.
+6. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt — shallow modules, tangled callers, no test seam — make that follow-up an `improve-codebase-architecture` pass rather than a vague "clean up later".
 
 ## Red flags
 

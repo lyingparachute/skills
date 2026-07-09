@@ -104,6 +104,8 @@ Push for remedies that reduce the number of concepts a reader must hold:
 
 Do not settle for rename-level feedback when the real problem is structural. Do not settle for a cleaner version of the same messy idea when a much simpler model is visible.
 
+When the structural problem is bigger than this diff — shallow modules, tangled callers, a missing seam across several files — the remedy is not a review comment. Raise it as a `followup-execplan` and point it at `improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix.
+
 ## Output
 
 Lead with findings, ordered by severity and review priority:
