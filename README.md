@@ -18,7 +18,7 @@ done
 `/flow` is the router — the map of every skill and the chains they form. Start there.
 
 - **Align & plan** — `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `to-spec`, `to-tickets`, `wayfinder`
-- **Build** — `implement`, `tdd`, `prototype`, `diagnosing-bugs`
+- **Build** — `implement` (light), `orchestrate` (heavy, subagent-per-milestone), `tdd`, `prototype`, `diagnosing-bugs`
 - **Design quality** — `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable` (owns FE detail refs + Web Interface Guidelines), `shadcn-ui`
 - **Verify** — `code-review`, `check-work`
 - **Knowledge** — `research`, `graphify`, `nlm-skill`
