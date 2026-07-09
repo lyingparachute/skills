@@ -1,17 +1,18 @@
 # skills
 
-My Claude skills + global agent rules. Sync across machines.
+My agent skills + global rules. Single source of truth, synced across every coding harness.
+
+## Install
+
+```sh
+./install.sh
+```
+
+Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode) and `AGENTS.md` into each harness's global-rules path. Idempotent — re-run after adding a skill or on a new machine.
 
 ## Rules
 
-`AGENTS.md` — one source of truth for global agent rules. Symlink it into each harness:
-
-```sh
-for dest in ~/.agents/AGENTS.md ~/.codex/AGENTS.md ~/.claude/CLAUDE.md ~/.config/opencode/AGENTS.md ~/.grok/AGENTS.md; do
-  mkdir -p "$(dirname "$dest")"
-  ln -sfn "$PWD/AGENTS.md" "$dest"
-done
-```
+`AGENTS.md` — global agent rules. `install.sh` links it into `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.config/opencode/AGENTS.md`, `~/.grok/AGENTS.md`.
 
 ## Skills
 
@@ -25,14 +26,3 @@ done
 - **Integrations** — `sentry-cli`, `stripe-best-practices`, `stripe-projects`
 - **Output & comms** — `caveman`, `caveman-commit`, `no-ai-slop`, `handoff`
 - **Meta** — `create-skill`, `writing-great-skills`, `plan-retire`, `flow`
-
-## Install
-
-Symlink each skill into every harness's skill dir (Claude Code, Codex, Cursor, Grok, OpenCode):
-
-```sh
-for d in ~/.claude/skills ~/.codex/skills ~/.cursor/skills ~/.grok/skills ~/.config/opencode/skills; do
-  mkdir -p "$d"
-  for s in */; do ln -sfn "$PWD/${s%/}" "$d/${s%/}"; done
-done
-```
