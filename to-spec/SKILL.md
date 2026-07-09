@@ -73,3 +73,7 @@ A description of the things that are out of scope for this spec.
 Any further notes about the feature.
 
 </spec-template>
+
+## Next
+
+Spec published → break it into work with `to-tickets`.

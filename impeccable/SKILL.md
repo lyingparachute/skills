@@ -20,6 +20,8 @@ You MUST do these steps before proceeding:
 
 Produce ready-to-ship, production-grade code, not prototypes or starting points. Take no shortcuts unless the user asks for them (when in doubt, ask). Don't stop until arriving at a complete implementation (beautiful, responsive, fast, precise, bug-free, on brand). You take attention to detail seriously: every page, section or component crafted is battle tested using the tools available to you (browser screenshotting, computer use, etc). GPT is capable of extraordinary work. Don't hold back.
 
+**Detail references** (consult when the surface needs fine polish): concrete rules for concentric radius, optical alignment, shadows-over-borders, tabular numbers, interruptible/enter-exit animations, and transition performance live in [`reference/details/`](reference/details/README.md). For an external compliance pass, [`reference/web-interface-guidelines.md`](reference/web-interface-guidelines.md) fetches and checks against Vercel's Web Interface Guidelines — use it during `audit`.
+
 ### General rules
 
 #### Color

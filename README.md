@@ -15,10 +15,16 @@ done
 
 ## Skills
 
-- `code-review/` — review code
-- `exec-plan/` — author execution plans
-- `plan-retire/` — retire landed plans, keep durable decisions
-- `implement/` — build from spec or tickets
+`/flow` is the router — the map of every skill and the chains they form. Start there.
+
+- **Align & plan** — `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `to-spec`, `to-tickets`, `wayfinder`
+- **Build** — `implement`, `tdd`, `prototype`, `diagnosing-bugs`
+- **Design quality** — `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable` (owns FE detail refs + Web Interface Guidelines), `shadcn-ui`
+- **Verify** — `code-review`, `check-work`
+- **Knowledge** — `research`, `graphify`, `nlm-skill`
+- **Integrations** — `sentry-cli`, `stripe-best-practices`, `stripe-projects`
+- **Output & comms** — `caveman`, `caveman-commit`, `no-ai-slop`, `handoff`
+- **Meta** — `create-skill`, `writing-great-skills`, `plan-retire`, `flow`
 
 ## Install
 
