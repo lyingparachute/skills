@@ -1,6 +1,17 @@
 # skills
 
-My Claude skills. Sync across machines.
+My Claude skills + global agent rules. Sync across machines.
+
+## Rules
+
+`AGENTS.md` — one source of truth for global agent rules. Symlink it into each harness:
+
+```sh
+for dest in ~/.agents/AGENTS.md ~/.codex/AGENTS.md ~/.claude/CLAUDE.md; do
+  mkdir -p "$(dirname "$dest")"
+  ln -sfn "$PWD/AGENTS.md" "$dest"
+done
+```
 
 ## Skills
 
