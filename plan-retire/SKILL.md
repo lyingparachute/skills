@@ -10,7 +10,7 @@ Landed plans are NOT memory archives. Retire them: keep anything durable, delete
 ## Checklist (per landed plan)
 
 1. **Confirm landed.** Feature merged to `main` — verify by file content on main, not branch commit count (squash-merge repos show "N commits ahead" for already-landed work).
-2. **Capture durable decisions — only if the plan produced any.** When it did, prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
+2. **Capture durable decisions — only if the plan produced any.** Source them from the plan's `Decision Log` and `Outcomes & Retrospective` sections (the exec-plan skill mandates both). When it did, prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
 3. **Capture reusable non-decision findings** (operational context, discoveries) the same way — update where the project already keeps them, create only if needed, skip if there's nothing worth keeping.
 4. **Delete the plan file.** Keep blocked/deferred follow-up plans only while actionable; a deferred plan whose premise a later change invalidated gets deleted too (verify premise vs committed code first).
 5. **Update the plans index** if it references the deleted plan.
