@@ -22,7 +22,7 @@ A plan is a brief for a senior dev with zero background. Required sections:
 - **Locked decisions** — module boundaries, patterns, public API shape, data model, dependency direction, security sources. All architecture locks HERE; the implementer gets tactics only (naming, control flow, test layout)
 - **Alternatives considered** — and why rejected
 - **Invariants / risks / open questions**
-- **Milestones** — one concern, one verifiable outcome each; no code, no pseudo-code, no step-by-step
+- **Milestones** — vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step
 - **DoD** — binary checkboxes, each with an exact verification command + expected output
 
 Rules:
@@ -31,6 +31,7 @@ Rules:
 - Every cited `file:line` verified against current repo state at write time AND again at execution time.
 - Vague AC ("should work correctly") is not an AC.
 - Acceptance greps: use `git grep -P`, not `-E "\b"` (silently matches nothing here).
+- **Wide refactors break vertical slicing.** A mechanical change with cross-codebase blast radius (rename a column, retype a shared symbol) can't land green as one tracer bullet. Sequence expand–contract: first a milestone that adds the new form beside the old (nothing breaks); then migrate call sites in batches sized to the blast radius (per package/dir), each its own milestone, CI green throughout because the old form stays; finally a contract milestone that removes the old form once no caller remains.
 
 ## Critic Gate (mandatory: min 1, max 2 rounds)
 
