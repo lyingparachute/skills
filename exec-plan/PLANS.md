@@ -82,6 +82,10 @@ Prefer additive code changes followed by subtractions that keep tests passing. P
 
     Explain in a few sentences what someone gains after this change and how they can see it working. State the user-visible behavior you will enable.
 
+    ## User Stories
+
+    An exhaustive numbered list of `As an <actor>, I want <capability>, so that <benefit>`. This is the scope-completeness check — a capability with no story is out of scope until one exists. For internal or refactor work with no external actor, say so and skip this section.
+
     ## Progress
 
     Use a list with checkboxes to summarize granular steps. Every stopping point must be documented here, even if it requires splitting a partially completed task into two (“done” vs. “remaining”). This section must always reflect the actual current state of the work.
