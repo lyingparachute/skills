@@ -1,15 +1,15 @@
 ---
 name: plan-retire
-description: Use after a plan's feature lands (merged) — or when the plans dir accumulates stale entries — to preserve durable decisions and delete the plan per retention policy.
+description: Use when a plan is done with — feature merged, abandoned, superseded, or invalidated — or when the plans dir accumulates stale entries, to preserve durable decisions and delete the plan per retention policy.
 ---
 
 # Plan Retire
 
-Landed plans are NOT memory archives. Retire them: keep anything durable, delete the rest. The common case is that nothing durable came out of the plan — then you write nothing and go straight to deleting it. Writing a doc is the exception, not a required step.
+Done-with plans are NOT memory archives. Retire them: keep anything durable, delete the rest. The common case is that nothing durable came out of the plan — then you write nothing and go straight to deleting it. Writing a doc is the exception, not a required step.
 
-## Checklist (per landed plan)
+## Checklist (per plan)
 
-1. **Confirm landed.** Feature merged to `main` — verify by file content on main, not branch commit count (squash-merge repos show "N commits ahead" for already-landed work).
+1. **Confirm it's retirable.** A plan retires when it's done with — most often the feature merged to `main` (verify by file content on main, not branch commit count; squash-merge repos show "N commits ahead" for already-landed work), but also when abandoned, superseded, or its premise was invalidated by a later change. Merge is the common case, not a precondition — the user can retire an unmerged plan and that's fine.
 2. **Capture durable decisions — only if the plan produced any.** Source them from the plan's `Decision Log` and `Outcomes & Retrospective` sections (the exec-plan skill mandates both). When it did, prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
 3. **Capture reusable non-decision findings** (operational context, discoveries) the same way — update where the project already keeps them, create only if needed, skip if there's nothing worth keeping.
 4. **Delete the plan file.** Keep blocked/deferred follow-up plans only while actionable; a deferred plan whose premise a later change invalidated gets deleted too (verify premise vs committed code first).
