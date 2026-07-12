@@ -23,6 +23,7 @@ A plan is a brief for a senior dev with zero background. Required sections:
 - **Alternatives considered** — and why rejected
 - **Invariants / risks / open questions**
 - **Milestones** — vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step
+- **Progress** — mandatory checkbox list (`- [ ]` / `- [x] (timestamp)`) tracking granular work. This is the tracker: the assistant ticks boxes as it goes, splits a half-done item into "done / remaining" at every stopping point, and the plan file stays the single source of truth. No external issue tracker
 - **DoD** — binary checkboxes, each with an exact verification command + expected output
 
 Rules:
@@ -46,7 +47,7 @@ Why min 1 fresh round: single self-review has approved BLOCKERs (a DoD "last dup
 
 - Plan = contract during execution: Scope/Non-goals/DoD literal, no drift. Hit a dependency on another plan → STOP and report.
 - A plan's "deferred / do NOT remove X" premise can be invalidated by a later-landed dependency — verify the premise against committed code before enforcing it.
-- Plan is a living document: update Status and decisions as they change; it is the cross-session source of truth.
+- Plan is a living document: update Status, tick Progress boxes as work lands, and record decisions as they change; it is the cross-session source of truth and the only tracker.
 - On completion: `Status: landed — <sha>`, tick DoD boxes. Then invoke `plan-retire`.
 
 ## Red Flags
