@@ -11,7 +11,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 ## Chains
 
 **Ship a feature**
-`grill-with-docs` [user] → `exec-plan` [model] or `to-spec` [user] → `to-tickets` [user] → `implement` [user] (drives `tdd`, `code-review`) → `check-work` [model] → `caveman-commit` [model] → `plan-retire` [model]
+`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `code-review`) → `check-work` [model] → `caveman-commit` [model] → `plan-retire` [model]
 
 **Execute a hard plan (heavy / high-token)**
 `orchestrate` [user] — fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
@@ -41,7 +41,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 
 | Purpose | Skills |
 | --- | --- |
-| Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `to-spec`, `to-tickets`, `wayfinder` |
+| Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
 | Build | `implement`, `orchestrate`, `tdd`, `prototype`, `diagnosing-bugs` |
 | Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
 | Verify | `code-review`, `check-work` |
