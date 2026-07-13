@@ -42,7 +42,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 | Purpose | Skills |
 | --- | --- |
 | Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
-| Build | `implement`, `orchestrate`, `tdd`, `prototype`, `diagnosing-bugs` |
+| Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
 | Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
 | Verify | `code-review`, `check-work` |
 | Knowledge | `research`, `graphify`, `nlm-skill` |
