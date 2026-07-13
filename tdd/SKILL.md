@@ -13,7 +13,19 @@ When exploring the codebase, read `CONTEXT.md` (if it exists) so test names and 
 
 Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists — and survives refactors because it doesn't care about internal structure.
 
+A good test also **fails when the behavior breaks**. Gut the implementation under test — if the test still passes, it proves nothing. Delete it. That's the tell for a flaky, useless test: maintenance cost, no signal.
+
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+
+## What deserves a test
+
+Not every piece of code needs a test. Test where behavior can break: branches, loops, calculations, validation, state transitions, money/auth/security paths — anything a user story asserts.
+
+Skip logic-free code: trivial CRUD passthroughs, getters/setters, DTO/field mapping, config, framework glue. No logic means nothing can break, so the test only adds maintenance. YAGNI applies to tests too.
+
+## Cover every case in the story, not every line
+
+Drive test cases from the user story's paths, not a line-coverage target. Per seam, cover the happy path plus each meaningful branch — error, empty, boundary, rejected input. One test per case, named for the case it proves (`checkout rejects an empty cart`). Coverage = every case in the story has a test that fails when that case regresses — not every line executed.
 
 ## Seams — where tests go
 
