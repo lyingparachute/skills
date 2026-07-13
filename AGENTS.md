@@ -3,6 +3,12 @@
 - **Global vs project rules.** This file = system-wide only. Project-specific rules live in the repo-level agent rules file and override conflicts here. Domain context (APIs, schemas, frameworks, conventions, build commands) belongs in the repo file, not here.
 - **Same correction 2x = rule gap, not slip.** First correction → fix + memory entry. Second correction same topic → stop and ask the user: promote to a skill, or add a rule to this file (or repo rules file, whichever scopes best)? Memory alone no fix the gap; rule must move into a skill or rules file.
 
+# Skills
+
+- **Skills live in one repo, symlinked everywhere.** The `skills` repo is the single source of truth; `install.sh` symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode). Never edit, rename, or delete a skill in a harness's own skill dir — that edits a symlink target and desyncs the rest. Edit the file in the `skills` repo.
+- **Writing or editing a skill → follow `writing-great-skills`.** Any new skill or change to an existing one obeys that skill's rules (predictability, invocation choice, information hierarchy, pruning, leading words). No exceptions.
+- **After add/rename/remove → re-run `install.sh`.** Adding, renaming, or removing a skill changes the symlink set; re-run `install.sh` to relink and prune stale links so every harness stays validated.
+
 # Communication Style
 
 **Decision order — first match wins:**
@@ -155,3 +161,46 @@ Rules below codify subagent dispatch and review discipline.
 ## Top Agent Discipline
 
 - **Top agent inherits all rules above.** Every general rule applies: `Verify before acting` (Code Quality) covers subagent claims; `Critic = fresh context, never the writer` covers self-approval; `Implementation = one slice per subagent` covers decomposition before dispatch; `Plan = self-contained brief...` covers subagent prompt shape (outcome + acceptance criteria, no pseudo-code, no step-by-step).
+
+<!-- headroom:rtk-instructions -->
+# RTK (Rust Token Killer) - Token-Optimized Commands
+
+When running shell commands, **always prefix with `rtk`**. This reduces context
+usage by 60-90% with zero behavior change. If rtk has no filter for a command,
+it passes through unchanged — so it is always safe to use.
+
+## Key Commands
+```bash
+# Git (59-80% savings)
+rtk git status          rtk git diff            rtk git log
+
+# Files & Search (60-75% savings)
+rtk ls <path>           rtk read <file>         rtk grep <pattern>
+rtk find <pattern>      rtk diff <file>
+
+# Test (90-99% savings) — shows failures only
+rtk pytest tests/       rtk cargo test          rtk test <cmd>
+
+# Build & Lint (80-90% savings) — shows errors only
+rtk tsc                 rtk lint                rtk cargo build
+rtk prettier --check    rtk mypy                rtk ruff check
+
+# Analysis (70-90% savings)
+rtk err <cmd>           rtk log <file>          rtk json <file>
+rtk summary <cmd>       rtk deps                rtk env
+
+# GitHub (26-87% savings)
+rtk gh pr view <n>      rtk gh run list         rtk gh issue list
+
+# Infrastructure (85% savings)
+rtk docker ps           rtk kubectl get         rtk docker logs <c>
+
+# Package managers (70-90% savings)
+rtk pip list            rtk pnpm install        rtk npm run <script>
+```
+
+## Rules
+- In command chains, prefix each segment: `rtk git add . && rtk git commit -m "msg"`
+- For debugging, use raw command without rtk prefix
+- `rtk proxy <cmd>` runs command without filtering but tracks usage
+<!-- /headroom:rtk-instructions -->
