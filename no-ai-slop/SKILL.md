@@ -1,6 +1,6 @@
 ---
 name: no-ai-slop
-description: Use when drafting, editing, tightening, or reviewing text bound for Jira, Confluence, or Bitbucket (issue descriptions and comments, Confluence pages and design/architecture/sign-off docs, PR descriptions and PR/page comments), and before calling any Atlassian or Bitbucket MCP write tool. Produces concise, high-value, human-sounding content and strips AI-slop, pitching detail at the reader's altitude. Trigger it on phrasings like "write/clean up a ticket", "update the Confluence page", "make a design doc for sign-off", "draft/write the PR description", "open a PR", "comment on the PR", "post this to Jira", "create the ticket", "push the page to Confluence", "add a comment to CS-1234", or "make this sound less like AI / less generated", even when quality or this skill is never mentioned. Does NOT apply to in-repo files (README, ADR/Markdown under docs/, code comments), Slack/email/chat, or commit messages (use caveman-commit), unless that content is being published into Jira, Confluence, or Bitbucket.
+description: Use when drafting, editing, tightening, or reviewing prose written for another person on a shared system — issues and tickets, wiki and design/sign-off docs, pull-request descriptions, review comments. Produces concise, high-value, human-sounding content and strips AI-slop, pitching detail at the reader's altitude. Trigger it on phrasings like "write/clean up this ticket", "make a design doc for sign-off", "draft the PR description", "write up this page", "comment on the PR", or "make this sound less like AI / less generated", even when quality or this skill is never mentioned. Does NOT apply to in-repo files (README, ADR/Markdown under docs/, code comments), casual chat (Slack/email), or commit messages (use caveman-commit).
 ---
 
 # No AI Slop
@@ -27,7 +27,7 @@ These are the patterns that read as machine-generated. Cut them on sight, and un
 - **Bold-term spam.** Every bullet opening with a **bolded lead-in**. When everything is emphasized, nothing is. Let the prose carry it.
 - **Hedging and filler.** "robust", "seamless", "leverage", "simply", "in order to", "it's worth noting", "as we can see". They add length and subtract confidence. State the thing plainly.
 - **Defensive meta-commentary.** Narrating the document's own scope ("this page stays at the architecture level on purpose…") reads as apologetic and draws attention to the failure you're trying to avoid. A confident author just writes at the right level.
-- **Em-dash (`—`) is banned.** Never use the em-dash character in published content. It is the single clearest tell of machine-generated text. Where you would reach for one, use a short hyphen (`-`) with spaces around it, or rewrite as two sentences, a comma, or a colon. This is a hard rule, not a preference: no `—` reaches Jira, Confluence, or Bitbucket.
+- **Em-dash (`—`) is banned.** Never use the em-dash character in published content. It is the single clearest tell of machine-generated text. Where you would reach for one, use a short hyphen (`-`) with spaces around it, or rewrite as two sentences, a comma, or a colon. This is a hard rule, not a preference: no `—` reaches the published text.
 - **Over-structuring.** Sixteen headed sections where five would do. Structure should follow the content's real shape, not impose a template.
 - **A conclusion that restates the intro.** End when the point is made.
 
@@ -35,10 +35,10 @@ These are the patterns that read as machine-generated. Cut them on sight, and un
 
 This is what an architect means by "AI slop" most often: correct content at the wrong level of detail. Match the surface:
 
-- **Confluence design / architecture sign-off docs.** State the *problem*, the *proposal*, the *decision being requested*, and the *open questions*, clearly enough to stand on their own. Describe the contract and the seam, not the implementation. Keep out class/type lists, package and module layouts, library/SDK choices, and ticket-dependency bookkeeping; those live in the implementation tickets, not here. (Exception: when a specific library or version *is* the decision being signed off, name it.) If a reader would ask "why this approach?", the doc should answer without them digging.
-- **Jira issues.** State the **contract**: the wire/auth/error shape, scope (in and out), and binary acceptance criteria. Do not prescribe `file:line` implementation, control flow, or helper names. The implementer owns tactics. Give them the *what* and *why*, not a step-by-step of *how*.
+- **Design / architecture sign-off docs.** State the *problem*, the *proposal*, the *decision being requested*, and the *open questions*, clearly enough to stand on their own. Describe the contract and the seam, not the implementation. Keep out class/type lists, package and module layouts, library/SDK choices, and ticket-dependency bookkeeping; those live in the implementation tickets, not here. (Exception: when a specific library or version *is* the decision being signed off, name it.) If a reader would ask "why this approach?", the doc should answer without them digging.
+- **Issues / tickets.** State the **contract**: the wire/auth/error shape, scope (in and out), and binary acceptance criteria. Do not prescribe `file:line` implementation, control flow, or helper names. The implementer owns tactics. Give them the *what* and *why*, not a step-by-step of *how*.
 - **PR descriptions.** What changed and why, at the level a reviewer needs to evaluate it. Link the ticket; don't restate it. Skip the play-by-play of how you got there.
-- **PR / page comments.** Actionable asks only. Strip praise and "looks clean / nice work" framing; it's noise in a review thread. The full assessment belongs in the conversation with the user, not posted, unless they ask you to post it.
+- **Review comments.** Actionable asks only. Strip praise and "looks clean / nice work" framing; it's noise in a review thread. The full assessment belongs in the conversation with the user, not posted, unless they ask you to post it.
 
 ## Facts must be real
 
@@ -49,7 +49,7 @@ Slop is also confidently-wrong detail. Don't invent API names, limits, or number
 These keep you from doing the wrong thing in the right voice:
 
 - **Don't post without an explicit ask.** "Review this PR" or "look at this ticket" means deliver findings *in the conversation*. Posting a comment, description, or page to a shared system is publishing. Confirm first unless the user clearly asked you to post.
-- **Jira and Confluence content is written in English**, even when the conversation is in another language. (Drafts you show the user for approval can be in the conversation's language; the published artifact is English.)
+- **Published content is written in English**, even when the conversation is in another language. (Drafts you show the user for approval can be in the conversation's language; the published artifact is English.)
 - **Write in the first person and own it.** It's the user's proposal, not a neutral report and not a letter addressed to the reviewer. "I propose…", "the open decision is…", not "you need to decide" or "the AI suggests".
 
 ## Before publishing: the checklist
