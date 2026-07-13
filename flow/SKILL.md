@@ -44,7 +44,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 | Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
 | Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
 | Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
-| Verify | `code-review`, `check-work` |
+| Verify | `code-review`, `receiving-code-review`, `check-work` |
 | Knowledge | `research`, `graphify`, `nlm-skill` |
 | Integrations | `sentry-cli`, `stripe-best-practices`, `stripe-projects` |
 | Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `handoff` |
