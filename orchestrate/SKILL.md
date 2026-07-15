@@ -32,10 +32,11 @@ Scan the plan once before milestone 1 for internal contradictions and for anythi
 2. **Brief:** `scripts/task-brief PLAN_FILE N` → writes the milestone's full text to a file, prints the path.
 3. **Dispatch implementer** (fresh subagent, model set explicitly). Dispatch carries: one line on where the milestone fits; the brief path ("read first — your requirements, exact values verbatim"); interfaces/decisions from earlier milestones the brief can't know; your resolution of any ambiguity; the report-file path. The implementer drives `tdd` (red-green-refactor) and `diagnosing-bugs` when something breaks. Never paste prior-milestone history.
 4. **Package the diff:** `scripts/review-package BASE HEAD` → prints a file with commit list + stat + `git diff -U10`. **Use the recorded BASE, never `HEAD~1`** — `HEAD~1` silently drops all but the last commit of a multi-commit milestone.
-5. **Dispatch one critic** — the `code-review` skill (code-judo: Standards axis = clean-code/enterprise quality, Spec axis = plan compliance, in one pass). Give it the brief, report, and review-package paths plus the plan's binding constraints copied verbatim.
-6. **Fix every finding** — including nice-to-haves — via one fix subagent with the complete list (not one fixer per finding). Fixer re-runs covering tests, reports command + output. Re-review. Loop until the critic is clean, **max 3 rounds**; leftovers after round 3 → record in the plan and report, don't loop forever.
-7. **Commit** the milestone with `caveman-commit` (one commit per milestone).
-8. **Update the plan:** tick the milestone's checkbox, write its progress; append a ledger line.
+5. **Dispatch one critic** — tell it explicitly to run the `/code-review` skill and to return **code-judo moves** (concrete rewrite suggestions, not just complaints) on both axes: Standards = clean-code/enterprise quality, Spec = plan compliance, in one pass. Give it the brief, report, and review-package paths plus the plan's binding constraints copied verbatim.
+6. **Triage the findings yourself** via the `/receiving-code-review` skill — every finding is a hypothesis, not an order. Confirm each against the code before it reaches the fixer; drop or reframe the wrong ones with a reason. Judge from your own context when you can; only dispatch an explorer subagent when a finding genuinely needs code you haven't read; don't summon one for calls you can make yourself.
+7. **Fix every surviving finding** — blockers, majors, **and every nice-to-have/code-judo move** — via one fix subagent with the complete list (not one fixer per finding). Nice-to-haves are not optional: fix them or record an explicit dismissal with reason. Fixer re-runs covering tests, reports command + output. Re-review. Loop until the critic is clean, **max 3 rounds**; leftovers after round 3 → record in the plan and report, don't loop forever.
+8. **Commit** the milestone with `caveman-commit` (one commit per milestone).
+9. **Update the plan:** tick the milestone's checkbox, write its progress; append a ledger line.
 
 ## File handoffs
 
@@ -64,7 +65,7 @@ Least powerful model that can do the role; **always specify it explicitly** (an 
 
 ## Close-out
 
-1. Whole-branch `code-review` on the most capable model: `scripts/review-package $(git merge-base main HEAD) HEAD`. Fix every finding (even nice-to-haves) via one fix subagent with the full list.
+1. Whole-branch `code-review` on the most capable model: `scripts/review-package $(git merge-base main HEAD) HEAD`. Triage the findings via `/receiving-code-review` (self-judge; explorer subagent only when a finding needs unread code), then fix every survivor (even nice-to-haves) via one fix subagent with the full list.
 2. Set the plan's `Status:` line to `landed — <short sha>`; tick all remaining checkboxes.
 3. `plan-retire` — extract durable decisions, delete the rest.
 4. Commit plan progress and update the plans index if there is one.
