@@ -11,7 +11,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 ## Chains
 
 **Ship a feature**
-`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `code-review`) → `check-work` [model] → `caveman-commit` [model] → `plan-retire` [model]
+`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `check-work` [model] → `caveman-commit` [model] → `plan-retire` [model]
 
 **Execute a hard plan (heavy / high-token)**
 `orchestrate` [user] — fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
@@ -20,7 +20,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 `wayfinder` [user] → per investigation ticket: `grill-with-docs` → `implement` …
 
 **Fix a bug**
-`diagnosing-bugs` [model] (drives `tdd` for the regression test) → `code-review` [model] → `check-work` [model]
+`diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model] → `check-work` [model]
 
 **Design / build frontend**
 `impeccable` [model] (drives `shadcn-ui` for components; owns the detail refs + Web Interface Guidelines audit)
