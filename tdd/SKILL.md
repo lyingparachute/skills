@@ -13,15 +13,15 @@ When exploring the codebase, read `CONTEXT.md` (if it exists) so test names and 
 
 Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists — and survives refactors because it doesn't care about internal structure.
 
-A good test also **fails when the behavior breaks**. Gut the implementation under test — if the test still passes, it proves nothing. Delete it. That's the tell for a flaky, useless test: maintenance cost, no signal.
+A good test is **falsifiable**: you can name the exact change to the implementation that would turn it red. Before accepting green, say it out loud: "this test fails if the code does X instead." Can't name that change? The test passes by construction. It's aimed at the wrong code, or it restates what it tests, so it proves nothing and only costs maintenance. Delete it.
 
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
 
 ## What deserves a test
 
-Not every piece of code needs a test. Test where behavior can break: branches, loops, calculations, validation, state transitions, money/auth/security paths — anything a user story asserts.
+Before writing a test, name the branch, calculation, validation, or state transition it protects. Can name one? Test it. Can't? The unit is logic-free and the test only adds maintenance, so skip it. Behavior breaks at branches, loops, calculations, validation, state transitions, and money/auth/security paths; that's where tests earn their keep.
 
-Skip logic-free code: trivial CRUD passthroughs, getters/setters, DTO/field mapping, config, framework glue. No logic means nothing can break, so the test only adds maintenance. YAGNI applies to tests too.
+Logic-free code (trivial CRUD passthroughs, getters/setters, DTO/field mapping, config, framework glue) has nothing that can break, so a test over it is pure cost. YAGNI applies to tests too.
 
 ## Cover every case in the story, not every line
 

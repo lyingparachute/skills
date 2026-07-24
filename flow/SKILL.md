@@ -35,7 +35,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 `create-skill` [model] (drives `writing-great-skills`)
 
 **Hand off / step back**
-`zoom-out` [user] (see the big picture) · `handoff` [user] (compact for the next agent)
+`zoom-out` [model] (see the big picture) · `handoff` [user] (compact for the next agent)
 
 ## Catalog by purpose
 

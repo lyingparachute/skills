@@ -36,7 +36,11 @@ Rules:
 
 ## Critic Gate (mandatory: min 1, max 2 rounds)
 
-1. Dispatch a skeptical fresh-context plan-critic (never the writer). Brief: **attack, don't validate** — verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps. Typed findings only: `{location, issue, severity, suggested fix}`.
+1. Dispatch a skeptical fresh-context plan-critic (never the writer). Brief: **attack, don't validate**, across two passes.
+   - **Rigor pass:** verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps.
+   - **Architecture pass:** first zoom out (/zoom-out) to map the planned change against existing modules, callers, and domain concepts, then apply the code-judo lens (/judo-review) to the plan's Locked decisions and boundaries. Hunt the design-judo move to make before code exists: a layer or abstraction the plan invents that could be deleted, a concern the plan puts in the wrong module, bespoke logic duplicating a canonical domain concept, or a state model that will spawn conditionals. Prefer the design that feels inevitable in hindsight and holds the fewest concepts (deep-module vocabulary: /codebase-design).
+
+   Typed findings only: `{location, issue, severity, suggested fix}`.
 2. Fix findings. Dismissals require an explicit written reason.
 3. Round 1 had BLOCKER/MAJOR findings → dispatch a SECOND fresh critic to verify the fixes. Round 1 clean → done after one round.
 4. **Hard cap: 2 rounds.** Findings still open after round 2 → list them in the plan's Status/notes for the owner and stop; no endless review loops. Set `Status: ready` when open BLOCKER/MAJOR = zero OR the leftovers are explicitly owner-dismissed.
