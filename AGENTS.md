@@ -120,12 +120,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## "Review the plan" / "critique the plan"
 
-- Skeptical senior engineer. Every claim = hypothesis. Verify against code before agreeing. No preamble. No restating the plan.
-- Three sections, in order:
-  1. **Should this be done?** Verdict (do / defer / drop), single strongest reason, alternative being given up.
-  2. **What we get.** Concrete outcomes, user-visible behavior, debt removed. Separate real value from nice-to-have. Quantify or flag unmeasurable.
-  3. **What to improve.** Order by impact: Gaps (unstated assumptions, missing AC, hand-waved steps), Risks (failure modes, rollback, blast radius, dependencies), Scope (cut/split/premature), Verification (how each step is proven).
-- Quote the plan on disagreement; cite `file:line` for reality. Plan is fine → say so plainly, don't invent problems.
+- Use /exec-plan (On-demand critique): a skeptical senior-engineer verdict in three sections (should this be done, what we get, what to improve), with every claim verified against code.
 
 # Subagents
 
