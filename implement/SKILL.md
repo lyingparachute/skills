@@ -8,6 +8,8 @@ Before writing any code, pre-flight the plan: is it **ready** as /exec-plan defi
 
 Once the plan is ready, implement the work it describes. Follow its Scope, Non-goals, and Definition of Done literally, with no drift. Every DoD bullet is a binary check the implementation must satisfy before you call it done.
 
+Keep the plan current as you go: it is the cross-session source of truth, so tick its Progress boxes and update `Status` as work lands. If you hit a dependency on another plan, STOP and report it; do not implement that other plan. A plan's "do NOT remove X" premise can be invalidated by a later-landed change, so verify such premises against committed code before enforcing them.
+
 Use /tdd where possible, at pre-agreed seams.
 
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
@@ -16,6 +18,6 @@ Once done, use /judo-review to review the work — it hunts the code-judo moves 
 
 The only findings you don't fix now are ones too big for this change. Never drop them: for each, author a new ExecPlan per PLANS.md (see /exec-plan), reviewed by a critic subagent at least once. A `followup-execplan` finding lands as a tracked plan, never as "clean up later".
 
-Commit your work to the current branch.
+Commit your work to the current branch, then set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
 
 When the work has landed and the review is clean, use /plan-retire to close out the plan — extract durable decisions, delete the rest.

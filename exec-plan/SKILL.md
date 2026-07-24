@@ -47,12 +47,19 @@ Rules:
 
 Why min 1 fresh round: single self-review has approved BLOCKERs (a DoD "last duplicate" completeness claim that grep-refuted with 9 hits). Why max 2: unbounded iterate-to-zero loops stall agents.
 
+## On-demand critique
+
+When the user asks to review or critique an existing plan (rather than author one), be a skeptical senior engineer: every claim is a hypothesis, verified against code before you agree. No preamble, no restating the plan. Three sections, in order:
+
+1. **Should this be done?** Verdict (do / defer / drop), the single strongest reason, and the alternative being given up.
+2. **What we get.** Concrete outcomes, user-visible behavior, debt removed. Separate real value from nice-to-have; quantify or flag as unmeasurable.
+3. **What to improve.** Ordered by impact: Gaps (unstated assumptions, missing AC, hand-waved steps), Risks (failure modes, rollback, blast radius, dependencies), Scope (cut/split/premature), Verification (how each step is proven).
+
+Quote the plan on disagreement; cite `file:line` for reality. If the plan is fine, say so plainly; don't invent problems.
+
 ## Execution & Lifecycle
 
-- Plan = contract during execution: Scope/Non-goals/DoD literal, no drift. Hit a dependency on another plan → STOP and report.
-- A plan's "deferred / do NOT remove X" premise can be invalidated by a later-landed dependency — verify the premise against committed code before enforcing it.
-- Plan is a living document: update Status, tick Progress boxes as work lands, and record decisions as they change; it is the cross-session source of truth and the only tracker.
-- On completion: `Status: landed — <sha>`, tick DoD boxes. Then invoke `plan-retire`.
+Once `Status: ready`, the baton passes out of this skill: /implement executes the plan as a contract and keeps its Status, Progress, and DoD current; /plan-retire closes it out. This skill's job ends at `ready`.
 
 ## Red Flags
 
