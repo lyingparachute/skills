@@ -1,42 +1,47 @@
 ---
 name: receiving-code-review
-description: Use when reacting to code-review feedback (a reviewer's comments, a PR review, inline thread replies, or a list of "fix these" items) before implementing any of it. Treats each comment as a hypothesis to verify against the codebase, not an order to obey. Trigger it when feedback arrives and you're about to act on it, especially if a comment seems unclear or technically questionable.
+description: Use when code-review feedback arrives and you are about to act on it: a reviewer's comments, a PR review, inline thread replies, a critic subagent's findings, or a plain "fix these" list. Also use when a comment reads as unclear or technically questionable.
 ---
 
 # Receiving Code Review
 
-A review comment is a **hypothesis**, not an order. Verify it against the code before you touch anything, and let the fix (not agreement) be your acknowledgment. Technical correctness over social comfort.
+A review comment is a **hypothesis**, not an order. Verify it against the code before you touch anything.
+
+The fix is the **receipt**. Acknowledge in diffs and verdicts, so every reply carries a `file:line`, a test result, or a technical counter-argument and nothing else. Technical correctness over social comfort.
 
 ## The loop
 
 1. **Read all of it first.** Take in every comment before reacting to any one. Later items reframe earlier ones.
-2. **Restate each item** in your own words. Can't restate it → you don't understand it → ask, don't guess.
+2. **Restate each item** in your own words. Can't restate it → you don't understand it → ask. Ask about *every* unclear item before implementing *any* item, since items are often related and a partial understanding produces a wrong fix; implementing the clear ones while questions hang is how the wrong fix ships.
 3. **Assess the problem it raises.** No comment is accepted bluntly; every one is critically assessed before you agree. Is the problem real for *this* code? Does following it break something working? Is there a reason the current code is the way it is? "Implement it properly" for an endpoint means grep for callers first; if unused, propose removing it (YAGNI) rather than building it out.
 4. **Assess the proposed fix separately.** A comment carries a problem *and* a suggested solution; agreeing the problem is real does not mean the suggestion is the best fix. Weigh it against alternatives: is there a simpler, more correct, or more robust option, or a way to improve on what was proposed? Implement the strongest solution, not the one that happened to be typed in the comment.
-5. **Respond per item** (see below).
-6. **Implement the verified items one at a time**, testing each: blocking issues (breakage, security) first, then trivial fixes (typos, imports), then complex ones. No batching untested changes.
+5. **Reconcile the set.** This is what reading everything first bought you. Findings pull opposite ways (extract this helper / delete this indirection), and honouring them in sequence churns the same lines twice to land somewhere worse than either would. Where two collide, design the one target shape that serves both intents and implement that; where one finding subsumes another, fix the parent and note the child as covered.
+6. **Assign a disposition** to each survivor (see below), then respond per item (see below).
+7. **Implement one item at a time**, in the order of step 6's dispositions. Each item gets the narrowest test, lint, or type check that covers it, run before you start the next one; that actual output is what licenses `Fixed:`. No batching untested changes.
+8. **Account for every finding.** Done means the list is closed, not that the easy items are done. Every finding the review raised reads back as exactly one of `fixed <file:line> + evidence`, `dismissed: <reason>`, `plan: <path>`, or `awaiting: <question>`, and the count going in equals the count coming out. A finding still carrying no disposition means the loop is running, not finished.
 
-## Clarify before you start
+## Disposition
 
-If *any* item is unclear, ask about those items before implementing *any* of them, since items are often related and a partial understanding produces a wrong fix. Don't implement the clear ones and defer the questions.
+`judo-review` tags every finding with a severity (`BLOCKER`, `MAJOR`, `MINOR`) and a disposition (`merge-blocking`, `followup-execplan`). Severity orders the work; the **value test** decides whether it lands. Feedback arriving without those tags (a human reviewer, a plain "fix these" list) gets them from you before you implement anything.
+
+**The value test:** does the change leave the code better, easier to maintain, or closer to enterprise-grade? Yes → implement it, whatever its label. A verified `MINOR` nitpick that passes is work you do, not work you defer: naming that reveals intent, a dead branch deleted, a type tightened, a duplicated literal named, a guard moved to the boundary. Severity describes blast radius, not worth, so "it's only a nit" is never the reason to leave code weaker than the review showed it could be. The one survivor you skip is the one that fails the test (churn with no gain), and skipping it is an explicit dismissal with a stated reason.
+
+- **`merge-blocking`** → fix in this change. Order within it: breakage and security first, then trivial fixes (typos, imports), then complex ones.
+- **`followup-execplan`** → the remedy is bigger than this change, so it is a plan, not a patch. Author a new ExecPlan per `/exec-plan`, critic-reviewed at least once, and point structural ones (shallow modules, tangled callers, a missing seam across files) at `improve-codebase-architecture`. A tracked plan, never "clean up later".
 
 ## Responding
 
-- **The problem is real** → apply the strongest fix (yours or theirs) and state it: `Fixed: <what changed> in <file:line>`. The changed code is the acknowledgment. If you improved on the suggested solution, say how and why.
+- **The problem is real** → apply the strongest fix (yours or theirs) and state it: `Fixed: <what changed> in <file:line>`, with the verifying command's output. If you improved on the suggested solution, say how and why.
 - **It's wrong** → push back with technical reasoning: cite the code, the tests, the build target, the compat constraint. Not defensiveness.
 - **You can't verify it** → say so and ask for direction: `Can't confirm this without <X>; investigate, ask, or proceed?`
 - **It conflicts with a decision the user already made** → stop and raise it with the user before implementing.
-
-No performative agreement. Skip "You're absolutely right", "Great point", "Let me implement now", and every form of thanks; they're noise that signals reflex over evaluation. About to type "Thanks"? Delete it, state the fix instead.
-
-## When you pushed back and were wrong
-
-State the correction as a fact and move on: `Verified: you're right, <X> does <Y>. Fixing.` No long apology, no defending why you pushed back.
+- **You pushed back and were wrong** → state the correction as a fact and move on: `Verified: you're right, <X> does <Y>. Fixing.`
 
 ## Trust by source
 
 - **From the user:** trusted; implement once understood. Still ask if scope is unclear.
-- **From an external reviewer:** skeptical; run the full verification above before acting. They may not have the whole context.
+- **From a critic subagent** (`judo-review`, a plan critic): high signal on structure, blind on context. Its fresh context cannot see decisions already settled in conversation, so what it reads as missing may be deliberate. Verify against the code and the governing plan before acting; its confidence is not evidence.
+- **From an external reviewer:** skeptical; run the full loop above before acting. They may not have the whole context.
 
 ## Posting a response
 
