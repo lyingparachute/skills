@@ -43,7 +43,7 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 Every review is two independent reviews, reported side by side.
 
 - **Standards**: does the change meet the bar? Sources are the repo's own rule files and the review passes below. Reviewing this axis, and only this axis, also read [`STANDARDS.md`](STANDARDS.md) for the smell and comment baseline.
-- **Spec**: does the change do what was asked? Sources, in order: a governing plan, then a ticket or issue, then the PR description, then issue refs in the commit messages. "No spec available" is a finding, not a skipped axis.
+- **Spec**: does the change do what was asked? Sources, in order: the current user's request, then a governing plan, then a ticket or issue, then the PR description, then issue refs in the commit messages. Report "No spec available" only when none of these sources states requirements; it is a finding, not a skipped axis.
 
 A diff can be clean code that builds the wrong thing, or the right feature built badly. Merging the two lists, or re-ranking one against the other, hides exactly that. Each axis keeps its own findings.
 

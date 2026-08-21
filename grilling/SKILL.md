@@ -14,15 +14,15 @@ Ask the whole frontier in one round, then wait for their answers before continui
 Format a round like this, with one horizontal rule between questions so a long round stays scannable:
 
 ```
-❓ **Q1** - **<question title>**: <question body, which may run several paragraphs and may offer choices>
+**Q1** - **<question title>**: <question body, which may run several paragraphs and may offer choices>
 
-➡️ <your recommended answer>
+Recommendation: <your recommended answer>
 
 ---
 
-❓ **Q2** - **<question title>**: <question body, which may run several paragraphs and may offer choices>
+**Q2** - **<question title>**: <question body, which may run several paragraphs and may offer choices>
 
-➡️ <your recommended answer>
+Recommendation: <your recommended answer>
 ```
 
 A question the user leaves unanswered is answered by your recommendation. Unanswered means their reply does not address that number, and does not restate or change your recommendation. A bare "yes" or "ok" is an answer, not silence.

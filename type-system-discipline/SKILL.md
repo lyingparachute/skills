@@ -1,6 +1,6 @@
 ---
 name: type-system-discipline
-description: Use when shaping or reviewing types in Java or TypeScript: modelling domain state, reaching for a boolean flag or an optional field, casting, parsing data from outside the process, switching over a union, or holding React state. Also use when a "should never happen" throw or a `!` shows up.
+description: 'Use when shaping or reviewing types in Java or TypeScript: modelling domain state, reaching for a boolean flag or an optional field, casting, parsing data from outside the process, switching over a union, or holding React state. Also use when a "should never happen" throw or a `!` shows up.'
 ---
 
 # Type System Discipline
@@ -47,7 +47,7 @@ In TypeScript the brand is reachable only through a parse function, and that fun
 
 Wire payloads, config, env vars, query results, and third-party responses are `unknown` until something checks them at the boundary. Parse there, into the domain type, and let the inside trust its own types.
 
-- TypeScript: one schema at the edge, with the type derived from it (`z.infer`) rather than a hand-rolled interface that drifts.
+- TypeScript: use the project's existing schema or parser at the edge. Derive the type from the schema when the library supports it. In a project that uses Zod, use `z.infer`. Otherwise, make the parser's checked return type authoritative.
 - Java: a DTO at the edge, mapped to the domain type. The wire type never reaches the core.
 
 ## Do not lie to the checker

@@ -39,21 +39,10 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 
 ## Catalog by purpose
 
-| Purpose | Skills |
-| --- | --- |
-| Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
-| Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
-| Design quality | `codebase-design`, `domain-modeling`, `type-system-discipline`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
-| Verify | `judo-review`, `receiving-code-review` |
-| Knowledge | `research`, `graphify`, `nlm-skill` |
-| Integrations | `sentry-cli`, `stripe-best-practices`, `stripe-projects` |
-| Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `wait-what`, `handoff` |
-| Meta | `writing-great-skills`, `plan-retire`, `flow` |
+`README.md` owns the category list. It is the same set of skills, so read it there rather than keeping a second copy in step.
 
 ## Rules of the graph
 
-- Post anything to Jira / Confluence / Bitbucket → run `no-ai-slop` first.
-- A landed `exec-plan` → `plan-retire` to keep durable decisions, delete the rest.
+Model-invoked skills fire from their descriptions. User-invoked skills, including `wait-what`, run only when typed. This file is the map.
+
 - Frontend detail work lives inside `impeccable` (see `impeccable/reference/details/`), not a separate skill.
-- Shaping a domain type, reaching for a boolean flag, a cast, or a parse at the boundary → `type-system-discipline`.
-- A reply landed wrong → `wait-what`.

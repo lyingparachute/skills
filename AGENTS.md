@@ -40,12 +40,11 @@
 - **No null returns.** Use typed absence — empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union — instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
 - **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → list with trade-off, ask which. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt. In a `grilling` round the recommendation stands in for silence, since the trade-off was surfaced with the question before any pick and the adoption is read back for confirmation.
-- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" — later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it.
+- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" — later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it. Done = plan met, tested, reviewed; "80% working" = 0% shipped.
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt — fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
 - **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values.
-- **No partial implementations.** Done = plan met, tested, reviewed. "80% working" = 0% shipped.
 - **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable — naked `.skip` = debt.
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
@@ -88,8 +87,7 @@
 
 ## Testing & Delivery
 
-- **Done = verified output, not assertion.** Before claiming complete/fixed/passing: run focused test, lint, type check. Green output = evidence. No green = no claim.
-- **Commit only on green.** Before every `git commit`: lint green, type check green, focused tests green — actual output, not assumption.
+- **Done = verified output, not assertion.** Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim.
 - **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
 - **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
@@ -100,8 +98,6 @@
 ## Types & Frontend
 
 - **Strict types everywhere.** No `any`, no type assertions without a comment explaining why. Discriminated unions over boolean flags for state.
-- **Generics need clear intent.** Type parameter needs comment to explain it → rename.
-- **Progressive enhancement.** Features work at lowest capability level first. Enrich from there.
 
 # Workflow Triggers
 
