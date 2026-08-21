@@ -34,9 +34,20 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
    - Check focused call sites or contracts only when a concrete risk requires it.
    - Do not trust summaries, test claims, or author rationale without evidence.
 
-4. **Apply the review passes below.**
+4. **Review on both axes**, keeping their findings apart.
    - Prioritize structural findings over local polish.
    - Prefer high-conviction blockers over long nit lists.
+
+## Two axes
+
+Every review is two independent reviews, reported side by side.
+
+- **Standards**: does the change meet the bar? Sources are the repo's own rule files and the review passes below. Reviewing this axis, and only this axis, also read [`STANDARDS.md`](STANDARDS.md) for the smell and comment baseline.
+- **Spec**: does the change do what was asked? Sources, in order: a governing plan, then a ticket or issue, then the PR description, then issue refs in the commit messages. "No spec available" is a finding, not a skipped axis.
+
+A diff can be clean code that builds the wrong thing, or the right feature built badly. Merging the two lists, or re-ranking one against the other, hides exactly that. Each axis keeps its own findings.
+
+Three ways this runs. As the top agent reviewing directly, dispatch one subagent per axis in parallel, each with its own scope and sources. As the top agent handing the whole review to one critic, that critic becomes the reviewer subagent and splits the axes itself, which is how `orchestrate` uses it. Already a reviewer subagent: run both axes yourself, in sequence, outputs still separate. A subagent never spawns.
 
 ## Baseline
 
@@ -48,17 +59,16 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 
 ## Review Passes
 
-Apply these passes in order:
+The Standards axis applies these passes in order. Requirement fit belongs to the Spec axis: compare the diff to what was asked and flag missing requirements, extra unrequested work, and misunderstood requirements.
 
-1. **Requirement fit**: when a task, plan, issue, or PR description exists, compare the diff to it. Flag missing requirements, extra unrequested work, and misunderstood requirements.
-2. **Correctness and regressions**: logic errors, missing edge cases, race conditions, broken error handling, test gaps, behavior that contradicts the request.
-3. **Structural simplification**: look for a code-judo move that deletes concepts, branches, helpers, modes, conditionals, layers, or state rather than polishing them. Prefer the structure that feels inevitable in hindsight.
-4. **Spaghetti growth**: flag ad-hoc conditionals, one-off booleans, nullable modes, scattered feature checks, repeated conditionals, and special cases bolted into unrelated flows.
-5. **Boundaries and types**: flag feature logic in shared paths, implementation details leaking through APIs, unnecessary `any` / `unknown` / casts / optionality, and silent fallback hiding unclear invariants.
-6. **Canonical ownership**: prefer existing utilities, helpers, packages, services, and domain concepts over bespoke near-duplicates or logic in the wrong layer.
-7. **Over-engineering**: hunt thin wrappers, identity abstractions, pass-through helpers, speculative flexibility, generic magic, unnecessary dependencies, and hand-rolled standard-library/native behavior.
-8. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious.
-9. **File size and decomposition**: if a change pushes a file from below 400 lines to above 400 lines, or from below 400 lines toward an 800-line sprawl, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
+1. **Correctness and regressions**: logic errors, missing edge cases, race conditions, broken error handling, test gaps, behavior that contradicts the request.
+2. **Structural simplification**: look for a code-judo move that deletes concepts, branches, helpers, modes, conditionals, layers, or state rather than polishing them. Prefer the structure that feels inevitable in hindsight.
+3. **Spaghetti growth**: flag ad-hoc conditionals, one-off booleans, nullable modes, scattered feature checks, repeated conditionals, and special cases bolted into unrelated flows.
+4. **Boundaries and types**: flag feature logic in shared paths, implementation details leaking through APIs, unnecessary `any` / `unknown` / casts / optionality, and silent fallback hiding unclear invariants.
+5. **Canonical ownership**: prefer existing utilities, helpers, packages, services, and domain concepts over bespoke near-duplicates or logic in the wrong layer.
+6. **Over-engineering**: hunt thin wrappers, identity abstractions, pass-through helpers, speculative flexibility, generic magic, unnecessary dependencies, and hand-rolled standard-library/native behavior.
+7. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious.
+8. **File size and decomposition**: if a change pushes a file from below 400 lines to above 400 lines, or from below 400 lines toward an 800-line sprawl, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
 
 ## Approval Bar
 
@@ -108,15 +118,7 @@ When the structural problem is bigger than this diff — shallow modules, tangle
 
 ## Output
 
-Lead with findings, ordered by severity and review priority:
-
-1. Requirement misses, extras, or misunderstandings
-2. Structural code-quality regressions
-3. Missed code-judo simplifications
-4. Spaghetti / branching complexity
-5. Boundary, abstraction, and type-contract problems
-6. File-size and decomposition concerns
-7. Correctness, security, test, and maintainability issues
+Two headed sections, `## Standards` then `## Spec`, each leading with its own findings ordered by severity. Within Standards, order by review priority: structural code-quality regressions, missed code-judo simplifications, spaghetti and branching complexity, boundary and type-contract problems, file size and decomposition, then correctness, security, test, and maintainability issues. Within Spec: requirement misses, extras, misunderstandings.
 
 For each finding include:
 
@@ -127,9 +129,9 @@ For each finding include:
 - Evidence: source, diff, rule, test output, or command result that proves the issue
 - Remedy: concrete shape of the fix, favoring simplification over rearrangement
 
-When a plan governs the change, include `PASS | FAIL | UNCLEAR — <Scope/DoD item> — <evidence>` for each relevant item.
+When a plan governs the change, the Spec section includes `PASS | FAIL | UNCLEAR - <Scope/DoD item> - <evidence>` for each relevant item.
 
-Include commands run with actual output, not assumptions. End with `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`; decide from `merge-blocking` findings only.
+Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis.
 
 Prefer a small number of high-conviction findings over a long nit list. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
 
