@@ -90,6 +90,9 @@
 
 - **Done = verified output, not assertion.** Before claiming complete/fixed/passing: run focused test, lint, type check. Green output = evidence. No green = no claim.
 - **Commit only on green.** Before every `git commit`: lint green, type check green, focused tests green — actual output, not assumption.
+- **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
+- **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
+- **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
 - **Test coverage is non-negotiable.** Every feature ships with tests. Untested code = unfinished code.
 - **Integration tests at boundaries over unit tests with mocks.** Test service in isolation against real/stubbed ports. Over-mocked unit tests = false confidence, break on refactors.
 - **Single focused tests over full-suite runs.** Narrowest test that covers the change. Full suite = CI's job.
@@ -121,6 +124,15 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - Also check: out-of-scope respected, no new compile errors or test regressions.
 - Findings → correction workflow: IMPLEMENT (one subagent per task) → VALIDATE (separate subagent per task) → REPORT.
 - Output: `PASS|FAIL|UNCLEAR: <bullet> — <evidence>`. Final verdict: `APPROVE | CHANGES REQUESTED | BLOCKED`.
+
+## "Check your work" / "verify changes" / "self-verify"
+
+- For plan-based work use the trigger above. This one covers sessions with no plan: an ad-hoc fix, an operational task, a question answered.
+- Dispatch a fresh verifier subagent. The agent that did the work never verifies it.
+- Verifier restates every ask as a checklist, including the non-code ones (operational, research, Q&A), then accounts for each with evidence it gathered itself, not from the transcript's claims.
+- Operational claims get probed against the live system: curl the endpoint, invoke the CLI, query the API, check the job status. Reading the code that would do it is not evidence.
+- Output: `PASS` or `FAIL`. On FAIL, the exact error output and what must change, with `file:line` where it is code.
+- FAIL → fix, then re-verify. Max 2 rounds, then report what is left standing.
 
 ## "Review the plan" / "critique the plan"
 

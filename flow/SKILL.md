@@ -11,7 +11,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 ## Chains
 
 **Ship a feature**
-`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `check-work` [model] → `caveman-commit` [model] → `plan-retire` [model]
+`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `caveman-commit` [model] → `plan-retire` [model]
 
 **Execute a hard plan (heavy / high-token)**
 `orchestrate` [user] — fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
@@ -20,7 +20,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 `wayfinder` [user] → per investigation ticket: `grill-with-docs` → `implement` …
 
 **Fix a bug**
-`diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model] → `check-work` [model]
+`diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]
 
 **Design / build frontend**
 `impeccable` [model] (drives `shadcn-ui` for components; owns the detail refs + Web Interface Guidelines audit)
@@ -32,7 +32,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 `research` [model] (web primary sources) · `nlm-skill` [model] (NotebookLM) · `graphify` [model] (this codebase)
 
 **Author a new skill**
-`create-skill` [model] (Grok skills) · `writing-great-skills` [user] (the bar every skill here meets)
+`writing-great-skills` [user] (the bar every skill here meets)
 
 **Hand off / step back**
 `zoom-out` [model] (see the big picture) · `handoff` [user] (compact for the next agent)
@@ -44,11 +44,11 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 | Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
 | Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
 | Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
-| Verify | `judo-review`, `receiving-code-review`, `check-work` |
+| Verify | `judo-review`, `receiving-code-review` |
 | Knowledge | `research`, `graphify`, `nlm-skill` |
 | Integrations | `sentry-cli`, `stripe-best-practices`, `stripe-projects` |
 | Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `handoff` |
-| Meta | `create-skill`, `writing-great-skills`, `plan-retire`, `flow` |
+| Meta | `writing-great-skills`, `plan-retire`, `flow` |
 
 ## Rules of the graph
 
