@@ -32,7 +32,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 `research` [model] (web primary sources) · `nlm-skill` [model] (NotebookLM) · `graphify` [model] (this codebase)
 
 **Author a new skill**
-`create-skill` [model] (drives `writing-great-skills`)
+`create-skill` [model] (Grok skills) · `writing-great-skills` [user] (the bar every skill here meets)
 
 **Hand off / step back**
 `zoom-out` [model] (see the big picture) · `handoff` [user] (compact for the next agent)
@@ -44,7 +44,7 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 | Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
 | Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
 | Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
-| Verify | `code-review`, `receiving-code-review`, `check-work` |
+| Verify | `judo-review`, `receiving-code-review`, `check-work` |
 | Knowledge | `research`, `graphify`, `nlm-skill` |
 | Integrations | `sentry-cli`, `stripe-best-practices`, `stripe-projects` |
 | Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `handoff` |

@@ -17,6 +17,8 @@ Two choices, trading different costs:
 
 Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
 
+Where one user-invoked skill's work depends on another's, hand the invocation back to the user and name the skill to type.
+
 When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each.
 
 ## Writing the description

@@ -22,7 +22,7 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** The issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if not. Consult the tracker doc's "Wayfinding operations" section for how _this_ repo expresses them. If no tracker has been provided, default to the local-markdown tracker.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Take the tracker from this repo's `CLAUDE.md` or `AGENTS.md`, which should name it and how this repo expresses wayfinding operations. If it names none, ask the user once; failing that, default to the local-markdown tracker.
 
 ### The map body
 
@@ -76,7 +76,7 @@ Every ticket is either **HITL** — human in the loop, worked *with* a human who
 
 - **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases. Creates a markdown summary as a linked asset. Use when knowledge outside the current working directory is required.
 - **Grilling** (HITL): Conversation via the /grilling and /domain-modeling skills — /grilling owns how questions are batched and paced. The default case.
-- **Architecture** (AFK): When a ticket hinges on the shape of existing code — where a seam should go, whether a module is deep enough, how tangled the callers are — resolve it via the /improve-codebase-architecture skill and link its report as an asset. Use when the way forward is blocked on "what shape should this take", not "what should it do".
+- **Architecture** (AFK): When a ticket hinges on the shape of existing code — where a seam should go, whether a module is deep enough, how tangled the callers are — hand it to the user to run `/improve-codebase-architecture` themselves, then link the report it produces as an asset. Wayfinder cannot reach that skill directly: both are user-invoked. Use when the way forward is blocked on "what shape should this take", not "what should it do".
 - **Task** (HITL or AFK): Manual work that must happen before a *decision* can be made — nothing to decide or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that *does* rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 
 ## Fog of war
