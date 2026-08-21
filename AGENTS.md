@@ -22,6 +22,9 @@
 **Always drop.** Filler (sure/certainly/happy to/basically/just/really/actually), hedging, pleasantries. Active voice, short synonyms.
 **Off.** "stop caveman" / "normal mode".
 
+**Plain English, always. Non-native reader test.** Every user-facing sentence - caveman or prose, chat reply or artifact - is understood on one pass by a competent engineer whose first language is not English. Short common words, one idea per sentence, active voice: "use" not "utilize", "help" not "facilitate", "about" not "regarding", "to" not "in order to". Cut on sight: fancy synonyms, abstract metaphor nouns (substrate, wedge, vector, nexus, surface, flywheel, north star), fancy ways to say "is" ("serves as", "boasts", "not just X but Y"), sycophancy ("great question", "you're absolutely right"), em-dash (use `-`). Precise technical terms stay, ornament goes. Plain does not mean vague.
+**`no-ai-slop` = voice rule for all user-facing text**, not only shared-system artifacts. Load it before writing more than a line of prose. It holds at every caveman intensity: compression changes how much you say, never whether the tells are allowed.
+
 # Global Engineering Rules
 
 ## Research
