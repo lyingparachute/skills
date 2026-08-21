@@ -34,9 +34,9 @@ Scan the plan once before milestone 1 for internal contradictions and for anythi
 4. **Package the diff:** `scripts/review-package BASE HEAD` → prints a file with commit list + stat + `git diff -U10`. **Use the recorded BASE, never `HEAD~1`** — `HEAD~1` silently drops all but the last commit of a multi-commit milestone.
 5. **Dispatch one critic** — tell it explicitly to run the `/judo-review` skill and to return **code-judo moves** (concrete rewrite suggestions, not just complaints) on both axes: Standards = clean-code/enterprise quality, Spec = plan compliance. It is a subagent, so it runs both itself and reports them as separate lists, never merged. Give it the brief, report, and review-package paths plus the plan's binding constraints copied verbatim.
 6. **Triage the findings yourself** via the `/receiving-code-review` skill — every finding is a hypothesis, not an order. Confirm each against the code before it reaches the fixer; drop or reframe the wrong ones with a reason. Judge from your own context when you can; only dispatch an explorer subagent when a finding genuinely needs code you haven't read; don't summon one for calls you can make yourself.
-7. **Fix every surviving finding** via one fix subagent with the complete list (not one fixer per finding); `/receiving-code-review` decides which land in this milestone and which become followup plans. A nice-to-have you don't fix needs an explicit dismissal with a reason. Fixer re-runs covering tests, reports command + output. Re-review. Loop until the critic is clean, **max 3 rounds**; leftovers after round 3 → record in the plan and report, don't loop forever.
+7. **Fix every surviving finding** via one fix subagent with the complete list (not one fixer per finding); `/receiving-code-review` decides which land in this milestone and which become followup plans. A nice-to-have you don't fix needs an explicit dismissal with a reason. Fixer re-runs covering tests, reports command + output. Re-review. Loop until the critic is clean, **max 2 rounds** per `AGENTS.md`; leftovers after round 2 → record in the plan and report, don't loop forever.
 8. **Commit** the milestone with `caveman-commit` (one commit per milestone).
-9. **Update the plan:** tick the milestone's checkbox, write its progress; append a ledger line.
+9. **Update the plan:** tick the milestone's checkbox, write its progress; append a ledger line and a decision row.
 
 ## File handoffs
 
@@ -50,7 +50,22 @@ Conversation memory does not survive compaction; a controller that lost its plac
 - On a clean review, append `Milestone N: complete (commits <base7>..<head7>, review clean)`.
 - After compaction, trust the ledger + `git log` over recollection.
 
-Keep a running `implementation-notes.md` at the repo root (tracked): decisions you made that weren't in the plan, changes forced by repo state, tradeoffs — anything the reader should know.
+Keep a running `implementation-notes.md` at the repo root for context that is not a decision: repo-state surprises, dead ends, anything the next reader would want and nobody would think to ask about.
+
+Both files are scaffolding, not history, so neither is committed. The durable record is the plan, its ADRs, and `git log`. Add them to the repo's `.gitignore` if they aren't there.
+
+### The decision row
+
+Every call you make that the plan did not make gets one row in `progress.md`:
+
+```
+| milestone | decision | why | evidence | result |
+|---|---|---|---|---|
+```
+
+**Evidence is a pointer**, never a paragraph: a commit sha, a `file:line`, a review-package path, a test name. Rows are append-only, so a call you later reverse gets a new row superseding the old one and the trail shows the turn instead of hiding it.
+
+Three places can hold a decision, so the order is fixed. The row is the running log during the run. The plan's `Decision Log` is where anything durable lands, and it is the only one that survives close-out. `implementation-notes.md` holds context, never decisions.
 
 ## Model per role
 
@@ -65,12 +80,14 @@ Least powerful model that can do the role; **always specify it explicitly** (an 
 
 ## Close-out
 
-1. Whole-branch `code-review` on the most capable model: `scripts/review-package $(git merge-base main HEAD) HEAD`. Triage the findings via `/receiving-code-review` (self-judge; explorer subagent only when a finding needs unread code), then fix every survivor via one fix subagent with the full list.
-2. Set the plan's `Status:` line to `landed — <short sha>`; tick all remaining checkboxes.
-3. `plan-retire` — extract durable decisions, delete the rest.
-4. Commit plan progress and update the plans index if there is one.
-5. **Report:** what changed, what tests ran (with output), any deviation from the plan, any follow-up findings.
-6. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt — shallow modules, tangled callers, no test seam — make that follow-up an `improve-codebase-architecture` pass rather than a vague "clean up later".
+1. Whole-branch `judo-review` on the most capable model: `scripts/review-package $(git merge-base main HEAD) HEAD`. Triage the findings via `/receiving-code-review` (self-judge; explorer subagent only when a finding needs unread code), then fix every survivor via one fix subagent with the full list.
+2. Audit the trail: read every decision row back against what happened and cut any row you cannot tie to a real commit, file, or command. A row nobody can trace is worse than a missing one.
+3. Fold the surviving rows and any notes worth keeping into the plan's `Decision Log`. The scratch files die with the working tree, so anything not in the plan by now is lost.
+4. Set the plan's `Status:` line to `landed — <short sha>`; tick all remaining checkboxes.
+5. `plan-retire` — extract durable decisions, delete the rest.
+6. Commit plan progress and update the plans index if there is one.
+7. **Report:** what changed, what tests ran (with output), any deviation from the plan, any follow-up findings.
+8. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt — shallow modules, tangled callers, no test seam — make that follow-up an `improve-codebase-architecture` pass rather than a vague "clean up later".
 
 ## Red flags
 
