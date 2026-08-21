@@ -25,6 +25,12 @@ Format a round like this, with one horizontal rule between questions so a long r
 ➡️ <your recommended answer>
 ```
 
+A question the user leaves unanswered is answered by your recommendation. Unanswered means their reply does not address that number, and does not restate or change your recommendation. A bare "yes" or "ok" is an answer, not silence.
+
+Two guardrails hold this in place. A question whose answer is irreversible, touches production or a shared system, or spends money stays blocking, so re-ask it instead of adopting it. And silence is never confirmation: before the session is done, list every answer you adopted this way and get an explicit yes on the set. Where another round follows, name them at its top as well, so an adopted answer stays visible while it can still be overturned.
+
+Anything recorded from an adopted answer carries that fact with it, in the ticket, `CONTEXT.md`, or the ADR, until the user confirms it.
+
 Each round of answers reshapes the tree — settled decisions push the frontier outward and unblock questions that depended on them (including new decisions the answers open). Recompute the frontier and ask the next round the same way. A question whose answer depends on another question still open in this round belongs to a later round, not this one.
 
 ## Facts vs decisions
