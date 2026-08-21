@@ -5,11 +5,15 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 # Diagnosing Bugs
 
-A discipline for hard bugs. Skip phases only when explicitly justified.
+A discipline for hard bugs. Phases 1 to 6 skip only when explicitly justified. Phase 0 never skips.
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
-## Phase 1 — Build a feedback loop
+## Phase 0 - Redact
+
+Diagnosis pastes raw output, and raw output carries secrets. The global redaction rule applies to every log, trace, and payload you surface here. On top of it: build the repro command against environment variables, never literal credentials, so the loop stays shareable.
+
+## Phase 1 - Build a feedback loop
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
@@ -59,7 +63,7 @@ Phase 1 is done when the loop is **tight** and **red-capable**: you can name **o
 
 If you catch yourself reading code to build a theory before this command exists, **stop — jumping straight to a hypothesis is the exact failure this skill prevents.** No red-capable command, no Phase 2.
 
-## Phase 2 — Reproduce + minimise
+## Phase 2 - Reproduce + minimise
 
 Run the loop. Watch it go red — the bug appears.
 
@@ -79,7 +83,7 @@ Done when **every remaining element is load-bearing** — removing any one of th
 
 Do not proceed until you have reproduced **and** minimised.
 
-## Phase 3 — Hypothesise
+## Phase 3 - Hypothesise
 
 Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
 
@@ -91,7 +95,7 @@ If you cannot state the prediction, the hypothesis is a vibe — discard or shar
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
 
-## Phase 4 — Instrument
+## Phase 4 - Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
 
@@ -105,7 +109,7 @@ Tool preference:
 
 **Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
-## Phase 5 — Fix + regression test
+## Phase 5 - Fix + regression test
 
 Write the regression test **before the fix** — but only if there is a **correct seam** for it.
 
@@ -121,7 +125,7 @@ If a correct seam exists:
 4. Watch it pass.
 5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
 
-## Phase 6 — Cleanup + post-mortem
+## Phase 6 - Cleanup + post-mortem
 
 Required before declaring done:
 

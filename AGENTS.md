@@ -44,6 +44,7 @@
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt — fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
+- **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values.
 - **No partial implementations.** Done = plan met, tested, reviewed. "80% working" = 0% shipped.
 - **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable — naked `.skip` = debt.
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
@@ -124,6 +125,11 @@ User phrases below activate specific workflows. Follow the protocol literally.
 ## "Review the plan" / "critique the plan"
 
 - Use /exec-plan (On-demand critique): a skeptical senior-engineer verdict in three sections (should this be done, what we get, what to improve), with every claim verified against code.
+
+# Context Boundaries
+
+- **Grilling through to a written plan stays in one window.** That chain reasons over what it just heard, so a compact costs it exactly the detail it needs.
+- **At a phase boundary (grilling → building → verifying), default to continuing.** When the window truly has to break, prefer in this order: `/clear` once the artifact is written down, then `/handoff`, then a subagent for the next slice, and `/compact` last.
 
 # Subagents
 
