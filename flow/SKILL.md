@@ -43,11 +43,11 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 | --- | --- |
 | Align & plan | `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `wayfinder` |
 | Build | `implement`, `orchestrate`, `tdd`, `diagnosing-bugs` |
-| Design quality | `codebase-design`, `domain-modeling`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
+| Design quality | `codebase-design`, `domain-modeling`, `type-system-discipline`, `improve-codebase-architecture`, `impeccable`, `shadcn-ui` |
 | Verify | `judo-review`, `receiving-code-review` |
 | Knowledge | `research`, `graphify`, `nlm-skill` |
 | Integrations | `sentry-cli`, `stripe-best-practices`, `stripe-projects` |
-| Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `handoff` |
+| Output & comms | `caveman`, `caveman-commit`, `no-ai-slop`, `wait-what`, `handoff` |
 | Meta | `writing-great-skills`, `plan-retire`, `flow` |
 
 ## Rules of the graph
@@ -55,3 +55,5 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 - Post anything to Jira / Confluence / Bitbucket → run `no-ai-slop` first.
 - A landed `exec-plan` → `plan-retire` to keep durable decisions, delete the rest.
 - Frontend detail work lives inside `impeccable` (see `impeccable/reference/details/`), not a separate skill.
+- Shaping a domain type, reaching for a boolean flag, a cast, or a parse at the boundary → `type-system-discipline`.
+- A reply landed wrong → `wait-what`.
