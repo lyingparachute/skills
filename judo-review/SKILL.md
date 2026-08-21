@@ -97,7 +97,7 @@ Do not let big architectural ideas silently block a well-scoped PR. Do not let t
 
 ## Preferred Remedies
 
-Push for remedies that reduce the number of concepts a reader must hold:
+Push for remedies that reduce the number of concepts a reader must hold. Reach for `codebase-design` here: its deep-module vocabulary and its deletion test are what turn a vague "this feels tangled" into a named move.
 
 - Delete an unnecessary layer instead of polishing it.
 - Reframe the state model so conditionals disappear instead of getting centralized.
@@ -114,7 +114,7 @@ Push for remedies that reduce the number of concepts a reader must hold:
 
 Do not settle for rename-level feedback when the real problem is structural. Do not settle for a cleaner version of the same messy idea when a much simpler model is visible.
 
-When the structural problem is bigger than this diff — shallow modules, tangled callers, a missing seam across several files — the remedy is not a review comment. Raise it as a `followup-execplan` and point it at `improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix.
+When the structural problem is bigger than this diff — shallow modules, tangled callers, a missing seam across several files — the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix. It is user-invoked, so name it as the next move rather than trying to reach it from here.
 
 ## Output
 
