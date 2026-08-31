@@ -74,10 +74,19 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 
 ## Approval Bar
 
-A green test run is not approval. Treat every Review Passes hit as a presumptive blocker until a stated structural reason clears it. Two shapes block even when no single pass names them:
+A green test run is not approval, and neither is behavior that seems correct. Treat every shape below as a presumptive blocker until a stated structural reason clears it:
 
-- The diff preserves incidental complexity while only moving it around.
 - A plausible simplification would delete a meaningful category of complexity.
+- A task in the batch misses its stated requirement, misunderstands it, or ships behavior beyond it.
+- The diff preserves incidental complexity while only moving it around.
+- A file crosses from below 400 lines to above 400 lines due to the change.
+- New branching makes an existing flow more tangled.
+- Feature checks leak across shared/general-purpose code.
+- A wrapper, abstraction, dependency, generic mechanism, cast, or optional contract adds indirection without making the model clearer.
+- Logic duplicates a canonical helper or lives outside the layer that owns the concept.
+- Related updates can leave half-applied state where an atomic structure is obvious.
+- Tests are missing, circular, over-mocked, or fail to cover the behavior being changed.
+- The review found named smells but no judo move, on a diff where a better shape is visible.
 
 Use `followup-execplan` instead of blocking when the best fix is real but too large for the current change. Do not let broad architectural opportunities disappear; report them as plan candidates.
 
