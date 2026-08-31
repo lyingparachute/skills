@@ -45,6 +45,8 @@ Every review is two independent reviews, reported side by side.
 - **Standards**: does the change meet the bar? Sources are the repo's own rule files and the review passes below. Reviewing this axis, and only this axis, also read [`STANDARDS.md`](STANDARDS.md) for the smell and comment baseline.
 - **Spec**: does the change do what was asked? Sources, in order: the current user's request, then a governing plan, then a ticket or issue, then the PR description, then issue refs in the commit messages. Report "No spec available" only when none of these sources states requirements; it is a finding, not a skipped axis.
 
+A branch is a **batch**: it usually carries several unrelated small tasks the author chose to ship together, and that packaging decision is already made. Split the diff into coherent task clusters, match each cluster to its own spec source, and answer the spec question per cluster. Where a cluster has no spec source, report that gap for the cluster and judge its code on Standards. Recommending a different branch, PR, or commit split is out of scope for both axes; say what the code gets wrong instead.
+
 A diff can be clean code that builds the wrong thing, or the right feature built badly. Merging the two lists, or re-ranking one against the other, hides exactly that. Each axis keeps its own findings.
 
 Three ways this runs. As the top agent reviewing directly, dispatch one subagent per axis in parallel, each with its own scope and sources. As the top agent handing the whole review to one critic, that critic becomes the reviewer subagent and splits the axes itself, which is how `orchestrate` uses it. Already a reviewer subagent: run both axes yourself, in sequence, outputs still separate. A subagent never spawns.
@@ -59,9 +61,9 @@ Three ways this runs. As the top agent reviewing directly, dispatch one subagent
 
 ## Review Passes
 
-The Standards axis applies these passes in order. Requirement fit belongs to the Spec axis: compare the diff to what was asked and flag missing requirements, extra unrequested work, and misunderstood requirements.
+The Standards axis applies these passes in order. Requirement fit belongs to the Spec axis: compare each task cluster to what was asked for it, and flag missing requirements, misunderstood requirements, and behavior that goes beyond what any task in the batch asked for.
 
-1. **Correctness and regressions**: logic errors, missing edge cases, race conditions, broken error handling, test gaps, behavior that contradicts the request.
+1. **Correctness and regressions**: logic errors, missing edge cases, race conditions, broken error handling, behavior that contradicts the request, and tests that are missing, circular, over-mocked, or failing to cover the changed behavior.
 2. **Structural simplification**: look for a code-judo move that deletes concepts, branches, helpers, modes, conditionals, layers, or state rather than polishing them. Prefer the structure that feels inevitable in hindsight.
 3. **Spaghetti growth**: flag ad-hoc conditionals, one-off booleans, nullable modes, scattered feature checks, repeated conditionals, and special cases bolted into unrelated flows.
 4. **Boundaries and types**: flag feature logic in shared paths, implementation details leaking through APIs, unnecessary `any` / `unknown` / casts / optionality, and silent fallback hiding unclear invariants.
@@ -72,17 +74,10 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 
 ## Approval Bar
 
-Do not approve merely because tests pass or behavior seems correct. Treat these as presumptive blockers unless clearly justified:
+A green test run is not approval. Treat every Review Passes hit as a presumptive blocker until a stated structural reason clears it. Two shapes block even when no single pass names them:
 
-- A plausible simplification would delete a meaningful category of complexity.
-- The change misses, exceeds, or misunderstands a stated requirement.
 - The diff preserves incidental complexity while only moving it around.
-- A file crosses from below 400 lines to above 400 lines due to the change.
-- New branching makes an existing flow more tangled.
-- Feature checks leak across shared/general-purpose code.
-- A wrapper, abstraction, dependency, generic mechanism, cast, or optional contract adds indirection without making the model clearer.
-- Logic duplicates a canonical helper or lives outside the layer that owns the concept.
-- Tests are missing, circular, over-mocked, or fail to cover the behavior being changed.
+- A plausible simplification would delete a meaningful category of complexity.
 
 Use `followup-execplan` instead of blocking when the best fix is real but too large for the current change. Do not let broad architectural opportunities disappear; report them as plan candidates.
 
@@ -118,7 +113,7 @@ When the structural problem is bigger than this diff — shallow modules, tangle
 
 ## Output
 
-Two headed sections, `## Standards` then `## Spec`, each leading with its own findings ordered by severity. Within Standards, order by review priority: structural code-quality regressions, missed code-judo simplifications, spaghetti and branching complexity, boundary and type-contract problems, file size and decomposition, then correctness, security, test, and maintainability issues. Within Spec: requirement misses, extras, misunderstandings.
+Two headed sections, `## Standards` then `## Spec`, each leading with its own findings ordered by severity. Within Standards, order by review priority: structural code-quality regressions, missed code-judo simplifications, spaghetti and branching complexity, boundary and type-contract problems, file size and decomposition, then correctness, security, test, and maintainability issues. Within Spec: group findings by task cluster, then order requirement misses, extras, misunderstandings.
 
 For each finding include:
 
