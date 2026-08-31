@@ -93,16 +93,14 @@ A green test run is not approval, and neither is behavior that seems correct. Tr
 - Tests are missing, circular, over-mocked, or fail to cover the behavior being changed.
 - The review found named smells but no judo move, on a diff where a better shape is visible.
 
-Use `followup-execplan` instead of blocking when the best fix is real but too large for the current change. Do not let broad architectural opportunities disappear; report them as plan candidates.
+Where the best fix is real but too large for this change, the finding becomes a `followup-execplan`, never a waiver.
 
 ## Disposition
 
 Every finding gets one disposition:
 
 - `merge-blocking`: local enough to fix in this change; blocks approval.
-- `followup-execplan`: real structural issue, but too large for this change. Describe the move, why, and rough blast radius. Does not block approval by itself.
-
-Do not let big architectural ideas silently block a well-scoped PR. Do not let them vanish either.
+- `followup-execplan`: real structural issue, but too large for this change. Describe the move, why, and rough blast radius. Reported every time, and does not block approval by itself.
 
 ## Preferred Remedies
 
