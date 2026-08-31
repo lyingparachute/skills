@@ -1,6 +1,6 @@
 ---
 name: judo-review
-description: Code-judo review for PRs, branch diffs, committed local changes, uncommitted changes, or named code. Use when reviewing code for correctness, requirements, structural simplification, spaghetti growth, boundaries, tests, security, or over-engineering.
+description: Code-judo review for a PR, branch diff, uncommitted changes, or named code. Use when reviewing code for correctness, requirements, structural simplification, spaghetti growth, boundaries, tests, security, or over-engineering.
 ---
 
 # Code Review
