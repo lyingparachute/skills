@@ -119,7 +119,7 @@ Push for remedies that reduce the number of concepts a reader must hold. Reach f
 - Parallelize independent work when it also simplifies orchestration.
 - Make related updates atomic when partial state would be hard to reason about.
 
-Do not settle for rename-level feedback when the real problem is structural. Do not settle for a cleaner version of the same messy idea when a much simpler model is visible.
+When the real problem is structural, a rename or a tidier version of the same messy idea is not a remedy; name the structural move instead.
 
 When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix. It is user-invoked, so name it as the next move rather than trying to reach it from here.
 
