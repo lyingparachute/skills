@@ -30,15 +30,18 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
    - Read repo instructions and rule files relevant to touched code before judging style, architecture, tests, security, or domain constraints.
    - When a plan, issue, or PR description governs the change, use it as intent and acceptance context.
    - Do not review plan/admin/doc hygiene unless explicitly asked, or unless it makes a false claim about shipped code or verification.
+   - Done when every rule file governing a touched path has been read, and the governing intent for each task cluster is named or recorded as absent.
 
 3. **Read the diff and source.**
    - Read the full diff and enough surrounding code to understand the changed flow.
    - Check focused call sites or contracts only when a concrete risk requires it.
    - Do not trust summaries, test claims, or author rationale without evidence.
+   - Done when every changed hunk is accounted for: each one either produced a finding or you can say in one sentence why it is clean.
 
 4. **Review on both axes**, keeping their findings apart.
    - Prioritize structural findings over local polish.
    - Prefer high-conviction blockers over long nit lists.
+   - Done when every pass has run against every changed hunk, and both axes hold their own list, each list either carrying findings or stating that none met the bar. A diff that passed every pass still owes the purism question: is the better shape visible from here?
 
 ## Two axes
 
