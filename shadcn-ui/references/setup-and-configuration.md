@@ -4,7 +4,7 @@
 
 shadcn/ui is **not** a traditional component library or npm package. Instead:
 - It's a **collection of reusable components** that you copy into your project
-- Components are **yours to customize** — you own the code
+- Components are **yours to customize** - you own the code
 - Built with **Radix UI** primitives for accessibility
 - Styled with **Tailwind CSS** utilities
 - Includes CLI tool for easy component installation

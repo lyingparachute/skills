@@ -1,20 +1,20 @@
 ---
 name: plan-retire
-description: Use when a plan is done with — feature merged, abandoned, superseded, or invalidated — or when the plans dir accumulates stale entries, to preserve durable decisions and delete the plan per retention policy.
+description: Use when a plan is done with - feature merged, abandoned, superseded, or invalidated - or when the plans dir accumulates stale entries, to preserve durable decisions and delete the plan per retention policy.
 ---
 
 # Plan Retire
 
-Done-with plans are NOT memory archives. Retire them: keep anything durable, delete the rest. The common case is that nothing durable came out of the plan — then you write nothing and go straight to deleting it. Writing a doc is the exception, not a required step.
+Done-with plans are NOT memory archives. Retire them: keep anything durable, delete the rest. The common case is that nothing durable came out of the plan - then you write nothing and go straight to deleting it. Writing a doc is the exception, not a required step.
 
 ## Checklist (per plan)
 
-1. **Confirm it's retirable.** A plan retires when it's done with — most often the feature merged to `main` (verify by file content on main, not branch commit count; squash-merge repos show "N commits ahead" for already-landed work), but also when abandoned, superseded, or its premise was invalidated by a later change. Merge is the common case, not a precondition — the user can retire an unmerged plan and that's fine.
-2. **Capture durable decisions — only if the plan produced any.** Source them from the plan's `Decision Log` and `Outcomes & Retrospective` sections (the exec-plan skill mandates both). When it did, load and follow the `domain-modeling` skill: it owns the ADR format and where ADRs live. Whether a decision earns one is decided by **ADR Or Garbage?** below, which is the plan-specific reading of that test. Prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
-3. **Capture reusable non-decision findings** (operational context, discoveries) the same way — update where the project already keeps them, create only if needed, skip if there's nothing worth keeping.
+1. **Confirm it's retirable.** A plan retires when it's done with - most often the feature merged to `main` (verify by file content on main, not branch commit count; squash-merge repos show "N commits ahead" for already-landed work), but also when abandoned, superseded, or its premise was invalidated by a later change. Merge is the common case, not a precondition - the user can retire an unmerged plan and that's fine.
+2. **Capture durable decisions - only if the plan produced any.** Source them from the plan's `Decision Log` and `Outcomes & Retrospective` sections (the exec-plan skill mandates both). When it did, load and follow the `domain-modeling` skill: it owns the ADR format and where ADRs live. Whether a decision earns one is decided by **ADR Or Garbage?** below, which is the plan-specific reading of that test. Prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
+3. **Capture reusable non-decision findings** (operational context, discoveries) the same way - update where the project already keeps them, create only if needed, skip if there's nothing worth keeping.
 4. **Delete the plan file.** Keep blocked/deferred follow-up plans only while actionable; a deferred plan whose premise a later change invalidated gets deleted too (verify premise vs committed code first).
 5. **Update the plans index** if it references the deleted plan.
-6. **Rebuild the knowledge graph — only if graphify is set up in this repo** (a committed `graph.json` exists). Deleting a plan changes docs the graph covers: `graphify extract . --out . --token-budget 24000 --max-concurrency 2 && graphify cluster-only . --no-viz`; the rebuilt tracked files (`graph.json`, `GRAPH_REPORT.md`, `manifest.json`, `.graphify_labels.json`) go into step 7's commit. Rebuild deliberately (LLM tokens), not per edit. No graphify → skip.
+6. **Rebuild the knowledge graph - only if graphify is set up in this repo** (a committed `graph.json` exists). Deleting a plan changes docs the graph covers: `graphify extract . --out . --token-budget 24000 --max-concurrency 2 && graphify cluster-only . --no-viz`; the rebuilt tracked files (`graph.json`, `GRAPH_REPORT.md`, `manifest.json`, `.graphify_labels.json`) go into step 7's commit. Rebuild deliberately (LLM tokens), not per edit. No graphify → skip.
 7. **Commit the retirement.** Was the plan file tracked in git? Then its deletion is a change the team needs, and leaving it uncommitted means the next session finds a dirty tree and a plan that is neither alive nor gone. One commit carries the whole retirement: the deleted plan, the ADR/doc writes from steps 2-3, the index update, and any rebuilt graph files. Message per `caveman-commit`, and the *why* is the retirement reason from step 1 (merged, abandoned, superseded, invalidated). Push only if the user asked. Untracked plan → delete it and say in the report there was nothing to commit.
 
 ## ADR Or Garbage?
@@ -39,8 +39,8 @@ Lazy test: if future you would not search the ADR dir to avoid re-litigating thi
 
 ## Red Flags
 
-- "Keep the plan for history" — git remembers; delete it.
-- "Every landed plan needs an ADR" — false; only durable decisions earn one, and many plans earn none.
-- Writing a doc just to have written something — if nothing is durable, delete the plan and stop.
+- "Keep the plan for history" - git remembers; delete it.
+- "Every landed plan needs an ADR" - false; only durable decisions earn one, and many plans earn none.
+- Writing a doc just to have written something - if nothing is durable, delete the plan and stop.
 - Creating a new ADR when an existing one should just be updated.
-- ADR linking to a plan path — forbidden, links rot.
+- ADR linking to a plan path - forbidden, links rot.

@@ -11,6 +11,8 @@ Run a code-judo review of the requested change: preserve behavior, but hunt for 
 
 Attack the change, do not validate it. Ask "what is wrong here?", not "is this right?". Behavior can be correct and still fail review if the change makes the codebase harder to understand, extend, or safely modify.
 
+The bar is **code purism**: the best solution available, not an acceptable one. Judge the diff against the shape an expert would build knowing the whole codebase and carrying no deadline, then report the gap. Keep hunting for the judo move even when the diff already passes every named check - the review's job is the better shape, not a clean scorecard.
+
 Treat every implementer summary, PR description, prior agent claim, and design rationale as a hypothesis until source proves it. Verify findings against source before reporting them.
 
 If running as a reviewer subagent, stay readonly and leaf-only: do not edit files, mutate git state, or spawn another agent.
@@ -74,7 +76,7 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 
 ## Approval Bar
 
-A green test run is not approval, and neither is behavior that seems correct. Treat every shape below as a presumptive blocker until a stated structural reason clears it:
+A green test run is not approval, and neither is behavior that seems correct. Treat every shape below as a presumptive blocker until a stated structural reason clears it. Purism decides what counts as a reason: a structural constraint in the codebase can clear a shape, while "it works", "good enough for now", "pragmatic", author deadline, and "we clean it up later" clear nothing.
 
 - A plausible simplification would delete a meaningful category of complexity.
 - A task in the batch misses its stated requirement, misunderstands it, or ships behavior beyond it.
@@ -118,11 +120,11 @@ Push for remedies that reduce the number of concepts a reader must hold. Reach f
 
 Do not settle for rename-level feedback when the real problem is structural. Do not settle for a cleaner version of the same messy idea when a much simpler model is visible.
 
-When the structural problem is bigger than this diff — shallow modules, tangled callers, a missing seam across several files — the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix. It is user-invoked, so name it as the next move rather than trying to reach it from here.
+When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix. It is user-invoked, so name it as the next move rather than trying to reach it from here.
 
 ## Output
 
-Two headed sections, `## Standards` then `## Spec`, each leading with its own findings ordered by severity. Within Standards, order by review priority: structural code-quality regressions, missed code-judo simplifications, spaghetti and branching complexity, boundary and type-contract problems, file size and decomposition, then correctness, security, test, and maintainability issues. Within Spec: group findings by task cluster, then order requirement misses, extras, misunderstandings.
+Two headed sections, `## Standards` then `## Spec`, each leading with its own findings. Within Standards, structural findings lead - every pass but correctness - then correctness, security, test, and maintainability findings, ordered by severity inside each group. Within Spec: group findings by task cluster, then order requirement misses, extras, misunderstandings.
 
 For each finding include:
 

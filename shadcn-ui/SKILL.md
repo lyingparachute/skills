@@ -10,7 +10,7 @@ Build accessible, customizable UI components with shadcn/ui, Radix UI, and Tailw
 
 ## Overview
 
-- Components are **copied into your project** — you own and customize the code
+- Components are **copied into your project** - you own and customize the code
 - Built on **Radix UI** primitives for full accessibility
 - Styled with **Tailwind CSS** and CSS variables for theming
 - CLI-based installation: `npx shadcn@latest add <component>`
@@ -279,11 +279,11 @@ toast({ variant: "destructive", title: "Error", description: "Failed to save." }
 
 ## Best Practices
 
-- **Accessibility**: Use Radix UI primitives — ARIA attributes are built in
+- **Accessibility**: Use Radix UI primitives - ARIA attributes are built in
 - **Client Components**: Add `"use client"` for interactive components (hooks, events)
 - **Type Safety**: Use TypeScript and Zod schemas for form validation
 - **Theming**: Configure CSS variables in `globals.css` for consistent design
-- **Customization**: Modify component files directly — you own the code
+- **Customization**: Modify component files directly - you own the code
 - **Path Aliases**: Ensure `@` alias is configured in `tsconfig.json`
 - **Registry Security**: Only install components from trusted registries; review generated code before production use
 - **Dark Mode**: Set up with CSS variables strategy and `next-themes`
@@ -303,9 +303,9 @@ toast({ variant: "destructive", title: "Error", description: "Failed to save." }
 
 Consult these files for detailed patterns and code examples:
 
-- **[references/setup-and-configuration.md](references/setup-and-configuration.md)** — Full installation, tsconfig, tailwind config, CSS variables
-- **[references/ui-components.md](references/ui-components.md)** — Button, Input, Card, Dialog, Sheet, Select, Toast, Table, Menubar
-- **[references/forms-and-validation.md](references/forms-and-validation.md)** — React Hook Form + Zod, advanced forms, login card, contact form
-- **[references/charts-components.md](references/charts-components.md)** — Bar, Line, Area, Pie charts with ChartContainer and theming
-- **[references/nextjs-integration.md](references/nextjs-integration.md)** — App Router, Server/Client Components, dark mode, metadata
-- **[references/customization.md](references/customization.md)** — Custom variants, CSS variables, cn() utility, extending components
+- **[references/setup-and-configuration.md](references/setup-and-configuration.md)** - Full installation, tsconfig, tailwind config, CSS variables
+- **[references/ui-components.md](references/ui-components.md)** - Button, Input, Card, Dialog, Sheet, Select, Toast, Table, Menubar
+- **[references/forms-and-validation.md](references/forms-and-validation.md)** - React Hook Form + Zod, advanced forms, login card, contact form
+- **[references/charts-components.md](references/charts-components.md)** - Bar, Line, Area, Pie charts with ChartContainer and theming
+- **[references/nextjs-integration.md](references/nextjs-integration.md)** - App Router, Server/Client Components, dark mode, metadata
+- **[references/customization.md](references/customization.md)** - Custom variants, CSS variables, cn() utility, extending components

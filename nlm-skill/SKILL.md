@@ -57,7 +57,7 @@ nlm --version           # Check installed version
 7. **Use aliases**: Simplify long UUIDs with `nlm alias set <name> <uuid>`
 8. **Check aliases before creating**: Run `nlm alias list` before creating a new alias to avoid conflicts with existing names.
 9. **DO NOT launch REPL**: Never use `nlm chat start` - it opens an interactive REPL that AI tools cannot control. Use `nlm notebook query` for one-shot Q&A instead.
-10. **Choose output format wisely**: Default output (no flags) is compact and token-efficient—use it for status checks. Use `--quiet` to capture IDs for piping. Only use `--json` when you need to parse specific fields programmatically.
+10. **Choose output format wisely**: Default output (no flags) is compact and token-efficient - use it for status checks. Use `--quiet` to capture IDs for piping. Only use `--json` when you need to parse specific fields programmatically.
 11. **Use `--help` when unsure**: Run `nlm <command> --help` to see available options and flags for any command.
 
 ## Workflow Decision Tree
@@ -263,7 +263,7 @@ Use `studio_create` with `artifact_type` and type-specific options. All require 
 
 **Revise Slides:** Use `studio_revise` to revise individual slides in an existing slide deck.
 - Requires `artifact_id` (from `studio_status`) and `slide_instructions`
-- Creates a NEW artifact — the original is not modified
+- Creates a NEW artifact - the original is not modified
 - Slide numbers are 1-based (slide 1 = first slide)
 - Poll `studio_status` after calling to check when the new deck is ready
 

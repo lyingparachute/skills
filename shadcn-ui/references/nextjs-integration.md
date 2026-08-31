@@ -5,7 +5,7 @@
 Most shadcn/ui components require `"use client"` directive when used with App Router. Static display components (Card, Table) can work in Server Components without the directive.
 
 ```tsx
-// src/components/ui/button.tsx — already includes "use client" after npx shadcn@latest add button
+// src/components/ui/button.tsx - already includes "use client" after npx shadcn@latest add button
 "use client"
 import * as React from "react"
 // ... rest of component
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 When using interactive shadcn/ui components in Server Components, wrap them in a Client Component:
 
 ```tsx
-// app/dashboard/page.tsx — Server Component
+// app/dashboard/page.tsx - Server Component
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ButtonClient } from "@/components/button-client"
 
@@ -60,7 +60,7 @@ export default function DashboardPage() {
 ```
 
 ```tsx
-// src/components/button-client.tsx — Client Component wrapper
+// src/components/button-client.tsx - Client Component wrapper
 "use client"
 import { Button } from "@/components/ui/button"
 

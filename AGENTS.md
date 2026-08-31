@@ -5,18 +5,18 @@
 
 # Skills
 
-- **Skills live in one repo, symlinked everywhere.** The `skills` repo is the single source of truth; `install.sh` symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode). Never edit, rename, or delete a skill in a harness's own skill dir — that edits a symlink target and desyncs the rest. Edit the file in the `skills` repo.
+- **Skills live in one repo, symlinked everywhere.** The `skills` repo is the single source of truth; `install.sh` symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode). Never edit, rename, or delete a skill in a harness's own skill dir - that edits a symlink target and desyncs the rest. Edit the file in the `skills` repo.
 - **Writing or editing a skill → follow `writing-great-skills`.** Any new skill or change to an existing one obeys that skill's rules (predictability, invocation choice, information hierarchy, pruning, leading words). No exceptions.
 - **After add/rename/remove → re-run `install.sh`.** Adding, renaming, or removing a skill changes the symlink set; re-run `install.sh` to relink and prune stale links so every harness stays validated.
 
 # Communication Style
 
-**Decision order — first match wins:**
+**Decision order - first match wins:**
 
 1. **Always normal.** Code blocks, commits, PR descriptions, quoted errors.
 2. **Prose triggers.** Question form ("why"/"how"/"explain"/"co myślisz"/"what could"); architecture/design/review/debugging causality; security warnings; irreversible-action confirmations; opinion requests.
 3. **Mixed request = split.** "Zrób X i wyjaśnij Y" → caveman for action/status, prose only for explain part.
-4. **Action-verb imperative = caveman.** "Add", "fix", "zrób", "zmień" — caveman even if topic complex.
+4. **Action-verb imperative = caveman.** "Add", "fix", "zrób", "zmień" - caveman even if topic complex.
 5. **Default = caveman.** Includes ambiguous/unclear cases. User expands with "rozwiń" / "więcej szczegółów" / re-ask.
 
 **Always drop.** Filler (sure/certainly/happy to/basically/just/really/actually), hedging, pleasantries. Active voice, short synonyms.
@@ -29,27 +29,27 @@
 
 ## Research
 
-- **External knowledge = mandatory tool fetch, not training-data recall.** Library, framework, API, SDK, CLI, vendor surface — fetch real docs every time, even when the answer "feels obvious". Training cutoff lies; hallucinated APIs are the top failure mode.
-- **`context7` MCP — default for library/framework/API docs.** Use on every library/API question. Not optional, not "if unsure" — every time.
-- **`nlm` CLI (NotebookLM) — prior research first, then deep research.** Before any deep research, check if an existing notebook already covers the problem. Current notebooks: `DDD` (Domain-Driven Design), `AI_DEVS` (building AI agents, agentic workflows). Only after no notebook fits → use `nlm` for external deep research on a new topic.
+- **External knowledge = mandatory tool fetch, not training-data recall.** Library, framework, API, SDK, CLI, vendor surface - fetch real docs every time, even when the answer "feels obvious". Training cutoff lies; hallucinated APIs are the top failure mode.
+- **`context7` MCP - default for library/framework/API docs.** Use on every library/API question. Not optional, not "if unsure" - every time.
+- **`nlm` CLI (NotebookLM) - prior research first, then deep research.** Before any deep research, check if an existing notebook already covers the problem. Current notebooks: `DDD` (Domain-Driven Design), `AI_DEVS` (building AI agents, agentic workflows). Only after no notebook fits → use `nlm` for external deep research on a new topic.
 
 ## Code Quality
 
 - **Code self-documents.** No narration (`// now we do X`), no removal markers (`// removed X`, `// was doing Y`), no obvious docstrings/javadocs (`@param user` for `getUser(user)`). Comment only what naming can't carry: hidden invariants, framework/bug workarounds, non-obvious protocol constraints, genuinely complex flow. In doubt: no comment.
-- **Construct objects completely.** Build in one place from all required inputs — factory, builder, or full-arg constructor. No empty init + scattered mutations. Mutation setters only when framework demands.
-- **No null returns.** Use typed absence — empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union — instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
+- **Construct objects completely.** Build in one place from all required inputs - factory, builder, or full-arg constructor. No empty init + scattered mutations. Mutation setters only when framework demands.
+- **No null returns.** Use typed absence - empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union - instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
 - **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → list with trade-off, ask which. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt. In a `grilling` round the recommendation stands in for silence, since the trade-off was surfaced with the question before any pick and the adoption is read back for confirmation.
-- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" — later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it. Done = plan met, tested, reviewed; "80% working" = 0% shipped.
-- **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt — fix now or track.
+- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" - later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it. Done = plan met, tested, reviewed; "80% working" = 0% shipped.
+- **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
 - **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values.
-- **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable — naked `.skip` = debt.
+- **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable - naked `.skip` = debt.
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
 - **4x = wrong approach.** Solution ~4x bigger than its core (200 lines for what fits in 50, 5 abstractions where 1 works) → approach wrong. Stop, rewrite from scratch. Patching no fix bad shape.
-- **Boy Scout rule, bounded.** Leave touched code cleaner than you found it — but only within the scope of the current change. No drive-by refactors of adjacent files.
+- **Boy Scout rule, bounded.** Leave touched code cleaner than you found it - but only within the scope of the current change. No drive-by refactors of adjacent files.
 
 ## Architecture
 
@@ -66,7 +66,7 @@
 - **Data structures over algorithms.** Right data layout makes algorithm obvious. Optimize shape first.
 - **Refactor in small, safe steps.** Each step leaves code working. Rewrite and refactor never in the same commit.
 - **Evolutionary design.** Design for next concrete requirement, not every hypothetical future. Extend when needed.
-- **Screaming architecture.** Package/module = business purpose, not technical layer. Top-level: `Ordering`, `Billing`, `Inventory` — never `Controllers`, `Services`, `Repositories`.
+- **Screaming architecture.** Package/module = business purpose, not technical layer. Top-level: `Ordering`, `Billing`, `Inventory` - never `Controllers`, `Services`, `Repositories`.
 - **Value objects over primitives.** Wrap domain concepts in typed value objects, not raw strings/ints. Kills primitive obsession; validity enforced at construction.
 - **Ubiquitous language.** Same terms in code, tests, domain conversations. Code says X, business says Y → code is wrong.
 
@@ -78,8 +78,8 @@
 
 ## Planning
 
-- **Plan before code.** Every non-trivial task starts with a written plan — problem, target state, acceptance criteria. Explore requirements and constraints before committing to a plan.
-- **Plan = self-contained brief for a senior dev with zero background.** Explain *why now*, problem solved, intent per decision, alternatives considered and rejected. Cover: background, scope + non-goals, invariants, risks/open questions, binary DoD. **All architectural decisions locked in plan** — module boundaries, patterns, abstractions, dependency direction, public API shape, data model. Implementer handles tactical execution (naming, control flow, helper extraction, test layout), never design. No code, no pseudo-code, no step-by-step. Reader asks "why this approach?" → plan answers without digging. Plans are briefs, not prescriptive code-per-step runbooks.
+- **Plan before code.** Every non-trivial task starts with a written plan - problem, target state, acceptance criteria. Explore requirements and constraints before committing to a plan.
+- **Plan = self-contained brief for a senior dev with zero background.** Explain *why now*, problem solved, intent per decision, alternatives considered and rejected. Cover: background, scope + non-goals, invariants, risks/open questions, binary DoD. **All architectural decisions locked in plan** - module boundaries, patterns, abstractions, dependency direction, public API shape, data model. Implementer handles tactical execution (naming, control flow, helper extraction, test layout), never design. No code, no pseudo-code, no step-by-step. Reader asks "why this approach?" → plan answers without digging. Plans are briefs, not prescriptive code-per-step runbooks.
 - **Bite-sized tasks.** One task = one concern = one verifiable outcome. No monolithic prompts.
 - **Acceptance criteria binary.** Concrete pass/fail with example inputs and expected outputs. Vague ("should work correctly") = not a criterion.
 - **Claim strength must match proof strength.** Every non-trivial plan claim needs a binary acceptance check that proves the same strength of claim. If a plan says "exact", "recursive", "durable", "full mirror", or "complete", its verification must distinguish a real implementation from a weaker partial implementation that merely still exits `0`.
@@ -110,7 +110,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - Hit a dependency on another plan? STOP and report; do not implement it.
 - One subagent per independent task. After each: separate verification subagent (not the implementer) runs the focused test, checks DoD bullet, greps for regressions.
 - Before "done": run every DoD verification command, paste actual output. No claim without evidence.
-- On completion: update plan `Status:` line to `landed — <commit sha>`, tick DoD checkboxes, commit code (NOT the plan file itself).
+- On completion: update plan `Status:` line to `landed - <commit sha>`, tick DoD checkboxes, commit code (NOT the plan file itself).
 - Report: what changed, tests run, deviations, follow-ups belonging to other plans.
 
 ## "Review the implementation" / "verify the implementation"
@@ -119,7 +119,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - For each Scope item + DoD bullet: locate the change, run the specified verify command (include actual output), flag missing/partial/deviation with `file:line`.
 - Also check: out-of-scope respected, no new compile errors or test regressions.
 - Findings → correction workflow: IMPLEMENT (one subagent per task) → VALIDATE (separate subagent per task) → REPORT.
-- Output: `PASS|FAIL|UNCLEAR: <bullet> — <evidence>`. Final verdict: `APPROVE | CHANGES REQUESTED | BLOCKED`.
+- Output: `PASS|FAIL|UNCLEAR: <bullet> - <evidence>`. Final verdict: `APPROVE | CHANGES REQUESTED | BLOCKED`.
 
 ## "Check your work" / "verify changes" / "self-verify"
 

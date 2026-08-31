@@ -1,6 +1,6 @@
 ---
 name: exec-plan
-description: Use when authoring a new execution plan, revising a plan, or deciding whether a plan is ready to execute — including writing acceptance criteria, scoping milestones, and running plan-critic review rounds.
+description: Use when authoring a new execution plan, revising a plan, or deciding whether a plan is ready to execute - including writing acceptance criteria, scoping milestones, and running plan-critic review rounds.
 ---
 
 # Exec Plan
@@ -9,22 +9,22 @@ Author `<plans-dir>/<date>-<topic>.md` plans as self-contained briefs, then gate
 
 `<plans-dir>` is wherever the project keeps plans (e.g. `.agents/plans/`, `docs/plans/`).
 
-The full ExecPlan spec — envelope, required sections, skeleton, self-containment rules — lives in [`PLANS.md`](PLANS.md). Read it before authoring; the shape below is the quick contract.
+The full ExecPlan spec - envelope, required sections, skeleton, self-containment rules - lives in [`PLANS.md`](PLANS.md). Read it before authoring; the shape below is the quick contract.
 
 ## Plan Shape (contract)
 
 A plan is a brief for a senior dev with zero background. Required sections:
 
-- **Status:** line (`draft` → `ready` → `landed — <sha>` / `blocked — <reason>`)
-- **Background / why now** — problem, evidence, what happens if deferred
-- **User stories** — the feature from the user's perspective, as `As an <actor>, I want <capability>, so that <benefit>`. The scope-completeness check: a capability with no story is out of scope until one exists. Internal/refactor work with no external actor → say so and skip
-- **Scope + Non-goals** — explicit exclusions kill drift
-- **Locked decisions** — module boundaries, patterns, public API shape, data model, dependency direction, security sources. All architecture locks HERE; the implementer gets tactics only (naming, control flow, test layout)
-- **Alternatives considered** — and why rejected
+- **Status:** line (`draft` → `ready` → `landed - <sha>` / `blocked - <reason>`)
+- **Background / why now** - problem, evidence, what happens if deferred
+- **User stories** - the feature from the user's perspective, as `As an <actor>, I want <capability>, so that <benefit>`. The scope-completeness check: a capability with no story is out of scope until one exists. Internal/refactor work with no external actor → say so and skip
+- **Scope + Non-goals** - explicit exclusions kill drift
+- **Locked decisions** - module boundaries, patterns, public API shape, data model, dependency direction, security sources. All architecture locks HERE; the implementer gets tactics only (naming, control flow, test layout)
+- **Alternatives considered** - and why rejected
 - **Invariants / risks / open questions**
-- **Milestones** — vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step
-- **Progress** — mandatory checkbox list (`- [ ]` / `- [x] (timestamp)`) tracking granular work. This is the tracker: the assistant ticks boxes as it goes, splits a half-done item into "done / remaining" at every stopping point, and the plan file stays the single source of truth. No external issue tracker
-- **DoD** — binary checkboxes, each with an exact verification command + expected output
+- **Milestones** - vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step
+- **Progress** - mandatory checkbox list (`- [ ]` / `- [x] (timestamp)`) tracking granular work. This is the tracker: the assistant ticks boxes as it goes, splits a half-done item into "done / remaining" at every stopping point, and the plan file stays the single source of truth. No external issue tracker
+- **DoD** - binary checkboxes, each with an exact verification command + expected output
 
 Rules:
 - **Test at the fewest, highest seams.** Prefer an existing seam to a new one; the ideal count across the change is one. Name the seam(s) and any prior art (similar tests in the codebase) so the implementer tests external behavior, not internals.
@@ -63,6 +63,6 @@ Once `Status: ready`, the baton passes out of this skill: /implement executes th
 
 ## Red Flags
 
-- "The plan is simple, one critic pass is enough" — two rounds, no exception.
-- Writing implementation code/pseudo-code into milestones — that's the implementer's job.
-- A DoD bullet with no command — untestable = not done-able.
+- "The plan is simple, one critic pass is enough" - two rounds, no exception.
+- Writing implementation code/pseudo-code into milestones - that's the implementer's job.
+- A DoD bullet with no command - untestable = not done-able.

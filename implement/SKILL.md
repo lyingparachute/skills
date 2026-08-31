@@ -18,4 +18,4 @@ Once done, use /judo-review to review the work: it hunts the code-judo moves tha
 
 Commit your work to the current branch, then set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
 
-When the work has landed and the review is clean, use /plan-retire to close out the plan — extract durable decisions, delete the rest.
+When the work has landed and the review is clean, use /plan-retire to close out the plan - extract durable decisions, delete the rest.
