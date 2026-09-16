@@ -35,7 +35,8 @@ These are the patterns that read as machine-generated. Cut them on sight, and un
 - **Repetition across sections.** Making the same point in the intro, the body, and the conclusion. Say it in the strongest place and trust the reader to remember.
 - **Bold-term spam.** Every bullet opening with a **bolded lead-in**. When everything is emphasized, nothing is. Let the prose carry it.
 - **Hedging and filler.** "robust", "seamless", "leverage", "simply", "in order to", "it's worth noting", "as we can see". They add length and subtract confidence. State the thing plainly.
-- **Sycophancy and chat filler.** "Great question", "You're absolutely right", "Of course!", "I hope this helps", "Let me know if you need anything else". Openers that warm up and closers that fish for applause. Lead with the answer, stop when it is answered.
+- **Praise, in every direction.** No praise. Not of the user ("great question", "you're absolutely right", "good catch"), not of the code or its author ("clean implementation", "nice use of the builder here", "solid refactor"), not of your own work ("this now handles the edge case elegantly"). Praise is not information. It is the warm-up a reader skims to reach the point, and it reads as a machine buying goodwill. Lead with the answer, stop when it is answered.
+- **Chat filler.** "Of course!", "I hope this helps", "Let me know if you need anything else", "Happy to dig further". Openers that clear the throat and closers that fish for applause.
 - **Fancy ways to say "is".** "serves as", "stands as", "boasts", "features", and "not just X, but Y". Say what the thing is or does.
 - **Abstract metaphor nouns.** substrate, wedge, vector, nexus, primitive, surface, scaffolding, paradigm, flywheel, north star. They read technical and mean less than the concrete word: a substrate is a base, to wedge in is to add, a vector is a way. Pick the concrete word.
 - **Feelings in place of mechanisms.** "types that follow your schema", "SQL you can read", "the database stays close at hand" name a sensation. Name the mechanism or the number: "a column rename fails the build". If a sentence could appear unchanged in another project's docs, it says nothing about this one.
@@ -53,7 +54,7 @@ This is what an architect means by "AI slop" most often: correct content at the 
 - **Design / architecture sign-off docs.** State the *problem*, the *proposal*, the *decision being requested*, and the *open questions*, clearly enough to stand on their own. Describe the contract and the seam, not the implementation. Keep out class/type lists, package and module layouts, library/SDK choices, and ticket-dependency bookkeeping. Those live in the implementation tickets, not here. (Exception: when a specific library or version *is* the decision being signed off, name it.) If a reader would ask "why this approach?", the doc should answer without them digging.
 - **Issues / tickets.** State the **contract**: the wire/auth/error shape, scope (in and out), and binary acceptance criteria. Do not prescribe `file:line` implementation, control flow, or helper names. The implementer owns tactics. Give them the *what* and *why*, not a step-by-step of *how*.
 - **PR descriptions.** What changed and why, at the level a reviewer needs to evaluate it. Link the ticket, but don't restate it. Skip the play-by-play of how you got there.
-- **Review comments.** Every sentence is something the author must do or decide. If they cannot act on it, cut it. Your own review trail fails that test ("I traced all three paths", "each of the four tests fails on develop"): it tells the author about you, not about their change. Evidence belongs beside the ask it justifies, the verdict is the approve / request-changes state, and the full assessment goes to the user in conversation, not the thread, unless they ask you to post it.
+- **Review comments.** Every sentence is something the author must do or decide. If they cannot act on it, cut it. Praise is the sentence that fails that test most often: no "nice catch", no "this is well structured", no compliment softening the ask, no praise sandwich around it. Open on the finding. Post the result, not the workings: the ask, plus the one fact that makes it true. A chain of citations proving how you got there ("this constructor null-checks it, and that one defaults it, so…") tells the author about your search, not their change. So does your own trail ("I traced all three paths", "each of the four tests fails on develop"). Say the finding once. Conclusion, restated conclusion, verdict, and ask is one comment doing one job four times. Keep a comment to one location. A second site with the same problem gets its own thread, so the author can resolve it on its own. Skip line numbers the review tool already anchors for you. Evidence belongs beside the ask it justifies, the verdict is the approve / request-changes state, and the full assessment goes to the user in conversation, not the thread, unless they ask you to post it.
 
 ## Facts must be real
 
@@ -78,8 +79,8 @@ These keep you from doing the wrong thing in the right voice:
 - No em-dash (`—`) anywhere. Hyphen (`-`) or a rewrite instead.
 - Every fact checkable, no internal contradictions.
 - First person, and the single decision or ask is obvious.
-- In review comments, every sentence is something the author must do or decide.
-- No sycophancy or chat filler. Straight quotes, sentence-case headings, no decorative emoji.
+- In review comments, every sentence is something the author must do or decide. Result, not workings. Finding stated once. One location per comment.
+- No praise anywhere: not of the user, not of the author or their code, not of your own work. No chat filler. Straight quotes, sentence-case headings, no decorative emoji.
 - Self-audit: read it back and answer "what here makes this obviously AI-generated?", then fix that.
 - Not posting to a shared system unless explicitly asked.
 
@@ -97,3 +98,21 @@ Why it fails: it's a class list and a port inventory, implementation detail an a
 > The boundary is storage-agnostic: it owns a staged file (a temporary, customer-bound input), not a storage object. Where the bytes physically live is internal and invisible to the contract. That's the heart of the proposal: the shared concept is a staged file, not a bucket key.
 
 The internal ports and types still exist. They just belong in the implementation tickets, where the people building it need them.
+
+## Example: tightening a review comment
+
+**Slop (nothing fluffy in it, and the author still won't read it twice):**
+
+> This guard never fires. `statusInstantForSort` on line 146 dereferences `task.status().timestamp()` without a check, and the SDK makes both non-null: `Task`'s constructor calls `checkNotNullParam("status", status)`, and `TaskStatus`'s constructor replaces a null timestamp with `OffsetDateTime.now(UTC)`. So the method can never return null, and the `@Nullable` on it is wrong. Drop the guard and the annotation. The same applies to `Comparator.nullsLast` in `listOwnedTasks` on line 80.
+
+Why it fails: three sentences of workings for one sentence of ask. The finding lands four times (never fires, never returns null, annotation wrong, drop it). It cites line numbers the review tool already anchors. It staples a second location onto a thread the author cannot resolve in one place.
+
+**Tightened (same finding, two threads):**
+
+> `@Nullable` is wrong here. The SDK guarantees both `status` and its `timestamp`, so this branch is dead - drop the annotation and the guard.
+
+On `listOwnedTasks`:
+
+> Same as `statusInstantForSort`: the timestamp is never null, so `nullsLast` can go.
+
+The two constructors are still the proof. They belong in the reply if the author pushes back, not in the opening comment.
