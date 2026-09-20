@@ -1,6 +1,6 @@
 ---
 name: sentry-cli-issue
-version: 0.31.0
+version: 0.45.0
 description: Manage Sentry issues
 requires:
   bins: ["sentry"]
@@ -18,8 +18,8 @@ List issues in a project
 **Flags:**
 - `-q, --query <value> - Search query (Sentry syntax, implicit AND, no OR operator)`
 - `-n, --limit <value> - Maximum number of issues to list - (default: "25")`
-- `-s, --sort <value> - Sort by: date, new, freq, user - (default: "date")`
-- `-t, --period <value> - Time range: "7d", "2026-04-01..2026-05-01", ">=2026-04-01" - (default: "90d")`
+- `-s, --sort <value> - Sort by: recommended, date, new, freq, user (default: recommended on sentry.io, else date)`
+- `-t, --period <value> - Time range: "7d", "2026-08-01..2026-09-01", ">=2026-08-01" - (default: "90d")`
 - `-c, --cursor <value> - Pagination cursor (use "next" for next page, "prev" for previous)`
 - `--compact - Single-line rows for compact output (auto-detects if omitted)`
 - `-f, --fresh - Bypass cache, re-detect projects, and fetch fresh data`
@@ -31,19 +31,19 @@ List issues in a project
 | `id` | string | Numeric issue ID |
 | `shortId` | string | Human-readable short ID (e.g. PROJ-ABC) |
 | `title` | string | Issue title |
-| `culprit` | string | Culprit string |
+| `culprit` | string \| null | Culprit string |
 | `count` | string | Total event count |
 | `userCount` | number | Number of affected users |
 | `firstSeen` | string \| null | First occurrence (ISO 8601) |
 | `lastSeen` | string \| null | Most recent occurrence (ISO 8601) |
 | `level` | string | Severity level |
 | `status` | string | Issue status |
-| `priority` | string | Triage priority |
-| `platform` | string | Platform |
 | `permalink` | string | URL to the issue in Sentry |
 | `project` | object | Project info |
 | `metadata` | object | Issue metadata |
-| `assignedTo` | unknown \| null | Assigned user or team |
+| `assignedTo` | object \| null | Assigned user or team |
+| `priority` | string | Triage priority |
+| `platform` | string | Platform |
 | `substatus` | string \| null | Issue substatus |
 | `isUnhandled` | boolean | Whether the issue is unhandled |
 | `seerFixabilityScore` | number \| null | Seer AI fixability score (0-1) |
@@ -69,6 +69,11 @@ sentry issue list my-org/frontend --query "is:resolved"
 # Sort by frequency
 sentry issue list my-org/frontend --sort freq --limit 20
 
+# Sort by Sentry's "recommended" relevance ranking (the default on sentry.io;
+# self-hosted instances default to "date" and require a recent Sentry version
+# to accept --sort recommended)
+sentry issue list my-org/frontend --sort recommended
+
 # Multiple filters (space-separated = implicit AND)
 sentry issue list --query "is:unresolved level:error assigned:me"
 
@@ -87,7 +92,7 @@ List events for a specific issue
 - `-n, --limit <value> - Number of events (1-1000) - (default: "25")`
 - `-q, --query <value> - Search query (Sentry search syntax)`
 - `--full - Include full event body (stacktraces)`
-- `-t, --period <value> - Time range: "7d", "2026-04-01..2026-05-01", ">=2026-04-01" - (default: "7d")`
+- `-t, --period <value> - Time range: "7d", "2026-08-01..2026-09-01", ">=2026-08-01" - (default: "7d")`
 - `-f, --fresh - Bypass cache, re-detect projects, and fetch fresh data`
 - `-c, --cursor <value> - Navigate pages: "next", "prev", "first" (or raw cursor string)`
 
@@ -109,7 +114,26 @@ List events for a specific issue
 | `platform` | string \| null | Platform (python, javascript, etc.) |
 | `dateCreated` | string | ISO 8601 creation timestamp |
 | `crashFile` | string \| null | Crash file URL |
-| `metadata` | unknown \| null | Event metadata |
+| `metadata` | object | Event metadata |
+
+**Examples:**
+
+```bash
+# List recent events for an issue
+sentry issue events FRONT-ABC
+
+# Filter events by search query
+sentry issue events FRONT-ABC --query "browser:Chrome"
+
+# Show full event details
+sentry issue events FRONT-ABC --full
+
+# Limit results and filter by time period
+sentry issue events FRONT-ABC --limit 50 --period 24h
+
+# Paginate through results
+sentry issue events FRONT-ABC -c next
+```
 
 ### `sentry issue explain <issue>`
 
@@ -122,6 +146,15 @@ Analyze an issue's root cause using Seer AI
 **Examples:**
 
 ```bash
+# View the most recent issue
+sentry issue view @latest
+
+# Explain the most frequently occurring issue
+sentry issue explain @most_frequent
+
+# Generate a fix plan for the latest issue
+sentry issue plan @latest
+
 # Analyze root cause (may take a few minutes for new issues)
 sentry issue explain 123456789
 
@@ -131,11 +164,11 @@ sentry issue explain my-org/MYPROJECT-ABC
 # Force a fresh analysis
 sentry issue explain 123456789 --force
 
-# Generate a fix plan (requires explain to be run first)
+# Generate a fix plan (automatically runs explain if needed)
 sentry issue plan 123456789
 
-# Specify which root cause to plan for
-sentry issue plan 123456789 --cause 0
+# Force a fresh plan even if one already exists
+sentry issue plan 123456789 --force
 ```
 
 ### `sentry issue plan <issue>`
@@ -143,7 +176,6 @@ sentry issue plan 123456789 --cause 0
 Generate a solution plan using Seer AI
 
 **Flags:**
-- `--cause <value> - Root cause ID to plan (required if multiple causes exist)`
 - `--force - Force new plan even if one exists`
 - `-f, --fresh - Bypass cache, re-detect projects, and fetch fresh data`
 
@@ -156,6 +188,34 @@ View details of a specific issue
 - `--spans <value> - Span tree depth limit (number, "all" for unlimited, "no" to disable) - (default: "3")`
 - `-f, --fresh - Bypass cache, re-detect projects, and fetch fresh data`
 
+**JSON Fields** (use `--json --fields` to select specific fields):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Numeric issue ID |
+| `shortId` | string | Human-readable short ID (e.g. PROJ-ABC) |
+| `title` | string | Issue title |
+| `culprit` | string \| null | Culprit string |
+| `count` | string | Total event count |
+| `userCount` | number | Number of affected users |
+| `firstSeen` | string \| null | First occurrence (ISO 8601) |
+| `lastSeen` | string \| null | Most recent occurrence (ISO 8601) |
+| `level` | string | Severity level |
+| `status` | string | Issue status |
+| `permalink` | string | URL to the issue in Sentry |
+| `project` | object | Project info |
+| `metadata` | object | Issue metadata |
+| `assignedTo` | object \| null | Assigned user or team |
+| `priority` | string | Triage priority |
+| `platform` | string | Platform |
+| `substatus` | string \| null | Issue substatus |
+| `isUnhandled` | boolean | Whether the issue is unhandled |
+| `seerFixabilityScore` | number \| null | Seer AI fixability score (0-1) |
+| `event` | unknown \| null | Latest event for the issue (full detail). Select named fields with `--fields event.id,event.title` to avoid pulling the whole payload; the `request` entry may include live session data. |
+| `org` | string \| null | Organization slug |
+| `replayIds` | array | Related Session Replay IDs |
+| `trace` | object \| null | Trace context from the latest event's span tree |
+
 **Examples:**
 
 ```bash
@@ -163,6 +223,33 @@ sentry issue view FRONT-ABC
 
 # Open in browser
 sentry issue view FRONT-ABC -w
+
+# GitHub-style identifiers work too (the "#" replaces the final slash)
+sentry issue view my-org/my-project#FRONT-ABC
+sentry issue view my-project#FRONT-ABC
+
+# Full JSON (issue fields + latest event + trace/replay context)
+sentry issue view FRONT-ABC --json
+
+# Select specific top-level fields to keep output small
+sentry issue view FRONT-ABC --json --fields shortId,title,culprit,count,userCount,permalink
+
+# Pull named fields off the latest event instead of the whole `event` object —
+# the event's `request` entry can include live session data (cookies, headers,
+# body), so extract only what you need
+sentry issue view FRONT-ABC --json --fields event.id,event.title,event.dateCreated
+
+# Issue summary
+sentry issue view FRONT-ABC --json | jq '{shortId, title, count, userCount, permalink}'
+
+# Latest event id + culprit
+sentry issue view FRONT-ABC --json | jq '{event: .event.id, culprit}'
+
+# Just the request URL and method (avoids the full request/session blob)
+sentry issue view FRONT-ABC --json | jq '.event.entries[] | select(.type == "request") | .data | {url, method}'
+
+# Exception type and value from the latest event
+sentry issue view FRONT-ABC --json | jq '.event.entries[] | select(.type == "exception") | .data.values[0] | {type, value}'
 ```
 
 ### `sentry issue resolve <issue>`
@@ -172,13 +259,17 @@ Mark an issue as resolved
 **Flags:**
 - `-i, --in <value> - Resolve in a release, next release, or commit ('<version>' | '@next' | '@commit' | '@commit:<repo>@<sha>')`
 
+### `sentry issue unresolve <issue>`
+
+Reopen a resolved issue
+
 **Examples:**
 
 ```bash
 # Resolve immediately (no regression tracking)
 sentry issue resolve CLI-G5
 
-# Resolve in a specific release - future events on newer releases are
+# Resolve in a specific release — future events on newer releases are
 # regression-flagged
 sentry issue resolve CLI-G5 --in 0.26.1
 
@@ -189,7 +280,7 @@ sentry issue resolve CLI-G5 --in spotlight@1.2.3
 sentry issue resolve CLI-G5 --in @next
 sentry issue resolve CLI-G5 -i @next
 
-# Resolve in the current git HEAD - auto-detects the Sentry repo from
+# Resolve in the current git HEAD — auto-detects the Sentry repo from
 # your git origin remote (hard-errors if it can't)
 sentry issue resolve CLI-G5 --in @commit
 
@@ -201,16 +292,12 @@ sentry issue unresolve CLI-G5
 sentry issue reopen CLI-G5   # alias
 ```
 
-### `sentry issue unresolve <issue>`
-
-Reopen a resolved issue
-
 ### `sentry issue archive <issue>`
 
 Archive (ignore) an issue
 
 **Flags:**
-- `-u, --until <value> - Condition for unarchival: auto, 30m, 10x, 10u, 10x/5m, etc.`
+- `-u, --until <value> - Condition for unarchival: forever, auto, 30m, 10x, 10u, 10x/5m, etc.`
 
 **Examples:**
 
@@ -218,7 +305,7 @@ Archive (ignore) an issue
 # Archive forever (fully silenced)
 sentry issue archive CLI-G5
 
-# Smart detection - unarchives when Sentry detects a spike in event frequency
+# Smart detection — unarchives when Sentry detects a spike in event frequency
 sentry issue archive CLI-G5 --until auto
 
 # Duration-based
@@ -226,13 +313,13 @@ sentry issue archive CLI-G5 --until 1h    # 1 hour
 sentry issue archive CLI-G5 --until 7d    # 7 days
 sentry issue archive CLI-G5 --until 2026-12-31  # specific date
 
-# Count-based - unarchive after N more events
+# Count-based — unarchive after N more events
 sentry issue archive CLI-G5 --until 100x
 
-# User-based - unarchive after N more users affected
+# User-based — unarchive after N more users affected
 sentry issue archive CLI-G5 --until 10u
 
-# Compound - count within a time window
+# Compound — count within a time window
 sentry issue archive CLI-G5 --until 100x/1h   # 100 events within 1 hour
 sentry issue archive CLI-G5 --until 10u/1d    # 10 users within 1 day
 
@@ -248,7 +335,7 @@ sentry issue ignore CLI-G5 --until auto
 Merge 2+ issues into a single canonical group
 
 **Flags:**
-- `-i, --into <value> - Prefer this issue as the canonical parent (must match one of the provided IDs)`
+- `-i, --into <value> - Prefer this issue as the canonical parent (included in the merge if not already listed)`
 
 **Examples:**
 
@@ -256,13 +343,13 @@ Merge 2+ issues into a single canonical group
 # Let Sentry auto-pick the parent (typically the largest by event count)
 sentry issue merge CLI-K9 CLI-15H CLI-15N
 
-# Pin the canonical parent explicitly - accepts the same formats as
+# Pin the canonical parent explicitly — accepts the same formats as
 # positional args, including org-qualified and project-alias forms
 sentry issue merge CLI-K9 CLI-15H CLI-15N --into CLI-K9
 sentry issue merge my-org/CLI-K9 my-org/CLI-15H --into my-org/CLI-K9
 sentry issue merge cli-k9 cli-15h --into cli-k9    # alias form
 
-# Cross-org merges are rejected - all issues must share an organization
+# Cross-org merges are rejected — all issues must share an organization
 # Non-error issue types (performance, info, etc.) cannot be merged
 ```
 
