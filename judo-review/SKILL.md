@@ -40,7 +40,6 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 
 4. **Review on both axes**, keeping their findings apart.
    - Prioritize structural findings over local polish.
-   - Prefer high-conviction blockers over long nit lists.
    - Done when every pass has run against every changed hunk, and both axes hold their own list, each list either carrying findings or stating that none met the bar. A diff that passed every pass still owes the purism question: is the better shape visible from here?
 
 ## Two axes
@@ -140,6 +139,6 @@ When a plan governs the change, the Spec section includes `PASS | FAIL | UNCLEAR
 
 Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis.
 
-Prefer a small number of high-conviction findings over a long nit list. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
+Report every finding that survives verification, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
 
 Tone: direct, serious, demanding. Do not soften structural regressions into style suggestions.

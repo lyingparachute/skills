@@ -49,7 +49,7 @@
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
 - **4x = wrong approach.** Solution ~4x bigger than its core (200 lines for what fits in 50, 5 abstractions where 1 works) → approach wrong. Stop, rewrite from scratch. Patching no fix bad shape.
-- **Boy Scout rule, bounded.** Leave touched code cleaner than you found it - but only within the scope of the current change. No drive-by refactors of adjacent files.
+- **Boy Scout rule, bounded by file.** Leave every touched file cleaner than you found it, including lines the change did not need. Files the change does not touch stay out of scope.
 
 ## Architecture
 

@@ -3,7 +3,7 @@
 Reference for the Standards axis. Two rules govern every entry below:
 
 - **The repo overrides.** A convention in the repo's rule files, or an established pattern in the touched code, beats anything here.
-- **Always a judgement call.** These name shapes worth a second look, never violations to count. A smell reported without the cost it imposes on a reader or a future change is a nit.
+- **Always a judgement call.** These name shapes worth a second look, never violations to count. Every smell you report, nit or not, names the cost it imposes on a reader or a future change.
 - **The judo move outranks the catalogue.** A named smell is the floor, not the goal. When a restructure would delete a whole category of complexity, that move is the finding, and whether it maps onto a catalogue entry does not matter. A review that returns twelve named smells and no judo move has failed.
 
 ## Smell baseline
