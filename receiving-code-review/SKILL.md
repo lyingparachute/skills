@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Use when code-review feedback arrives and you are about to act on it: a reviewer's comments, a PR review, inline thread replies, a critic subagent's findings, or a plain "fix these" list. Also use when a comment reads as unclear or technically questionable.
+description: "Use when code-review feedback arrives and you are about to act on it: a reviewer's comments, a PR review, inline thread replies, a critic subagent's findings, or a plain \"fix these\" list. Also use when a comment reads as unclear or technically questionable."
 ---
 
 # Receiving Code Review
