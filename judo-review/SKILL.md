@@ -13,7 +13,7 @@ Attack the change, do not validate it. Ask "what is wrong here?", not "is this r
 
 The bar is **code purism**: the best solution available, not an acceptable one. Judge the diff against the shape an expert would build knowing the whole codebase and carrying no deadline, then report the gap. Keep hunting for the judo move even when the diff already passes every named check - the review's job is the better shape, not a clean scorecard.
 
-Treat every implementer summary, PR description, prior agent claim, and design rationale as a hypothesis until source proves it. Verify findings against source before reporting them.
+Treat every implementer summary, PR description, prior agent claim, and design rationale as a hypothesis until source proves it.
 
 If running as a reviewer subagent, stay readonly and leaf-only: do not edit files, mutate git state, or spawn another agent.
 
@@ -42,6 +42,14 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
    - Prioritize structural findings over local polish.
    - Done when every pass has run against every changed hunk, and both axes hold their own list, each list either carrying findings or stating that none met the bar. A diff that passed every pass still owes the purism question: is the better shape visible from here?
 
+5. **Double-verify every finding before reporting.** For each candidate finding, on either axis and at any severity:
+   - Re-read the cited `path:line` and enough code around it to confirm the claim is true in source, not only in your memory of the diff.
+   - Name the evidence that proves it: diff hunk, call site, test, rule, or command output.
+   - Confirm the remedy is real: the proposed shape fixes or simplifies without inventing requirements.
+   - Drop anything that fails re-check or rests on an implementer claim. A nit that survives re-check stays, with the cost it puts on a reader or the next change stated.
+   - Do not invent compensating findings to fill the list after dropping weak ones.
+   - Done when every reported finding has passed the re-read, the evidence check, and the remedy check.
+
 ## Two axes
 
 Every review is two independent reviews, reported side by side.
@@ -68,7 +76,7 @@ Three ways this runs. As the top agent reviewing directly, dispatch one subagent
 The Standards axis applies these passes in order. Requirement fit belongs to the Spec axis: compare each task cluster to what was asked for it, and flag missing requirements, misunderstood requirements, and behavior that goes beyond what any task in the batch asked for.
 
 1. **Correctness and regressions**: logic errors, missing edge cases, race conditions, broken error handling, behavior that contradicts the request, and tests that are missing, circular, over-mocked, or failing to cover the changed behavior.
-2. **Structural simplification**: look for a code-judo move that deletes concepts, branches, helpers, modes, conditionals, layers, or state rather than polishing them. Prefer the structure that feels inevitable in hindsight.
+2. **Structural simplification**: look for every code-judo move that deletes concepts, branches, helpers, modes, conditionals, layers, or state rather than polishing them. Prefer the structure that feels inevitable in hindsight.
 3. **Spaghetti growth**: flag ad-hoc conditionals, one-off booleans, nullable modes, scattered feature checks, repeated conditionals, and special cases bolted into unrelated flows.
 4. **Boundaries and types**: flag feature logic in shared paths, implementation details leaking through APIs, unnecessary `any` / `unknown` / casts / optionality, and silent fallback hiding unclear invariants.
 5. **Canonical ownership**: prefer existing utilities, helpers, packages, services, and domain concepts over bespoke near-duplicates or logic in the wrong layer.
@@ -139,6 +147,6 @@ When a plan governs the change, the Spec section includes `PASS | FAIL | UNCLEAR
 
 Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis.
 
-Report every finding that survives verification, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
+Report every finding that survives the double-verify step, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
 
 Tone: direct, serious, demanding. Do not soften structural regressions into style suggestions.

@@ -1,6 +1,6 @@
 # Standards baseline
 
-Reference for the Standards axis. Two rules govern every entry below:
+Reference for the Standards axis. Three rules govern every entry below:
 
 - **The repo overrides.** A convention in the repo's rule files, or an established pattern in the touched code, beats anything here.
 - **Always a judgement call.** These name shapes worth a second look, never violations to count. Every smell you report, nit or not, names the cost it imposes on a reader or a future change.
@@ -8,7 +8,7 @@ Reference for the Standards axis. Two rules govern every entry below:
 
 ## Smell baseline
 
-Twelve shapes from Fowler's catalogue, each with the move that resolves it. Where a move here overlaps Preferred Remedies in `SKILL.md`, that section is authoritative on the remedy; this list is what you scan the diff for.
+Twelve shapes from Fowler's catalogue, each with the move that resolves it. Where a move here overlaps Preferred Remedies in `SKILL.md`, that section is authoritative on the remedy; this list is what you scan the diff for. Scan the whole list against the touched flow, past the first hit.
 
 - **Mysterious name** - a name that needs the body read to be understood. Rename until the call site reads on its own.
 - **Duplicated code** - the same logic in two places. Extract it, or move it to the layer that owns the concept.
