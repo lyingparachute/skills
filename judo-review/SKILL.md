@@ -42,13 +42,8 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
    - Prioritize structural findings over local polish.
    - Done when every pass has run against every changed hunk, and both axes hold their own list, each list either carrying findings or stating that none met the bar. A diff that passed every pass still owes the purism question: is the better shape visible from here?
 
-5. **Double-verify every finding before reporting.** For each candidate finding, on either axis and at any severity:
-   - Re-read the cited `path:line` and enough code around it to confirm the claim is true in source, not only in your memory of the diff.
-   - Name the evidence that proves it: diff hunk, call site, test, rule, or command output.
-   - Confirm the remedy is real: the proposed shape fixes or simplifies without inventing requirements.
-   - Drop anything that fails re-check or rests on an implementer claim. A nit that survives re-check stays, with the cost it puts on a reader or the next change stated.
-   - Do not invent compensating findings to fill the list after dropping weak ones.
-   - Done when every reported finding has passed the re-read, the evidence check, and the remedy check.
+5. **Ground every finding in source.** Report a finding only with evidence you saw in this review: the `path:line` as it reads now, a call site, a test, a rule, or command output. When a finding came from memory of the diff, a summary, or a pattern rather than from the code itself, re-read the cited lines before you keep it. Check that the remedy fixes the problem without inventing requirements. Drop what fails, and what rests only on an implementer claim; a nit that survives stays, with its cost stated. Do not invent compensating findings to fill the list after dropping weak ones.
+   - Done when every reported finding carries evidence from source and a remedy you checked.
 
 ## Two axes
 
@@ -147,6 +142,6 @@ When a plan governs the change, the Spec section includes `PASS | FAIL | UNCLEAR
 
 Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis.
 
-Report every finding that survives the double-verify step, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
+Report every finding that survives step 5, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
 
 Tone: direct, serious, demanding. Do not soften structural regressions into style suggestions.
