@@ -173,3 +173,7 @@ Rules below codify subagent dispatch and review discipline.
 ## Top Agent Discipline
 
 - **Top agent inherits all rules above.** Every general rule applies: `Verify before acting` (Code Quality) covers subagent claims; `Critic = fresh context, never the writer` covers self-approval; `Implementation = one slice per subagent` covers decomposition before dispatch; `Plan = self-contained brief...` covers subagent prompt shape (outcome + acceptance criteria, no pseudo-code, no step-by-step).
+
+# graphify
+- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

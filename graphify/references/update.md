@@ -63,7 +63,7 @@ print('code_only:', code_only)
 
 If `code_only` is True: print `[graphify update] Code-only changes detected - skipping semantic extraction (no LLM needed)`, run only Step 3A (AST) on the changed files, skip Step 3B entirely (no subagents), then go straight to merge and Steps 4–8.
 
-If `code_only` is False (any changed file is a doc/paper/image/video): **first, if any changed file is in `new_files['video']`, run `references/transcribe.md` (Step 2.5) on those files, then rewrite `.graphify_detect.json` to move the resulting transcript paths into `files['document']` and drop `files['video']`** - otherwise raw `.mp4/.mp3` paths are fed to semantic subagents as unreadable media (#1392). Then run the full Steps 3A–3C pipeline as normal.
+If `code_only` is False (any changed file is a doc/paper/image/video): **first, if any changed file is in `new_files['video']`, run `references/transcribe.md` (Step 2.5) on those files, then rewrite `.graphify_detect.json` to move the resulting transcript paths into `files['document']` and drop `files['video']`** — otherwise raw `.mp4/.mp3` paths are fed to semantic subagents as unreadable media (#1392). Then run the full Steps 3A–3C pipeline as normal.
 
 
 If no new files exist (only deletions), create an empty extraction so the merge step can prune:
@@ -98,10 +98,10 @@ deleted = list(incremental.get('deleted_files', []))
 # new_chunks is dropped from the base before merge, so old/stale nodes don't survive.
 # Do NOT add `changed` here: with root= passed, prune_set relativizes to the same base
 # as the freshly merged nodes and would DELETE the re-extracted content (#1178 is moot
-# now that replace - not the dedup pass - reconciles changed files).
+# now that replace — not the dedup pass — reconciles changed files).
 prune = list(deleted) or None
 
-# Use build_merge() - reads graph.json directly without NetworkX round-trip
+# Use build_merge() — reads graph.json directly without NetworkX round-trip
 # so edge direction (calls, implements, imports) is always preserved (#801).
 # Pass root= so prune_sources (absolute paths from detect_incremental) are
 # relativized to match the graph's relative source_file values; without it
@@ -140,9 +140,27 @@ print(f'[graphify update] Merged extraction written ({len(merged_out[\"nodes\"])
 # Save manifest so next --update diffs against today's state, not the
 # prior run's baseline (prevents ghost-node reports on subsequent updates).
 # root= matches the build_merge call above so the manifest keys stay relative to
-# the scan root - portable across clones/machines, so --update keeps matching
+# the scan root — portable across clones/machines, so --update keeps matching
 # cached files instead of missing every one after a move (#1417).
-save_manifest(incremental['files'], root='INPUT_PATH')
+#
+# Only stamp semantic files (docs/papers/images) that ACTUALLY produced output
+# THIS run (new_extraction is this run's fresh extraction, read above before the
+# merge overwrote the file): a changed doc whose chunk failed must stay unstamped
+# so the next --update re-queues it, otherwise it is marked done and its content
+# is lost forever (#2015). Mirrors the library extract path
+# (cli._stamped_manifest_files + clear_semantic + scan_corpus).
+from graphify.cli import _stamped_manifest_files
+_manifest_files = _stamped_manifest_files(incremental['files'], new_extraction, Path('INPUT_PATH'))
+# Changed semantic files dispatched this run but NOT stamped had their chunk fail
+# or be omitted; clear any stale semantic_hash so they are re-queued (#1948).
+_sem_types = ('document', 'paper', 'image')
+_dispatched = {f for t, fl in incremental.get('new_files', {}).items() if t in _sem_types for f in fl}
+_stamped = {f for fl in _manifest_files.values() for f in fl}
+_cleared = _dispatched - _stamped
+# scan_corpus = the RAW full corpus so in-root files newly excluded since last run
+# are dropped rather than masquerading as deletions; untouched rows preserved (#1908).
+_scan = {f for fl in incremental['files'].values() for f in fl}
+save_manifest(_manifest_files, root='INPUT_PATH', scan_corpus=_scan, clear_semantic=_cleared or None)
 print('[graphify update] Manifest saved.')
 "
 ```
@@ -189,4 +207,4 @@ Skip Steps 1–3. Re-run clustering on the existing graph:
 graphify cluster-only .
 ```
 
-`graphify cluster-only .` is **self-contained**: it re-clusters, names communities, and regenerates `GRAPH_REPORT.md`, `graph.json`, and `graph.html` from the existing graph. **Do not re-run Steps 5–9** - they read intermediate files (`.graphify_extract.json`, `.graphify_detect.json`, `.graphify_analysis.json`) that a prior build's cleanup (Step 9) already deleted, so they raise `FileNotFoundError` (#1392). When it finishes, present the refreshed `GRAPH_REPORT.md` summary as usual.
+`graphify cluster-only .` is **self-contained**: it re-clusters, names communities, and regenerates `GRAPH_REPORT.md`, `graph.json`, and `graph.html` from the existing graph. **Do not re-run Steps 5–9** — they read intermediate files (`.graphify_extract.json`, `.graphify_detect.json`, `.graphify_analysis.json`) that a prior build's cleanup (Step 9) already deleted, so they raise `FileNotFoundError` (#1392). When it finishes, present the refreshed `GRAPH_REPORT.md` summary as usual.
