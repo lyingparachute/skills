@@ -29,17 +29,16 @@
 
 ## Research
 
-- **External knowledge = mandatory tool fetch, not training-data recall.** Library, framework, API, SDK, CLI, vendor surface - fetch real docs every time, even when the answer "feels obvious". Training cutoff lies; hallucinated APIs are the top failure mode.
-- **`context7` MCP - default for library/framework/API docs.** Use on every library/API question. Not optional, not "if unsure" - every time.
+- **Fetch docs for anything that changes between versions.** Third-party libraries, frameworks, SDKs, CLIs, and vendor APIs: fetch the real docs before you use them, even when the answer feels obvious. Training data goes stale, and made-up APIs are the top failure mode. Use `context7` MCP first. Stable language built-ins (`Array.map`, `java.util.Optional`) need no fetch.
 - **`nlm` CLI (NotebookLM) - prior research first, then deep research.** Before any deep research, check if an existing notebook already covers the problem. Current notebooks: `DDD` (Domain-Driven Design), `AI_DEVS` (building AI agents, agentic workflows). Only after no notebook fits → use `nlm` for external deep research on a new topic.
 
 ## Code Quality
 
-- **Code self-documents.** No narration (`// now we do X`), no removal markers (`// removed X`, `// was doing Y`), no obvious docstrings/javadocs (`@param user` for `getUser(user)`). Comment only what naming can't carry: hidden invariants, framework/bug workarounds, non-obvious protocol constraints, genuinely complex flow. In doubt: no comment.
+- **No comments by default. No doc blocks, ever.** Never write Javadoc, JSDoc, TSDoc, KDoc, or docstrings, even on public API. Only exception: the user asks, or the repo rules file requires them. Code explains itself through names, types, and small functions. Code needs a comment to make sense → rename or restructure first. A comment is allowed only when all three hold: the fact cannot live in code, a reader would get it wrong without it, and git history is the wrong place for it. Real cases: hidden invariant, workaround for a named library bug (link the issue), non-obvious spec or protocol constraint, why a surprising choice was made. Never: narration (`// now we do X`), restating the code, `@param`/`@return` tags, section banners, removal markers (`// removed X`), change history. Redundant comments on lines you touch → delete. In doubt: no comment.
 - **Construct objects completely.** Build in one place from all required inputs - factory, builder, or full-arg constructor. No empty init + scattered mutations. Mutation setters only when framework demands.
 - **No null returns.** Use typed absence - empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union - instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
-- **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → list with trade-off, ask which. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt. In a `grilling` round the recommendation stands in for silence, since the trade-off was surfaced with the question before any pick and the adoption is read back for confirmation.
+- **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → recommend one and state the trade-off. Ask only when the choice is the user's to make: product behavior, public API shape, scope, or cost. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt.
 - **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" - later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it. Done = plan met, tested, reviewed; "80% working" = 0% shipped.
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
@@ -137,27 +136,19 @@ User phrases below activate specific workflows. Follow the protocol literally.
 # Context Boundaries
 
 - **Grilling through to a written plan stays in one window.** That chain reasons over what it just heard, so a compact costs it exactly the detail it needs.
-- **At a phase boundary (grilling → building → verifying), default to continuing.** When the window truly has to break, prefer in this order: `/clear` once the artifact is written down, then `/handoff`, then a subagent for the next slice, and `/compact` last.
+- **At a phase boundary (grilling → building → verifying), keep going in the same window.** If it must break, write the artifact down first, then `/clear` or `/handoff`.
 
 # Subagents
 
-Rules below codify subagent dispatch and review discipline.
-
-## Hard Rules (Subagent Behavior)
-
-- **If you are a subagent, no spawn.** Never call any tool that dispatches another agent (`Agent`, `Task`, `dispatch_agent`, `spawn`, MCP agent tools, etc.). Only top agent spawn.
-- **Subagent = leaf.** Do work self with own tools (Read, Bash, Edit, Grep, WebFetch...). No redelegate.
-- **Need more? Return to top.** Say what missing, what to spawn next. Top decide.
-- **Unsure if subagent?** Check system prompt for "dispatched", "subagent", "you were invoked by". If yes → no spawn.
+- **Subagent = leaf.** A subagent never spawns agents. Need more → return to top with what is missing and what to spawn next.
 
 ## When Top Agent Spawn
 
-- **Discovery > 3 reads/greps → spawn.** Big exploration go to subagent. Top get summary only. Keep main context clean.
-- **Implementation = one slice per subagent.** One task, one concern, one verifiable outcome. Never whole feature in one subagent. Big work = many slices.
+- **Broad exploration or large tool output → spawn.** Searches across many modules, long research, big logs. Top reads the summary, not the raw dump. A few targeted reads or greps stay in the top agent.
+- **Large work = slices, one per subagent.** One slice = one concern, one verifiable outcome. A medium feature that fits one context stays in one agent. Splitting it too fine loses shared context and breaks the seams.
 - **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. No serial when no dependency.
 - **Plan exists → critic subagent review plan before execute.** No exception for non-trivial plan.
-- **Slice done → critic subagent review code before next slice.** No exception.
-- **Long research, big tool output → spawn.** Protect top context window. Top read synthesis, not raw dump.
+- **Non-trivial slice done → critic subagent review code before next slice.**
 
 ## Critic Subagent Rules
 
@@ -169,11 +160,3 @@ Rules below codify subagent dispatch and review discipline.
 - **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → one round 2 to verify fixes. Leftovers after round 2 → report to user, never third loop.
 - **Findings block progress.** Plan no execute until findings resolved or top write explicit dismissal with reason. Slice no merge until findings fixed. Quality bar = no code smell, no debt created, no debt left behind.
 - **Critic discipline:** fresh-context critic reviews findings; implementer addresses with evidence, not performative agreement.
-
-## Top Agent Discipline
-
-- **Top agent inherits all rules above.** Every general rule applies: `Verify before acting` (Code Quality) covers subagent claims; `Critic = fresh context, never the writer` covers self-approval; `Implementation = one slice per subagent` covers decomposition before dispatch; `Plan = self-contained brief...` covers subagent prompt shape (outcome + acceptance criteria, no pseudo-code, no step-by-step).
-
-# graphify
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

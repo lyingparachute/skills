@@ -12,7 +12,7 @@ harness_commands="clear compact check verify help init config fast skills plugin
 
 # Path and url segments that read like an invocation but are not. Add to this
 # list when a new false positive shows up, so the check can stay a hard failure.
-not_skills="tmp api users read sources exit-codes headroom"
+not_skills="tmp api users read source sources exit-codes headroom"
 
 # Backticked labels in routing docs that are not skill references. Filenames,
 # paths, and flags do not match the bare-name pattern below.
@@ -51,6 +51,14 @@ for ref in $(grep -hoE '(^|[[:space:]`(])/[a-z][a-z0-9-]{2,}' $routing_files | g
   echo "FAIL /$ref names no skill, in: $(grep -lE "(^|[[:space:]\`(])/$ref\b" $routing_files | tr '\n' ' ')"
   fail=1
 done
+
+# AGENTS.md is linked into every harness. Tool installers (graphify) append
+# blocks that point at one harness's skill dir through that symlink.
+echo "== AGENTS.md names no single harness's home dir"
+if grep -nE '~/\.(claude|codex|cursor|grok|config/opencode)/' AGENTS.md; then
+  echo "FAIL AGENTS.md points at a harness-specific path (lines above)"
+  fail=1
+fi
 
 echo "== user-invoked skills reaching other user-invoked skills (warnings)"
 user_invoked=$(grep -l "disable-model-invocation: true" */SKILL.md | cut -d/ -f1 | sort)
