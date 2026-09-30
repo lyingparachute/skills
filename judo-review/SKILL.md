@@ -123,7 +123,7 @@ Push for remedies that reduce the number of concepts a reader must hold. Reach f
 
 When the real problem is structural, a rename or a tidier version of the same messy idea is not a remedy; name the structural move instead.
 
-When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase-architecture`, which scans for the deepening opportunity and grills through the fix. It is user-invoked, so name it as the next move rather than trying to reach it from here.
+When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - the remedy is not a review comment. Raise it as a `followup-execplan` and recommend the user run `/improve-codebase` on the affected path, with the move as a suspect. It is user-invoked, so name it as the next move rather than trying to reach it from here.
 
 ## Output
 

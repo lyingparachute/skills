@@ -22,8 +22,8 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 **Design / build frontend**
 `impeccable` [model] (drives `shadcn-ui` for components; owns the detail refs + Web Interface Guidelines audit)
 
-**Rescue architecture**
-`graphify` [model] (map the codebase) → `improve-codebase-architecture` [user] (drives `codebase-design`, `domain-modeling`)
+**Clean up a codebase**
+`improve-codebase` [user] (drives `graphify` output or `zoom-out`, `judo-review`, `exec-plan`), then hand its plans to `implement` or `orchestrate`
 
 **Research a question**
 `research` [model] (web primary sources) · `nlm-skill` [model] (NotebookLM) · `graphify` [model] (this codebase)

@@ -12,14 +12,13 @@ These started as his and have since diverged, some heavily. Diff against that co
 
 | Skill | Notes on the divergence |
 |---|---|
-| `codebase-design` | Close to upstream, including `DEEPENING.md` and `DESIGN-IT-TWICE.md`. |
+| `codebase-design` | Pruned: dropped duplicated seam rules, the Relationships recap, and generic testability samples. `DEEPENING.md` and `DESIGN-IT-TWICE.md` close to upstream. |
 | `diagnosing-bugs` | Plus Phase 0, redaction. |
 | `domain-modeling` | Close to upstream. |
 | `grilling` | Round format taken from upstream. Silence-adopts-the-recommendation rule is ours. |
 | `grill-with-docs` | Same composition as upstream. |
 | `handoff` | Close to upstream. |
 | `implement` | Ours drives `judo-review` and `plan-retire`. |
-| `improve-codebase-architecture` | Adapted from upstream, then rebuilt around our `codebase-design` and grilling workflow. |
 | `plan-retire` | Ours; his repo has no equivalent. Built on his ADR test. |
 | `research` | Close to upstream. |
 | `tdd` | Close to upstream, plus `tests.md` and `mocking.md`. |

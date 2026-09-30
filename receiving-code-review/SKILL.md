@@ -30,7 +30,7 @@ The fix is the **receipt**. Acknowledge in diffs and verdicts, so every reply ca
 **Every confirmed finding lands.** Severity orders the work and decides nothing else. A confirmed `MINOR` or nitpick is work you do in this change: naming that reveals intent, a dead branch deleted, a type tightened, a duplicated literal named, a guard moved to the boundary. Severity describes blast radius, not worth. Where the suggested fix is weak, step 4 finds a stronger one; the finding still lands. Low severity, small gain, and "churn" are never dismissal reasons, because a confirmed finding has already shown the code is weaker than it could be.
 
 - **`merge-blocking`** → fix in this change. Order within it: breakage and security first, then trivial fixes (typos, imports), then complex ones.
-- **`followup-execplan`** → the remedy is bigger than this change, so it is a plan, not a patch. The size of the remedy decides this, never the severity: a fix that fits in this change lands in this change. Author a new ExecPlan per `/exec-plan`, critic-reviewed at least once, and point structural ones (shallow modules, tangled callers, a missing seam across files) at `improve-codebase-architecture`. A tracked plan, never "clean up later".
+- **`followup-execplan`** → the remedy is bigger than this change, so it is a plan, not a patch. The size of the remedy decides this, never the severity: a fix that fits in this change lands in this change. Author a new ExecPlan per `/exec-plan`, critic-reviewed at least once, and for structural ones (shallow modules, tangled callers, a missing seam across files) recommend the user run `/improve-codebase` on the affected path, with the finding as a suspect. A tracked plan, never "clean up later".
 
 ## Responding
 
