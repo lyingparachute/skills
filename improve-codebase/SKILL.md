@@ -33,7 +33,7 @@ Every finding carries these fields:
 
 ### 1. Map
 
-Dispatch one read-only mapper subagent. It uses `graphify-out/` when it exists and is current, else the `zoom-out` skill, and reads the rule files plus the `CONTEXT.md` and ADRs that govern each part.
+Dispatch one read-only mapper subagent. It runs the `zoom-out` skill and reads the rule files plus the `CONTEXT.md` and ADRs that govern each part.
 
 The mapper cuts the scope into **areas** of about 5,000 lines each. Tests belong to the area of the code they test. In a monorepo, an area never spans two packages. When the scope is the repo root, add one **repo area** for everything outside source: root config, CI, build and release scripts, docs. List the **cross-area calls**: calls from one area into another through its public interface or shared state, with the files on both sides.
 

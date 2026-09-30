@@ -13,6 +13,9 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 **Ship a feature**
 `grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `caveman-commit` [model] → `plan-retire` [model]
 
+**Design a feature, model decides**
+`design-feature` [user] (drives `zoom-out`, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement` or `orchestrate`
+
 **Execute a hard plan (heavy / high-token)**
 `orchestrate` [user] - fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
 

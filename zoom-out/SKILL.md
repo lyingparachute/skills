@@ -4,3 +4,5 @@ description: Go up a layer of abstraction and map the relevant modules, callers,
 ---
 
 Go up a layer of abstraction. Map the relevant modules and their callers, using the project's domain glossary vocabulary, so the area is understood as a whole before it is judged or changed.
+
+Use `graphify-out/` as the map when the graph was built after the last commit touching the area: compare the graph's `manifest.json` modification time with `git log -1 --format=%ct -- <area>`. Otherwise read the code.
