@@ -23,7 +23,6 @@ These started as his and have since diverged, some heavily. Diff against that co
 | `plan-retire` | Ours; his repo has no equivalent. Built on his ADR test. |
 | `research` | Close to upstream. |
 | `tdd` | Close to upstream, plus `tests.md` and `mocking.md`. |
-| `wayfinder` | Close to upstream. |
 | `wait-what` | Taken 2026-08-21. |
 | `writing-great-skills` | His `writing-for-agents`, renamed and reworked, with our `GLOSSARY.md`. |
 | `judo-review` | His `code-review`, renamed, then rewritten: two axes, `STANDARDS.md`, severity and disposition tags. |

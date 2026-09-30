@@ -16,9 +16,6 @@ The map of my skills and how they chain. `[user]` = orchestrator, invoked by typ
 **Execute a hard plan (heavy / high-token)**
 `orchestrate` [user] - fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
 
-**Big / multi-session work**
-`wayfinder` [user] → per investigation ticket: `grill-with-docs` → `implement` …
-
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]
 
