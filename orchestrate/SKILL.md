@@ -24,7 +24,7 @@ Run scripts from this skill's `scripts/` dir. Execute the whole plan without che
 
 ## Pre-flight
 
-Scan the plan once before milestone 1 for internal contradictions and for anything the plan mandates that a review rubric would flag as a defect. Batch every finding into one question to the user (finding beside the plan text, asking which governs). Clean scan → proceed silently.
+Scan the plan once before milestone 1 for internal contradictions and for anything the plan mandates that a review rubric would flag as a defect. Batch every finding into one question to the user (finding beside the plan text, asking which governs). Plan in a feature folder: every plan in its index row's "starts after" must have landed, else STOP and report. Clean scan → proceed silently.
 
 ## Per-milestone loop
 
@@ -83,11 +83,11 @@ Least powerful model that can do the role; **always specify it explicitly** (an 
 1. Whole-branch `judo-review` on the most capable model: `scripts/review-package $(git merge-base main HEAD) HEAD`. Triage the findings via `/receiving-code-review` (self-judge; explorer subagent only when a finding needs unread code), then fix every survivor via one fix subagent with the full list and the Boy Scout sweep.
 2. Audit the trail: read every decision row back against what happened and cut any row you cannot tie to a real commit, file, or command. A row nobody can trace is worse than a missing one.
 3. Fold the surviving rows and any notes worth keeping into the plan's `Decision Log`. The scratch files die with the working tree, so anything not in the plan by now is lost.
-4. Set the plan's `Status:` line to `landed - <short sha>`; tick all remaining checkboxes.
+4. Set the plan's `Status:` line to `landed - <short sha>`; tick all remaining checkboxes; sync its feature folder index row (see `exec-plan`).
 5. `plan-retire` - extract durable decisions, delete the rest.
-6. Commit plan progress and update the plans index if there is one.
+6. Commit plan progress and update any index that still names the plan (plans-dir index, feature folder `00-INDEX.md`).
 7. **Report:** what changed, what tests ran (with output), any deviation from the plan, any follow-up findings.
-8. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt - shallow modules, tangled callers, no test seam - offer to run the `improve-codebase` skill on the affected path, with that debt as a suspect, rather than a vague "clean up later". Run it only after the user agrees.
+8. Follow-up work → write a plan or fold it into a draft or unstarted plan, per `exec-plan`, reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt - shallow modules, tangled callers, no test seam - offer to run the `improve-codebase` skill on the affected path, with that debt as a suspect, rather than a vague "clean up later". Run it only after the user agrees.
 
 ## Red flags
 

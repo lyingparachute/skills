@@ -8,7 +8,7 @@ Before writing any code, pre-flight the plan: is it **ready** as /exec-plan defi
 
 Once the plan is ready, implement the work it describes. Follow its Scope, Non-goals, and Definition of Done literally, with no drift. Every DoD bullet is a binary check the implementation must satisfy before you call it done.
 
-Keep the plan current as you go: it is the cross-session source of truth, so tick its Progress boxes and update `Status` as work lands. If you hit a dependency on another plan, STOP and report it; do not implement that other plan. A plan's "do NOT remove X" premise can be invalidated by a later-landed change, so verify such premises against committed code before enforcing them.
+Keep the plan current as you go: it is the cross-session source of truth, so tick its Progress boxes and update `Status` as work lands. If you hit a dependency on another plan, STOP and report it; do not implement that other plan. A plan in a feature folder: every plan in its index row's "starts after" must have landed, and its row follows its `Status` (see /exec-plan). A plan's "do NOT remove X" premise can be invalidated by a later-landed change, so verify such premises against committed code before enforcing them.
 
 Use /tdd where possible, at pre-agreed seams.
 

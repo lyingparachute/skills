@@ -1,11 +1,11 @@
 ---
 name: exec-plan
-description: Use when authoring a new execution plan, revising a plan, or deciding whether a plan is ready to execute - including writing acceptance criteria, scoping milestones, and running plan-critic review rounds.
+description: Use when authoring, folding into, or revising an execution plan, or deciding whether a plan is ready to execute - including writing acceptance criteria, scoping milestones, and running plan-critic review rounds.
 ---
 
 # Exec Plan
 
-Author `<plans-dir>/<date>-<topic>.md` plans as self-contained briefs, then gate them through **1–2 fresh-context critic rounds** (min 1, hard cap 2) before execution. A plan with zero critic rounds is a draft, not a plan.
+Author plans as self-contained briefs, alone or in a feature folder (see Feature folder), then gate them through **1–2 fresh-context critic rounds** (min 1, hard cap 2) before execution. A plan with zero critic rounds is a draft, not a plan.
 
 `<plans-dir>` is wherever the project keeps plans (e.g. `.agents/plans/`, `docs/plans/`).
 
@@ -34,6 +34,31 @@ Rules:
 - Acceptance greps: use `git grep -P`, not `-E "\b"` (silently matches nothing here).
 - **Wide refactors break vertical slicing.** A mechanical change with cross-codebase blast radius (rename a column, retype a shared symbol) can't land green as one tracer bullet. Sequence expand–contract: first a milestone that adds the new form beside the old (nothing breaks); then migrate call sites in batches sized to the blast radius (per package/dir), each its own milestone, CI green throughout because the old form stays; finally a contract milestone that removes the old form once no caller remains.
 
+## Fold before you write
+
+**Fold** = add work to an existing plan as new milestones. Check before any new plan. Caller already named a target or said "new plan" → use that, skip the search. Writer subagents never make the fold call or ask the user.
+
+- **Find:** `grep -r` (not `git grep`; plans may be untracked) `Status:` in every plan under `<plans-dir>`, feature folders too, skipping `00-INDEX.md`. Candidate = `draft` or `ready`, no ticked Progress box, Scope or Purpose names a file, module, or capability the work touches.
+- **Fit = all:** plan stays one outcome that can land alone, said in one sentence; not a Non-goal; every Locked decision still holds; each new milestone fits one context window. New milestones go last unless they must go first.
+- **Pick:** two fit → the one covering more work. `ready` target → user agrees first (accepted, maybe running). Parallel writers → top agent decides. Inside `plan-feature` → its index decides, skip this.
+- **Fold:** update every touched section, add a Decision Log entry and a revision note. Target in a feature folder → update every index section that names it. `Status: draft`, critic gate from round 1, critics attack new milestones, seams, and any section that still reads as before the fold. Tell user which plan changed.
+- **No fit:** new plan, candidates read + reason under Alternatives considered, or "none found".
+
+Depends on another plan → name it by title while checked in, else say in Background what it changed.
+
+Done when work sits in exactly one plan, the gate ran on it, and it records the fold in its Decision Log or the candidates (or "none found") in Alternatives considered.
+
+## Feature folder
+
+**Feature folder** = related plans for one feature; each plan lands on its own. Order: fold first; no fit and a folder exists → new plan goes in it.
+
+- **When:** a second plan for the same user outcome is written → make the folder, move the first plan in as `01-<topic>.md` with its Status kept, and write the index from both. Every `plan-feature` run makes one. In parallel runs the top agent makes the folder, the index, and each `NN` before dispatching writers.
+- **Layout:** `<plans-dir>/<feature>/00-INDEX.md`, plus `NN-<topic>.md` per plan. `NN` = creation sequence (highest + 1), set once, never renumbered, gaps fine. Order lives in "starts after", not in `NN`.
+- **Index (minimum):** Status; why the feature exists; plans table (`NN` + title, delivers, status, starts after); feature decisions; roadmap fit (related plans outside the folder); feature DoD (checklist for the whole set, each item with a command and expected output). Index adds no work of its own; plans stay self-contained. `plan-feature` adds its sections on top.
+- **Status sync:** the plan's `Status:` line is the source; the index status column copies it. Whoever changes a plan's Status updates its row and the index Status, a one-line summary of the rows (`active - 01, 02 ready; 03 blocked`), and ticks feature DoD items it proved.
+
+One plan, no feature folder → `<plans-dir>/<date>-<topic>.md`.
+
 ## Critic Gate (mandatory: min 1, max 2 rounds)
 
 1. Dispatch a skeptical fresh-context plan-critic (never the writer). Brief: **attack, don't validate**, across two passes.
@@ -59,10 +84,11 @@ Quote the plan on disagreement; cite `file:line` for reality. If the plan is fin
 
 ## Execution & Lifecycle
 
-Once `Status: ready`, the baton passes out of this skill: /implement executes the plan as a contract and keeps its Status, Progress, and DoD current; /plan-retire closes it out. This skill's job ends at `ready`.
+Once `Status: ready`, the baton passes out of this skill (a fold sends it back to `draft`): /implement executes the plan as a contract and keeps its Status, Progress, and DoD current; /plan-retire closes it out. This skill's job ends at `ready`.
 
 ## Red Flags
 
 - "The plan is simple, one critic pass is enough" - two rounds, no exception.
 - Writing implementation code/pseudo-code into milestones - that's the implementer's job.
 - A DoD bullet with no command - untestable = not done-able.
+- "This is new work, it needs its own plan" - search for a fold target first.

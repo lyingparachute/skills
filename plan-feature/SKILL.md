@@ -15,7 +15,7 @@ Input: the feature, in the user's words; or a **handoff** from `improve-codebase
 
 ## The feature folder
 
-Everything lives in `<plans-dir>/<YYYY-MM-DD>-<feature>/`. `README.md` there is the **single source** for the design, written as each step completes, and handed to subagents by path. It holds these sections:
+Everything lives in a feature folder, `<plans-dir>/<feature>/`, as the `exec-plan` skill defines it. Its `00-INDEX.md` holds the minimum index from that skill, with Build order as its plans table, and is the **single source** for the design, written as each step completes, and handed to subagents by path. It holds these sections:
 
 - **Capabilities, stories, and walkthroughs**: story ids (`S1`, …), each story's step-by-step walkthrough, and a story-to-plan table.
 - **Decisions**: one row per decision (`D1`, …) with the choice, the options with one line on why each lost, prior art where required, what would change it (naming assumption ids), and the plans that carry it.
@@ -25,17 +25,17 @@ Everything lives in `<plans-dir>/<YYYY-MM-DD>-<feature>/`. `README.md` there is 
 - **Build order**: plans by title, each with the plans it needs.
 - **Questions for you**: every assumption with its chosen value and the decisions it drives, every open question, and every critic finding left open.
 
-Plans are referenced by title, never by path. Write the README and the decision page with `no-ai-slop` loaded. The run commits nothing.
+Plans are referenced by title, never by path. Write the index and the decision page with `no-ai-slop` loaded. The run commits nothing.
 
 ## Steps
 
 ### 1. Ground
 
-Create the folder. Dispatch read-only subagents in parallel:
+Create the folder, or reuse the feature's existing one. Dispatch read-only subagents in parallel:
 - **Code map**: the `zoom-out` skill, plus the rule files, and the `CONTEXT.md` and ADRs that govern the touched parts.
-- **Roadmap**: one subagent per 20 plans in the plans dir, including plans in other feature folders. Plans marked `landed`, abandoned, or superseded count as `unrelated`. Each plan returns one line with its relation: `conflicts` (both cannot hold), `needs` (this feature needs it first), `needed-by` (it needs this feature first), `overlaps` (same code or capability), or `unrelated`.
+- **Roadmap**: one subagent per 20 plans in the plans dir, including plans in other feature folders, skipping `00-INDEX.md`. Plans marked `landed`, abandoned, or superseded count as `unrelated`. Each plan returns one line with its relation: `conflicts` (both cannot hold), `needs` (this feature needs it first), `needed-by` (it needs this feature first), `overlaps` (same code or capability), or `unrelated`.
 
-**Early exit**, at this step or after any critic round: when the feature is already covered by a plan, or should wait or not be built, record that as a decision, write the README and the decision page, and end the run.
+**Early exit**, at this step or after any critic round: when the feature is already covered by a plan, or should wait or not be built, record that as a decision, write the index and the decision page, and end the run.
 
 Then get the **prep candidates**, once per feature folder. In a handoff, the handed-off findings are the feature itself, and the candidates are the report's other kept findings in the feature's path. A run that began from a handoff never starts a prep sweep. Otherwise, when the code map found existing modules in the feature's path, run the **prep sweep**: the `improve-codebase` skill on those modules, with the code map as its map and friction the code map found as suspects. It costs dozens of subagents. A feature with no existing modules in its path has no candidates. Copy every kept finding into Prep candidates. Later reworks and Update runs reuse these candidates.
 
@@ -63,7 +63,7 @@ Done when every walkthrough step and every area has its line, every row is compl
 
 ### 4. Attack the design
 
-Dispatch a fresh design critic with the README path. Its brief: verify claims against the code, and find missing decisions, weak option sets, hidden assumptions, scope creep, premature abstraction, roadmap relations that changed once the data model and API were chosen, and ADR conflicts. It returns typed findings with severity.
+Dispatch a fresh design critic with the index path. Its brief: verify claims against the code, and find missing decisions, weak option sets, hidden assumptions, scope creep, premature abstraction, roadmap relations that changed once the data model and API were chosen, and ADR conflicts. It returns typed findings with severity.
 
 Triage the findings yourself with the `receiving-code-review` skill. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a finding that needs its own plan becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
 
@@ -71,11 +71,11 @@ Done when a round ends with zero open BLOCKER or MAJOR findings, or after the se
 
 ### 5. Write the plans
 
-One plan is one outcome that can land on its own. Its milestones are the slices inside it. Each plan is `<feature-folder>/<topic>.md` with its title as the H1. For each plan, a writer subagent drafts it from the README with the `exec-plan` skill's plan shape; the writer drafts only, and you run the gate. The plan copies its own stories and walkthroughs verbatim, and its decisions into Locked decisions, so the implementer needs only that file. A plan that needs another plan's work embeds the contract it relies on, marked as existing after that plan lands. It lists the assumption ids it rests on under risks, and has a milestone for any glossary or ADR writes it carries. A prep plan has no story; it copies its finding from Prep candidates in full instead.
+One plan is one outcome that can land on its own. Its milestones are the slices inside it. Each plan is `<feature-folder>/NN-<topic>.md`, `NN` assigned in Build order at creation, with its title as the H1. For each plan, a writer subagent drafts it from the index with the `exec-plan` skill's plan shape; the writer drafts only, and you run the gate. The plan copies its own stories and walkthroughs verbatim, and its decisions into Locked decisions, so the implementer needs only that file. A plan that needs another plan's work embeds the contract it relies on, marked as existing after that plan lands. It lists the assumption ids it rests on under risks, and has a milestone for any glossary or ADR writes it carries. A prep plan has no story; it copies its finding from Prep candidates in full instead.
 
 Run the `exec-plan` critic gate on each draft, with critics that did not write it. Tell them embedded contracts from earlier plans are expected. Triage the findings with `receiving-code-review`, and dispatch a fresh writer to fix the ones that survive.
 
-Then check the set: every Locked decision matches its README row, every decision names the plan that carries it or the other plan's change in Roadmap fit, shared contracts agree across plans, and the build order has no cycle. Update the README where a gate changed a decision.
+Then check the set: every Locked decision matches its index row, every decision names the plan that carries it or the other plan's change in Roadmap fit, shared contracts agree across plans, and the build order has no cycle. Update the index where a gate changed a decision.
 
 A plan with critic findings left open after the gate stays `Status: draft`, and those findings go to Questions for you. A plan that rests on an unconfirmed assumption names it on its Status line.
 
@@ -83,9 +83,9 @@ Done when every story maps to a plan in the story-to-plan table, every taken pre
 
 ### 6. Decision page
 
-Render every README section as one self-contained HTML page for a person: one card per decision, the stories with their walkthroughs, the build order as an inline SVG or HTML diagram, and Questions for you at the end. Inline CSS with a `prefers-color-scheme` block, and no external requests. Write it to `${TMPDIR:-/tmp}/plan-feature-<feature>-<YYYYMMDD-HHMM>.html` and open it (`open` on macOS, `xdg-open` on Linux, `start ""` in a Windows shell).
+Render every index section as one self-contained HTML page for a person: one card per decision, the stories with their walkthroughs, the build order as an inline SVG or HTML diagram, and Questions for you at the end. Inline CSS with a `prefers-color-scheme` block, and no external requests. Write it to `${TMPDIR:-/tmp}/plan-feature-<feature>-<YYYYMMDD-HHMM>.html` and open it (`open` on macOS, `xdg-open` on Linux, `start ""` in a Windows shell).
 
-Done when the page shows the same decision ids, assumption ids, stories, roadmap rows, prep candidates, and questions as the README. Show the user the page path, the README path, and the question count. Then name `implement` or `orchestrate` as the next command, after the user confirms the assumptions the first plan rests on.
+Done when the page shows the same decision ids, assumption ids, stories, roadmap rows, prep candidates, and questions as the index. Show the user the page path, the index path, and the question count. Then name `implement` or `orchestrate` as the next command, after the user confirms the assumptions the first plan rests on.
 
 ## Update run
 

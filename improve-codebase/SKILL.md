@@ -86,10 +86,10 @@ Done when every finding from steps 2 and 3 appears exactly once in the report: k
 
 A prep sweep never reaches this step.
 
-Ask which findings to plan, and stop until the user answers. Ask where plans live if the repo has no plans dir. Each picked finding gets its own plan, unless the user groups some.
+Ask which findings to plan, and stop until the user answers. Ask where plans live if the repo has no plans dir. Each picked finding gets its own plan, unless the user groups some. A group's plans share a feature folder, per `exec-plan`; you name it, write its index, and assign each `NN` before dispatching writers.
 
 A **user-facing pick** is one whose Change alters a user-visible flow, or an API or data format that people or systems outside this repo depend on. Ask the user which user-facing picks go to the `plan-feature` skill, which decides product behavior and scope itself, and stop until they answer. Each confirmed group the user names, otherwise each confirmed pick, gets one `plan-feature` run with its findings, this report, and the plans dir as a handoff.
 
-For each other pick, unconfirmed user-facing picks included, a writer subagent drafts it with the `exec-plan` skill. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
+For each other pick, unconfirmed user-facing picks included, first make the fold call from the `exec-plan` skill yourself, asking the user once about all `ready` targets. Picks that share a target go to one writer. A writer subagent then drafts the new plan or the fold, with the target or "new plan" named in its brief. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
 
-Done when every picked finding maps to exactly one plan or one finished `plan-feature` run, and every plan written here has passed the critic gate. Then name `implement` or `orchestrate` as the next command for the user to type; for `plan-feature` plans, only after the user confirms the assumptions the first plan rests on.
+Done when every picked finding maps to exactly one plan or one finished `plan-feature` run, and every plan written or folded here has passed the critic gate. Then name `implement` or `orchestrate` as the next command for the user to type; for `plan-feature` plans, only after the user confirms the assumptions the first plan rests on.
