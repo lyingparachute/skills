@@ -1,11 +1,11 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Use when pinning down domain terms or a ubiquitous language, before adding to or editing a durable doc (ADR, CONTEXT.md, README, AGENTS.md or CLAUDE.md, docs/ pages, runbooks), or when another skill needs the domain model.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline - challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill - that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline - challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down once they survive the contest (see Durable docs). (Merely *reading* `CONTEXT.md` for vocabulary is not this skill - that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -37,7 +37,25 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 │       └── docs/adr/
 ```
 
-Create files lazily - only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily: `CONTEXT.md` when the first term survives the contest, `docs/adr/` when the first ADR does.
+
+## Durable docs
+
+Durable docs = ADRs, `CONTEXT.md`, READMEs, `AGENTS.md` or `CLAUDE.md`, `docs/` pages, runbooks: anything meant to outlive the work. Implementation detail lives in the code.
+
+**Contest** = argue against a change before you make it. Contest every add or edit to a durable doc, plus the existing text in the section you touch. Keep only what survives:
+
+1. **True now?** Read every claim about what the code does today (behavior, states, names) from the code in this session. Code does not show it → drop it. Decisions, constraints, and terms the user stated are intent; they pass this step.
+2. **Code says it?** Name the module or concept instead of restating it. No line numbers; paths only where the reader needs them to act, as in runbooks and commands.
+3. **Owner?** One owner per fact: term → `CONTEXT.md`, decision and why → ADR, agent rule and the commands agents run → `AGENTS.md`, human setup → README, operating steps → runbook. Grep every durable doc in the touched context for the fact first. Found → edit it there or link to it.
+4. **Enforced?** Each "must" or "never" in an ADR, README, or runbook names an automated check (test, lint, CI, hook) or a person or team who answers for it. None → state what the code does today, or cut it. Agent rules in `AGENTS.md` are enforced by the agent reading them.
+5. **History?** Keep the decision and its constraint. A rejected option gets one line: the constraint that ruled it out.
+6. **Useful?** Who reads this, and what do they do differently? No answer, or an agent does it by default → cut.
+7. **Shrink.** Edit, merge, or delete before adding. A doc this edit takes past 50 lines gets a split or a cut; a glossary splits by subheading.
+
+Voice: `no-ai-slop`.
+
+Done when every changed block has one line in your reply or commit message: the doc, what was added, and what was cut or merged, or why nothing could go.
 
 ## During the session
 
@@ -59,16 +77,10 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up - capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a term is resolved and survives the contest, update `CONTEXT.md` right there. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+`CONTEXT.md` is a glossary and nothing else.
 
-### Offer ADRs sparingly
+### Write ADRs sparingly
 
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse** - the cost of changing your mind later is meaningful
-2. **Surprising without context** - a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** - there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+A new ADR passes the test in [ADR-FORMAT.md](./ADR-FORMAT.md) and the contest.

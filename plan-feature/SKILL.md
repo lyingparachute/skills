@@ -21,7 +21,7 @@ Everything lives in a feature folder, `<plans-dir>/<feature>/`, as the `exec-pla
 - **Decisions**: one row per decision (`D1`, …) with the choice, the options with one line on why each lost, prior art where required, what would change it (naming assumption ids), and the plans that carry it.
 - **Roadmap fit**: each related plan, its relation, and what was done about it.
 - **Prep candidates**: each prep sweep finding copied with every field, with the decision that took it or turned it down.
-- **New terms and ADR candidates**: domain terms and decisions that pass the ADR test in `domain-modeling`. The plans that introduce them write them to the project's glossary and ADR home, as `domain-modeling` defines.
+- **New terms and ADR candidates**: domain terms, and decisions that pass the ADR test in `domain-modeling`. Each plan that introduces them ends with a milestone that writes them after its code exists, through the contest in `domain-modeling`.
 - **Build order**: plans by title, each with the plans it needs.
 - **Questions for you**: every assumption with its chosen value and the decisions it drives, every open question, and every critic finding left open.
 

@@ -14,7 +14,7 @@ These started as his and have since diverged, some heavily. Diff against that co
 |---|---|
 | `codebase-design` | Pruned: dropped duplicated seam rules, the Relationships recap, and generic testability samples. `DEEPENING.md` and `DESIGN-IT-TWICE.md` close to upstream. |
 | `diagnosing-bugs` | Plus Phase 0, redaction. |
-| `domain-modeling` | Close to upstream. |
+| `domain-modeling` | Diverged: durable-doc contest, tighter ADR and CONTEXT rules, ADR examples cut to three. |
 | `grilling` | Round format taken from upstream. Silence-adopts-the-recommendation rule is ours. |
 | `grill-with-docs` | Same composition as upstream. |
 | `handoff` | Close to upstream. |

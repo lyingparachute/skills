@@ -10,8 +10,8 @@ Done-with plans are NOT memory archives. Retire them: keep anything durable, del
 ## Checklist (per plan)
 
 1. **Confirm it's retirable.** A plan retires when it's done with - most often the feature merged to `main` (verify by file content on main, not branch commit count; squash-merge repos show "N commits ahead" for already-landed work), but also when abandoned, superseded, or its premise was invalidated by a later change. Merge is the common case, not a precondition - the user can retire an unmerged plan and that's fine.
-2. **Capture durable decisions - only if the plan produced any.** Source them from the plan's `Decision Log` and `Outcomes & Retrospective` sections (the exec-plan skill mandates both). When it did, load and follow the `domain-modeling` skill: it owns the ADR format and where ADRs live. Whether a decision earns one is decided by **ADR Or Garbage?** below, which is the plan-specific reading of that test. Prefer editing the existing ADR/doc that owns that area over creating a new file; write a new ADR (e.g. `docs/adr/*.md`) only when no home exists. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
-3. **Capture reusable non-decision findings** (operational context, discoveries) the same way - update where the project already keeps them, create only if needed, skip if there's nothing worth keeping.
+2. **Capture durable decisions - only if the plan produced any.** Source them from the plan's `Decision Log`, and from `Outcomes & Retrospective` only for a decision made late; lessons learned and incident stories stay out. When it did, load and follow the `domain-modeling` skill: it owns the ADR format and where ADRs live. The ADR test and the contest live there; **ADR Or Garbage?** below lists plan exhaust that never earns one. Terse prose; NEVER embed plan-file paths (plans get deleted, links rot). Nothing durable → write nothing.
+3. **Capture operational facts** (how to run, operate, or recover) through the `domain-modeling` contest - update where the project already keeps them, create only if needed, skip if nothing survives.
 4. **Delete the plan file.** Keep blocked/deferred follow-up plans only while actionable; a deferred plan whose premise a later change invalidated gets deleted too (verify premise vs committed code first).
 5. **Update the plans-dir index** (a project-kept list of plans, if any) if it references the deleted plan.
 6. **Feature folder** (see `exec-plan`): run step 2 also on the `00-INDEX.md` feature decisions that name this plan. Remove the plan from every index section that names it. Clear it from other rows' "starts after" only if it landed; otherwise flag each dependent plan to the user. Update the index Status per `exec-plan` Status sync, and delete the folder together with its last plan.
@@ -20,15 +20,7 @@ Done-with plans are NOT memory archives. Retire them: keep anything durable, del
 
 ## ADR Or Garbage?
 
-Create an ADR when the plan locked a decision future work must treat as precedent:
-
-- architecture or module boundary changed
-- long-lived domain rule / invariant changed
-- cross-app or public contract changed
-- vendor / protocol / storage / security model choice made with real trade-off
-- future deviation should require a superseding decision, not a casual refactor
-
-Do NOT create an ADR for plan exhaust:
+Plan exhaust never earns an ADR:
 
 - implementation notes already obvious from code/tests/migrations
 - one-off bugfix mechanics or cleanup details
@@ -36,12 +28,9 @@ Do NOT create an ADR for plan exhaust:
 - local refactor shape with no lasting policy
 - duplicate restatement of an existing ADR
 
-Lazy test: if future you would not search the ADR dir to avoid re-litigating this decision, skip the ADR.
-
 ## Red Flags
 
 - "Keep the plan for history" - git remembers; delete it.
 - "Every landed plan needs an ADR" - false; only durable decisions earn one, and many plans earn none.
 - Writing a doc just to have written something - if nothing is durable, delete the plan and stop.
-- Creating a new ADR when an existing one should just be updated.
 - ADR linking to a plan path - forbidden, links rot.
