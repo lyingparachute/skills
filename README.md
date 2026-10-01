@@ -20,7 +20,7 @@ Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Co
 
 `/flow` is the router. It maps every skill and the chains they form. Start there.
 
-- **Align & plan:** `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `design-feature`
+- **Align & plan:** `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `plan-feature`
 - **Build:** `implement` (light), `orchestrate` (heavy, subagent-per-milestone), `tdd`, `diagnosing-bugs`
 - **Design quality:** `codebase-design`, `domain-modeling`, `type-system-discipline`, `improve-codebase`, `impeccable` (owns FE detail refs + Web Interface Guidelines), `shadcn-ui`
 - **Verify:** `judo-review`, `receiving-code-review`

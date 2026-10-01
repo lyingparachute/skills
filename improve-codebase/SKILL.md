@@ -1,14 +1,15 @@
 ---
 name: improve-codebase
-description: Sweep a whole codebase (or one path) with parallel subagents for code smells, code-judo moves, and real user or developer friction. Every finding is checked twice, the top 10 are ranked, and the ones you pick become ExecPlans.
-disable-model-invocation: true
+description: Use when the user asks to audit a whole codebase or path for smells and friction, or when plan-feature needs a prep sweep of a feature's path. Heavy: dozens of subagents.
 ---
 
 # Improve Codebase
 
 A **sweep**: explore everything in scope, report only what clears the **cut line**.
 
-Input: an optional path (default: the whole repo) and optional **suspects**, known problems the user or another skill already named.
+Input: an optional path (default: the whole repo), optional **suspects**, known problems the user or another skill already named, and an optional map from the caller.
+
+A sweep run by `plan-feature` is a **prep sweep**. It talks only to `plan-feature`: steps 1 and 4 say what changes, and it returns the report path after step 4. A prep sweep never hands off to `plan-feature`.
 
 ## The cut line
 
@@ -33,11 +34,11 @@ Every finding carries these fields:
 
 ### 1. Map
 
-Dispatch one read-only mapper subagent. It runs the `zoom-out` skill and reads the rule files plus the `CONTEXT.md` and ADRs that govern each part.
+Dispatch one read-only mapper subagent. Given a map from the caller, it skips the `zoom-out` run and the rule-file reading, and still does the rest of this step. Otherwise it runs the `zoom-out` skill and reads the rule files plus the `CONTEXT.md` and ADRs that govern each part.
 
 The mapper cuts the scope into **areas** of about 5,000 lines each. Tests belong to the area of the code they test. In a monorepo, an area never spans two packages. When the scope is the repo root, add one **repo area** for everything outside source: root config, CI, build and release scripts, docs. List the **cross-area calls**: calls from one area into another through its public interface or shared state, with the files on both sides.
 
-More than 12 areas → ask the user to narrow the scope or approve hunting in waves of 12.
+More than 12 areas → ask the user to narrow the scope or approve hunting in waves of 12. A prep sweep hunts in waves of 12 without asking.
 
 Done when every file in scope belongs to exactly one area, and generated, vendored, and build-output paths are listed as excluded.
 
@@ -51,7 +52,7 @@ Dispatch in parallel:
 Area hunters leave cross-area calls to the cross-area hunters. The brief for every hunter:
 
 - Both lenses, the cut line, and the finding fields, copied verbatim from above.
-- Run the full `judo-review` workflow on the scope as named code, with three changes: skip the Spec axis, report in the finding fields above in place of its Output, and name the structural move from its Preferred Remedies in the finding itself.
+- Run the full `judo-review` workflow on the scope as named code, with four changes: skip the Spec axis, report in the finding fields above in place of its Output, name the structural move from its Preferred Remedies in the finding itself, and return findings only, since step 5 owns handoffs to other skills.
 - At most 10 findings, ranked by frequency times severity. A smell with no concrete task behind it goes to the candidates list.
 - Read-only on the repo: no file edits, no agents. Commands that only read, and tests or benchmarks that write only to a temp dir, are allowed.
 - Return the findings, a one-line list of candidates below the cut line, and the list of files read.
@@ -77,14 +78,18 @@ Write the report to `${TMPDIR:-/tmp}/improve-codebase-<YYYYMMDD-HHMM>.md`. It ho
 - refuted findings, with one line each
 - the area list, so coverage is visible
 
-Show the top 10 in the conversation with the report path and the number of kept findings past rank 10.
+Show the top 10 in the conversation with the report path and the number of kept findings past rank 10. A prep sweep returns the report path to `plan-feature` instead.
 
-Done when every finding from steps 2 and 3 appears exactly once in the report: kept, below cut, refuted, or named as merged into another. No kept findings → show coverage and the below-cut list, and end the sweep.
+Done when every finding from steps 2 and 3 appears exactly once in the report: kept, below cut, refuted, or named as merged into another. No kept findings → show coverage and the below-cut list, and end the sweep. A prep sweep with no kept findings still returns the report path.
 
 ### 5. Plan the picks
 
+A prep sweep never reaches this step.
+
 Ask which findings to plan, and stop until the user answers. Ask where plans live if the repo has no plans dir. Each picked finding gets its own plan, unless the user groups some.
 
-For each plan, a writer subagent drafts it with the `exec-plan` skill. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
+A **user-facing pick** is one whose Change alters a user-visible flow, or an API or data format that people or systems outside this repo depend on. Ask the user which user-facing picks go to the `plan-feature` skill, which decides product behavior and scope itself, and stop until they answer. Each confirmed group the user names, otherwise each confirmed pick, gets one `plan-feature` run with its findings, this report, and the plans dir as a handoff.
 
-Done when every picked finding maps to exactly one plan, and every plan has passed the critic gate. Then name `implement` or `orchestrate` as the next command for the user to type.
+For each other pick, unconfirmed user-facing picks included, a writer subagent drafts it with the `exec-plan` skill. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
+
+Done when every picked finding maps to exactly one plan or one finished `plan-feature` run, and every plan written here has passed the critic gate. Then name `implement` or `orchestrate` as the next command for the user to type; for `plan-feature` plans, only after the user confirms the assumptions the first plan rests on.

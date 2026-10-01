@@ -87,7 +87,7 @@ Least powerful model that can do the role; **always specify it explicitly** (an 
 5. `plan-retire` - extract durable decisions, delete the rest.
 6. Commit plan progress and update the plans index if there is one.
 7. **Report:** what changed, what tests ran (with output), any deviation from the plan, any follow-up findings.
-8. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt - shallow modules, tangled callers, no test seam - recommend the user run `improve-codebase` on the affected path, with that debt as a suspect, rather than a vague "clean up later".
+8. Follow-up work → author a new ExecPlan per `PLANS.md` (see `exec-plan`), reviewed by a critic subagent at least once. If a milestone kept bumping into architecture debt - shallow modules, tangled callers, no test seam - offer to run the `improve-codebase` skill on the affected path, with that debt as a suspect, rather than a vague "clean up later". Run it only after the user agrees.
 
 ## Red flags
 
