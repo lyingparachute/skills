@@ -48,7 +48,7 @@
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
 - **4x = wrong approach.** Solution ~4x bigger than its core (200 lines for what fits in 50, 5 abstractions where 1 works) → approach wrong. Stop, rewrite from scratch. Patching no fix bad shape.
-- **Boy Scout rule, bounded by file.** Leave every touched file cleaner than you found it, including lines the change did not need. Files the change does not touch stay out of scope.
+- **Boy Scout rule, bounded by file.** Leave every touched file cleaner than you found it, including lines the change did not need. Other files stay out of scope, except for red checks (see Done).
 
 ## Architecture
 
@@ -86,7 +86,7 @@
 
 ## Testing & Delivery
 
-- **Done = verified output, not assertion.** Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim.
+- **Done = verified output, not assertion.** Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, in its own commit, even outside the files you touched.
 - **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
 - **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
