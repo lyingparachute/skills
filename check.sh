@@ -65,8 +65,14 @@ user_invoked=$(grep -l "disable-model-invocation: true" */SKILL.md | cut -d/ -f1
 for a in $user_invoked; do
   for b in $user_invoked; do
     [ "$a" = "$b" ] && continue
-    grep -q "/$b\b" "$a/SKILL.md" && echo "WARN $a names /$b, both user-invoked"
+    grep -qE "(^|[^[:alnum:]_./-])/$b([^[:alnum:]_-]|$)" "$a/SKILL.md" && echo "WARN $a names /$b, both user-invoked"
   done
+done
+
+echo "== no Skill tool call aims at a user-invoked skill"
+for b in $user_invoked; do
+  hits=$(grep -lE "Skill tool with \`$b\`" */SKILL.md)
+  [ -n "$hits" ] && { echo "FAIL Skill tool call to user-invoked $b, in: $(echo $hits | tr '\n' ' ')"; fail=1; }
 done
 
 echo "== vendored skills have a provenance row (warnings)"

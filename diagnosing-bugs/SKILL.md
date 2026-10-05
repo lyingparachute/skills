@@ -7,7 +7,7 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 A discipline for hard bugs. Phases 1 to 6 skip only when explicitly justified. Phase 0 never skips.
 
-When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
+When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 ## Phase 0 - Redact
 
@@ -135,4 +135,4 @@ Required before declaring done:
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message - so the next debugger learns
 
-**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) offer to run the `improve-codebase` skill on the affected path, with the specifics as suspects, and run it only after the user agrees. Make the recommendation **after** the fix is in, not before - you have more information now than when you started.
+**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) offer to run the `improve-codebase` skill on the affected path, with the specifics as suspects, and run it only after the user agrees. If the answer lies in the agent's environment (a missing check, a missing standard, a fact the agent could not reach), tell the user to type `/retro` in this session. Make the recommendation **after** the fix is in, not before - you have more information now than when you started.

@@ -29,7 +29,7 @@ A question the user leaves unanswered is answered by your recommendation. Unansw
 
 Two guardrails hold this in place. A question whose answer is irreversible, touches production or a shared system, or spends money stays blocking, so re-ask it instead of adopting it. And silence is never confirmation: before the session is done, list every answer you adopted this way and get an explicit yes on the set. Where another round follows, name them at its top as well, so an adopted answer stays visible while it can still be overturned.
 
-Hold adopted answers out of `CONTEXT.md` and ADRs until the user confirms them; then they go through the `domain-modeling` contest.
+Hold adopted answers out of `GLOSSARY.md` and ADRs until the user confirms them; then they go through the `domain-modeling` contest.
 
 Each round of answers reshapes the tree - settled decisions push the frontier outward and unblock questions that depended on them (including new decisions the answers open). Recompute the frontier and ask the next round the same way. A question whose answer depends on another question still open in this round belongs to a later round, not this one.
 

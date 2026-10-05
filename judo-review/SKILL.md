@@ -49,7 +49,7 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 
 Every review is two independent reviews, reported side by side.
 
-- **Standards**: does the change meet the bar? Sources are the repo's own rule files and the review passes below. Reviewing this axis, and only this axis, also read [`STANDARDS.md`](STANDARDS.md) for the smell and comment baseline.
+- **Standards**: does the change meet the bar? Sources are the repo's own rule files, its `CODING_STANDARDS.md` where one exists, and the review passes below. Reviewing this axis, and only this axis, also read [`STANDARDS.md`](STANDARDS.md) for the smell and comment baseline.
 - **Spec**: does the change do what was asked? Sources, in order: the current user's request, then a governing plan, then a ticket or issue, then the PR description, then issue refs in the commit messages. Report "No spec available" only when none of these sources states requirements; it is a finding, not a skipped axis.
 
 A branch is a **batch**: it usually carries several unrelated small tasks the author chose to ship together, and that packaging decision is already made. Split the diff into coherent task clusters, match each cluster to its own spec source, and answer the spec question per cluster. Where a cluster has no spec source, report that gap for the cluster and judge its code on Standards. Recommending a different branch, PR, or commit split is out of scope for both axes; say what the code gets wrong instead.

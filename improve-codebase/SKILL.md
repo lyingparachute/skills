@@ -34,7 +34,7 @@ Every finding carries these fields:
 
 ### 1. Map
 
-Dispatch one read-only mapper subagent. Given a map from the caller, it skips the `zoom-out` run and the rule-file reading, and still does the rest of this step. Otherwise it runs the `zoom-out` skill and reads the rule files plus the `CONTEXT.md` and ADRs that govern each part.
+Dispatch one read-only mapper subagent. Given a map from the caller, it skips the `zoom-out` run and the rule-file reading, and still does the rest of this step. Otherwise it calls the Skill tool with `zoom-out` and reads the rule files plus the `GLOSSARY.md` and ADRs that govern each part.
 
 The mapper cuts the scope into **areas** of about 5,000 lines each. Tests belong to the area of the code they test. In a monorepo, an area never spans two packages. When the scope is the repo root, add one **repo area** for everything outside source: root config, CI, build and release scripts, docs. List the **cross-area calls**: calls from one area into another through its public interface or shared state, with the files on both sides.
 
@@ -52,7 +52,7 @@ Dispatch in parallel:
 Area hunters leave cross-area calls to the cross-area hunters. The brief for every hunter:
 
 - Both lenses, the cut line, and the finding fields, copied verbatim from above.
-- Run the full `judo-review` workflow on the scope as named code, with four changes: skip the Spec axis, report in the finding fields above in place of its Output, name the structural move from its Preferred Remedies in the finding itself, and return findings only, since step 5 owns handoffs to other skills.
+- Call the Skill tool with `judo-review` and run its full workflow on the scope as named code, with four changes: skip the Spec axis, report in the finding fields above in place of its Output, name the structural move from its Preferred Remedies in the finding itself, and return findings only, since step 5 owns handoffs to other skills.
 - At most 10 findings, ranked by frequency times severity. A smell with no concrete task behind it goes to the candidates list.
 - Read-only on the repo: no file edits, no agents. Commands that only read, and tests or benchmarks that write only to a temp dir, are allowed.
 - Return the findings, a one-line list of candidates below the cut line, and the list of files read.
@@ -90,6 +90,6 @@ Ask which findings to plan, and stop until the user answers. Ask where plans liv
 
 A **user-facing pick** is one whose Change alters a user-visible flow, or an API or data format that people or systems outside this repo depend on. Ask the user which user-facing picks go to the `plan-feature` skill, which decides product behavior and scope itself, and stop until they answer. Each confirmed group the user names, otherwise each confirmed pick, gets one `plan-feature` run with its findings, this report, and the plans dir as a handoff.
 
-For each other pick, unconfirmed user-facing picks included, first make the fold call from the `exec-plan` skill yourself, asking the user once about all `ready` targets. Picks that share a target go to one writer. A writer subagent then drafts the new plan or the fold, with the target or "new plan" named in its brief. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
+For each other pick, unconfirmed user-facing picks included, call the Skill tool with `exec-plan`, then make its fold call yourself, asking the user once about all `ready` targets. Picks that share a target go to one writer. A writer subagent then drafts the new plan or the fold, with the target or "new plan" named in its brief. The plan copies its findings' evidence in, because the report lives in a temp dir. Each plan names the other plans it depends on. You run the `exec-plan` critic gate on each draft, with critics that did not write it, and send the findings back to the writer to fix.
 
 Done when every picked finding maps to exactly one plan or one finished `plan-feature` run, and every plan written or folded here has passed the critic gate. Then name `implement` or `orchestrate` as the next command for the user to type; for `plan-feature` plans, only after the user confirms the assumptions the first plan rests on.

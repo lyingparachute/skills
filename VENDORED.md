@@ -6,7 +6,7 @@ Not everything here was written here. Without this file, "what changed upstream 
 
 ## Adapted from mattpocock/skills
 
-Upstream: <https://github.com/mattpocock/skills>. Last compared: 2026-08-21, against commit `5b15a47`.
+Upstream: <https://github.com/mattpocock/skills>. Last compared: 2026-10-05, against commit `4588b32` (v1.3.1 plus docs).
 
 These started as his and have since diverged, some heavily. Diff against that commit before pulling anything new.
 
@@ -14,7 +14,7 @@ These started as his and have since diverged, some heavily. Diff against that co
 |---|---|
 | `codebase-design` | Pruned: dropped duplicated seam rules, the Relationships recap, and generic testability samples. `DEEPENING.md` and `DESIGN-IT-TWICE.md` close to upstream. |
 | `diagnosing-bugs` | Plus Phase 0, redaction. |
-| `domain-modeling` | Diverged: durable-doc contest, tighter ADR and CONTEXT rules, ADR examples cut to three. |
+| `domain-modeling` | Diverged: durable-doc contest, tighter ADR and GLOSSARY rules, ADR examples cut to three. |
 | `grilling` | Round format taken from upstream. Silence-adopts-the-recommendation rule is ours. |
 | `grill-with-docs` | Same composition as upstream. |
 | `handoff` | Close to upstream. |
@@ -23,12 +23,13 @@ These started as his and have since diverged, some heavily. Diff against that co
 | `research` | Close to upstream. |
 | `tdd` | Close to upstream, plus `tests.md` and `mocking.md`. |
 | `wait-what` | Taken 2026-08-21. |
+| `retro` | Taken 2026-10-05. Points at `writing-great-skills` by file (user-invoked), names harness log paths, reads the log in a subagent, sends judgement calls to `CODING_STANDARDS.md` or `judo-review/STANDARDS.md`, and merges steering and no-op checks into one category. |
 | `writing-great-skills` | His `writing-for-agents`, renamed and reworked, with our `GLOSSARY.md`. |
 | `judo-review` | His `code-review`, renamed, then rewritten: two axes, `STANDARDS.md`, severity and disposition tags. |
 | `flow` | His `ask-matt`, renamed and rebuilt around our chains. |
 | `exec-plan` | Ours, replacing his `to-spec` and `to-tickets`. `PLANS.md` is OpenAI's ExecPlan spec. |
 
-Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
+Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`orchestrate` covers it), `pr`, `chief-of-staff`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
 
 ## Third-party skills
 

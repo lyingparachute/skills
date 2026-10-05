@@ -32,7 +32,7 @@ Plans are referenced by title, never by path. Write the index and the decision p
 ### 1. Ground
 
 Create the folder, or reuse the feature's existing one. Dispatch read-only subagents in parallel:
-- **Code map**: the `zoom-out` skill, plus the rule files, and the `CONTEXT.md` and ADRs that govern the touched parts.
+- **Code map**: call the Skill tool with `zoom-out`, then read the rule files and the `GLOSSARY.md` and ADRs that govern the touched parts.
 - **Roadmap**: one subagent per 20 plans in the plans dir, including plans in other feature folders, skipping `00-INDEX.md`. Plans marked `landed`, abandoned, or superseded count as `unrelated`. Each plan returns one line with its relation: `conflicts` (both cannot hold), `needs` (this feature needs it first), `needed-by` (it needs this feature first), `overlaps` (same code or capability), or `unrelated`.
 
 **Early exit**, at this step or after any critic round: when the feature is already covered by a plan, or should wait or not be built, record that as a decision, write the index and the decision page, and end the run.
@@ -43,7 +43,7 @@ Done when every existing plan has a relation line, the code map lists the module
 
 ### 2. Stories and walkthroughs
 
-List the capabilities first. Then write one story per capability as `As an <actor>, I want <capability>, so that <benefit>`, and a walkthrough per story from the user's side: every step, what the user sees, and at each step the errors, empty states, and first-use states. A feature with a UI runs the `impeccable` skill in critique mode over its walkthroughs.
+List the capabilities first. Then write one story per capability as `As an <actor>, I want <capability>, so that <benefit>`, and a walkthrough per story from the user's side: every step, what the user sees, and at each step the errors, empty states, and first-use states. For a feature with a UI, call the Skill tool with `impeccable` and run it in critique mode over its walkthroughs.
 
 Done when every capability has a story, and every walkthrough step lists its error and empty states or says it has none.
 
@@ -53,7 +53,7 @@ Sweep for decisions twice: along every walkthrough step, and across the areas da
 
 For each decision, fill its row. Prior art, meaning a production open-source project, a standard, or a known pattern with a link, is required for decisions that are hard to reverse or shared across plans.
 
-For the interface of each new module that other plans use or that is hard to reverse, run design-it-twice from the `codebase-design` skill once, with 3 agents, and skip its presentation steps. The comparison and recommendation become that decision's options and choice.
+For the interface of each new module that other plans use or that is hard to reverse, call the Skill tool with `codebase-design` and run its design-it-twice once, with 3 agents, and skip its presentation steps. The comparison and recommendation become that decision's options and choice.
 
 Each prep candidate gets a decision: take it if it makes a walkthrough step or a chosen interface easier to build. A taken one becomes a prep plan, placed before the plans it eases in Build order.
 
@@ -65,7 +65,7 @@ Done when every walkthrough step and every area has its line, every row is compl
 
 Dispatch a fresh design critic with the index path. Its brief: verify claims against the code, and find missing decisions, weak option sets, hidden assumptions, scope creep, premature abstraction, roadmap relations that changed once the data model and API were chosen, and ADR conflicts. It returns typed findings with severity.
 
-Triage the findings yourself with the `receiving-code-review` skill. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a finding that needs its own plan becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
+Call the Skill tool with `receiving-code-review` and triage the findings yourself. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a finding that needs its own plan becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
 
 Done when a round ends with zero open BLOCKER or MAJOR findings, or after the second round.
 
@@ -73,7 +73,7 @@ Done when a round ends with zero open BLOCKER or MAJOR findings, or after the se
 
 One plan is one outcome that can land on its own. Its milestones are the slices inside it. Each plan is `<feature-folder>/NN-<topic>.md`, `NN` assigned in Build order at creation, with its title as the H1. For each plan, a writer subagent drafts it from the index with the `exec-plan` skill's plan shape; the writer drafts only, and you run the gate. The plan copies its own stories and walkthroughs verbatim, and its decisions into Locked decisions, so the implementer needs only that file. A plan that needs another plan's work embeds the contract it relies on, marked as existing after that plan lands. It lists the assumption ids it rests on under risks, and has a milestone for any glossary or ADR writes it carries. A prep plan has no story; it copies its finding from Prep candidates in full instead.
 
-Run the `exec-plan` critic gate on each draft, with critics that did not write it. Tell them embedded contracts from earlier plans are expected. Triage the findings with `receiving-code-review`, and dispatch a fresh writer to fix the ones that survive.
+Call the Skill tool with `exec-plan` and run its critic gate on each draft, with critics that did not write it. Tell them embedded contracts from earlier plans are expected. Triage the findings with `receiving-code-review`, and dispatch a fresh writer to fix the ones that survive.
 
 Then check the set: every Locked decision matches its index row, every decision names the plan that carries it or the other plan's change in Roadmap fit, shared contracts agree across plans, and the build order has no cycle. Update the index where a gate changed a decision.
 

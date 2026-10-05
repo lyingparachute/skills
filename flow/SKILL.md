@@ -31,6 +31,9 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 **Research a question**
 `research` [model] (web primary sources) · `nlm-skill` [model] (NotebookLM) · `graphify` [model] (this codebase)
 
+**Improve the agent's environment**
+`retro` [user] - after a session that went sideways, before you clear it.
+
 **Author a new skill**
 `writing-great-skills` [user] (the bar every skill here meets)
 
