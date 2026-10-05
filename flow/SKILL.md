@@ -11,7 +11,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 ## Chains
 
 **Ship a feature**
-`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `caveman-commit` [model] → `plan-retire` [model]
+`grill-with-docs` [user] → `exec-plan` [model] → `implement` [user] (drives `tdd`, `judo-review`) → `caveman-commit` [model] → `pr` [model] (when it goes up as a PR) → `plan-retire` [model]
 
 **Plan a feature, model decides**
 `plan-feature` [model] (drives `zoom-out`, `improve-codebase` as prep sweep, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement` or `orchestrate`

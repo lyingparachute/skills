@@ -26,5 +26,5 @@ Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Co
 - **Verify:** `judo-review`, `receiving-code-review`
 - **Knowledge:** `research`, `graphify`, `nlm-skill`
 - **Integrations:** `sentry-cli`, `stripe-best-practices`, `stripe-projects`
-- **Output & comms:** `caveman`, `caveman-commit`, `no-ai-slop`, `wait-what`, `handoff`
+- **Output & comms:** `caveman`, `caveman-commit`, `no-ai-slop`, `pr`, `wait-what`, `handoff`
 - **Meta:** `writing-great-skills`, `plan-retire`, `retro`, `flow`
