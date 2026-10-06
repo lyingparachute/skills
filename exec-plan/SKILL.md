@@ -22,7 +22,7 @@ A plan is a brief for a senior dev with zero background. Required sections:
 - **Locked decisions** - module boundaries, patterns, public API shape, data model, dependency direction, security sources. All architecture locks HERE; the implementer gets tactics only (naming, control flow, test layout)
 - **Alternatives considered** - and why rejected
 - **Invariants / risks / open questions**
-- **Milestones** - vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step
+- **Milestones** - vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step. Each opens with the heading `### Milestone N - <title>`, numbered from 1, with sub-parts under `####`, so `orchestrate` can extract it
 - **Progress** - mandatory checkbox list (`- [ ]` / `- [x] (timestamp)`) tracking granular work. This is the tracker: the assistant ticks boxes as it goes, splits a half-done item into "done / remaining" at every stopping point, and the plan file stays the single source of truth. No external issue tracker
 - **DoD** - binary checkboxes, each with an exact verification command + expected output
 

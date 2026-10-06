@@ -80,5 +80,11 @@ for s in $(grep -lE '^version:' */SKILL.md | cut -d/ -f1); do
   grep -q "\`$s\`" VENDORED.md 2>/dev/null || echo "WARN $s carries a version but has no VENDORED.md row"
 done
 
+echo "== skill script tests"
+for t in */scripts/*.test.sh; do
+  [ -x "$t" ] || continue
+  "$t" >/dev/null || { echo "FAIL $t (run it for details)"; fail=1; }
+done
+
 [ $fail -eq 0 ] && echo "OK" || echo "FAILURES above"
 exit $fail

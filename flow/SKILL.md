@@ -17,7 +17,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 `plan-feature` [model] (drives `zoom-out`, `improve-codebase` as prep sweep, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement` or `orchestrate`
 
 **Execute a hard plan (heavy / high-token)**
-`orchestrate` [user] - fresh implementer + one code-judo critic per milestone, whole-branch review, then `plan-retire`. The multi-agent alternative to `implement` for plans too big or risky for one agent.
+`orchestrate` [user] - fresh implementer per milestone + a code-judo critic per code milestone, a green gate before each commit, whole-branch review, then `plan-retire`; walks a feature folder in build order. The multi-agent alternative to `implement` for plans too big or risky for one agent.
 
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]

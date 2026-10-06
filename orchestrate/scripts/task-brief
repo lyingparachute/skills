@@ -1,38 +1,178 @@
 #!/usr/bin/env bash
-# Extract one task's full text from an implementation plan into a file the
-# implementer reads in one call, so the task text never has to be pasted
-# through the controller's context.
+# Extract one milestone of an ExecPlan into a brief file the implementer reads
+# in one call, so plan text never has to be pasted through the controller's
+# context. The brief holds the milestone, then the plan's binding sections
+# (locked decisions, scope and non-goals, contracts, invariants, definition of
+# done), because a milestone paragraph alone does not carry them.
 #
-# Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
-# Default OUTFILE: <repo-root>/.orchestrate/task-<N>-brief.md
+# Milestone starts, strongest form first; the strongest form the plan uses is
+# the only one that counts, so prose that mentions a milestone elsewhere
+# cannot start a block:
+#   heading    "### Milestone 2 - Title", "### M1a - Title", "## Step 3 ..."
+#   paragraph  "Milestone 2: ...", "**M2. ...**", "M4, ...", "Milestone B ..."
+#   list item  "2. ..." or "- [ ] **M2 ..." directly under a "Milestones"
+#              heading, used only when the plan has no heading or paragraph form
+# Words: Milestone, Task, Step, Phase, or a bare "M". Ids: digits with an
+# optional lowercase suffix ("1a"), or one capital letter.
+# A heading block ends at the next milestone heading or at a shallower
+# heading; paragraph and list blocks end at the next start or any heading.
+# The first block wins.
+#
+# Usage: task-brief PLAN_FILE MILESTONE_ID [OUTFILE]
+#        task-brief PLAN_FILE --list
+# Prints "wrote <path>: <n> lines", or with --list one id per line.
+# Exit 3 when the milestone (or, with --list, any milestone) is not found.
+# Default OUTFILE: <repo-root>/.orchestrate/task-<ID>-brief.md
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]" >&2
-  exit 2
-fi
+usage() { echo "usage: task-brief PLAN_FILE MILESTONE_ID [OUTFILE] | task-brief PLAN_FILE --list" >&2; exit 2; }
+[ $# -ge 2 ] && [ $# -le 3 ] || usage
 
 plan=$1
-n=$2
+id=$2
 [ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
+
+mode=brief
+if [ "$id" = "--list" ]; then
+  [ $# -eq 2 ] || usage
+  mode=list
+  id=""
+else
+  case $id in
+    [0-9]|[0-9][a-z]|[0-9][0-9]|[0-9][0-9][a-z]|[A-Z]) ;;
+    *) echo "milestone id must be digits (optional lowercase suffix) or one capital letter: $id" >&2; exit 2 ;;
+  esac
+fi
+
+prog='
+  function heading_level(line) {
+    if (match(line, /^#+[ \t]/)) return RLENGTH - 1
+    return 0
+  }
+  function is_fence(line) { return line ~ /^[ \t]*(```|~~~)/ }
+  # The milestone id a line starts, or "".
+  function milestone_id(line,   s, mid, rest, is_heading) {
+    is_heading = heading_level(line) > 0
+    s = line
+    sub(/^#+[ \t]+/, "", s)
+    sub(/^\*\*/, "", s)
+    if (match(s, /^(Milestone|Task|Step|Phase)[ \t]+(M?[0-9]+[a-z]?|[A-Z])/)) {
+      mid = substr(s, RSTART, RLENGTH); sub(/^[A-Za-z]+[ \t]+/, "", mid); sub(/^M/, "", mid)
+      rest = substr(s, RLENGTH + 1)
+      if (rest ~ /^[0-9A-Za-z]/) return ""
+      return mid
+    }
+    if (match(s, /^M[0-9]+[a-z]?/)) {
+      mid = substr(s, 2, RLENGTH - 1)
+      rest = substr(s, RLENGTH + 1)
+      if (is_heading && rest ~ /^([ \t]|$|[-.:,)*])/) return mid
+      if (rest ~ /^(\*\*)?[.:,)]|^(\*\*)?[ \t]+[-–—]/) return mid
+    }
+    return ""
+  }
+  # Form of a line: 3 heading, 2 paragraph, 1 list item, 0 none. Sets lid.
+  function form_of(line,   level) {
+    level = heading_level(line)
+    lid = ""
+    if (level > 0) {
+      lid = milestone_id(line)
+      list_section = (lid == "" && tolower(line) ~ /milestones/)
+      return lid != "" ? 3 : 0
+    }
+    lid = milestone_id(line)
+    if (lid != "") return 2
+    if (!list_section) return 0
+    if (match(line, /^[0-9]+\.[ \t]/)) {
+      lid = substr(line, 1, RLENGTH); sub(/\.[ \t]*$/, "", lid)
+      return 1
+    }
+    if (match(line, /^[-*][ \t]+(\[[ xX]\][ \t]+)?/)) {
+      lid = milestone_id(substr(line, RLENGTH + 1))
+      if (lid != "") return 1
+    }
+    lid = ""
+    return 0
+  }
+  function binding_heading(line,   t) {
+    t = tolower(line)
+    if (t ~ /milestone/) return 0
+    return t ~ /locked decision|scope|non-goal|contract|invariant|definition of done|^#+[ \t]+dod/
+  }
+  FNR == 1 { pass++; list_section = 0; infence = 0 }
+
+  # Pass 1: which forms exist, and every id in document order.
+  pass == 1 {
+    if (is_fence($0)) { infence = !infence; next }
+    if (infence) next
+    f = form_of($0)
+    if (f >= 2) strong = 1
+    if (f > 0) { n_ids++; ids[n_ids] = lid; idform[n_ids] = f }
+    if (f > 0 && lid == want && f > best) best = f
+    next
+  }
+  pass == 2 && mode == "list" { exit }
+
+  # Pass 2: the milestone block.
+  pass == 2 {
+    if (best == 1 && strong) best = 0
+    if (is_fence($0)) { if (inmilestone) print; infence = !infence; next }
+    if (infence) { if (inmilestone) print; next }
+    level = heading_level($0)
+    f = form_of($0)
+    if (f == best && best > 0) {
+      inmilestone = (lid == want && !printed)
+      start_level = level
+    } else if (inmilestone && level > 0 && (start_level == 0 || level < start_level)) {
+      inmilestone = 0
+    }
+    if (inmilestone) { print; printed = 1 }
+    next
+  }
+
+  # Pass 3: the binding sections, at heading level 2 or above.
+  pass == 3 {
+    if (!printed) exit
+    if (is_fence($0)) { if (inbinding) print; infence = !infence; next }
+    if (infence) { if (inbinding) print; next }
+    level = heading_level($0)
+    if (level > 0 && level <= 2) {
+      inbinding = binding_heading($0)
+      if (inbinding && !header_done) { print ""; print "---"; print "Binding plan sections, read before you start:"; print ""; header_done = 1 }
+    }
+    if (inbinding) print
+  }
+
+  END {
+    if (mode == "list") {
+      top = strong ? 2 : 1
+      for (i = 1; i <= n_ids; i++) if (idform[i] >= top && !seen[ids[i]]++) { print ids[i]; any = 1 }
+      if (!any) exit 3
+    } else if (!printed) exit 3
+  }
+'
+
+if [ "$mode" = list ]; then
+  set +e
+  awk -v want="" -v mode=list "$prog" "$plan" "$plan"
+  rc=$?
+  set -e
+  [ $rc -eq 0 ] || echo "no milestones found in ${plan}" >&2
+  exit $rc
+fi
 
 if [ $# -eq 3 ]; then
   out=$3
 else
   dir=$("$(cd "$(dirname "$0")" && pwd)/workspace")
-  out="$dir/task-${n}-brief.md"
+  out="$dir/task-${id}-brief.md"
 fi
 
-awk -v n="$n" '
-  /^```/ { infence = !infence }
-  !infence && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    intask = ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)"))
-  }
-  intask { print }
-' "$plan" > "$out"
-
-if [ ! -s "$out" ]; then
-  echo "task ${n} not found in ${plan} (no heading matching 'Task ${n}')" >&2
+set +e
+awk -v want="$id" -v mode=brief "$prog" "$plan" "$plan" "$plan" > "$out"
+rc=$?
+set -e
+if [ $rc -ne 0 ]; then
+  echo "milestone ${id} not found in ${plan}" >&2
   exit 3
 fi
 
