@@ -42,7 +42,6 @@ Vendored whole. Upstream is what I could not verify from the files, so fill it i
 | `nlm-skill` | 0.5.5 | unknown, wraps <https://github.com/jacob-bd/notebooklm-cli> |
 | `sentry-cli` | 0.31.0 | unknown |
 | `graphify` | see `.graphify_version` | unknown |
-| `shadcn-ui` | none | unknown |
 | `stripe-best-practices` | none | unknown |
 | `stripe-projects` | none | unknown |
 

@@ -23,7 +23,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 `diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]
 
 **Design / build frontend**
-`impeccable` [model] (drives `shadcn-ui` for components; owns the detail refs + Web Interface Guidelines audit)
+`impeccable` [model] (owns the detail refs + Web Interface Guidelines audit)
 
 **Clean up a codebase**
 `improve-codebase` [model] (drives `graphify` output or `zoom-out`, `judo-review`, `exec-plan`, `plan-feature` for user-facing picks), then hand its plans to `implement` or `orchestrate`
