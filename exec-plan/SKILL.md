@@ -9,7 +9,7 @@ Author plans as self-contained briefs, alone or in a feature folder (see Feature
 
 `<plans-dir>` is wherever the project keeps plans (e.g. `.agents/plans/`, `docs/plans/`).
 
-The full ExecPlan spec - envelope, required sections, skeleton, self-containment rules - lives in [`PLANS.md`](PLANS.md). Read it before authoring; the shape below is the quick contract.
+Start every new plan from [`TEMPLATE.md`](TEMPLATE.md): it is the skeleton, and each section's placeholder says what belongs there. Run `scripts/check-plan-format <plan>` before any critic round: a plan that fails it is not ready for review. A repo may add its own plan rules (for example a `PLANS.md` in its plans dir); they apply on top of this skill.
 
 ## Plan Shape (contract)
 
@@ -22,11 +22,15 @@ A plan is a brief for a senior dev with zero background. Required sections:
 - **Locked decisions** - module boundaries, patterns, public API shape, data model, dependency direction, security sources. All architecture locks HERE; the implementer gets tactics only (naming, control flow, test layout)
 - **Alternatives considered** - and why rejected
 - **Invariants / risks / open questions**
-- **Milestones** - vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step. Each opens with the heading `### Milestone N - <title>`, numbered from 1, with sub-parts under `####`, so `orchestrate` can extract it
+- **Milestones** - vertical tracer-bullet slices: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable on its own, and fits one fresh context window. One concern, one verifiable outcome; no code, no pseudo-code, no step-by-step. All sit under one `## Milestones` section; each opens with the heading `### Milestone N - <title>` (numbered from 1, plain hyphen, short sentence-case title), with sub-parts under `####`, so `orchestrate` can extract it. No other milestone form; `scripts/check-plan-format` enforces it
 - **Progress** - mandatory checkbox list (`- [ ]` / `- [x] (timestamp)`) tracking granular work. This is the tracker: the assistant ticks boxes as it goes, splits a half-done item into "done / remaining" at every stopping point, and the plan file stays the single source of truth. No external issue tracker
 - **DoD** - binary checkboxes, each with an exact verification command + expected output
 
 Rules:
+- **Novice reader.** The implementer has only the working tree and this one file: no memory, no earlier plans, no chat. Repeat every assumption, define every term that is not ordinary English where it first appears, and embed needed outside knowledge in your own words, never as a link. A checked-in plan it builds on is named by title; an unchecked one is summarized in Background.
+- **Outcome first, decided, in prose.** Lead with what a user can do afterwards and how to see it. Resolve every ambiguity in the plan and say why; leave the implementer tactics only. Write prose; lists only where they are the content (Progress, DoD, user stories).
+- **Living document.** Progress is updated at every stopping point, with partly done items split into done and remaining. Every decision goes to the Decision Log with its rationale, every surprise to Surprises & Discoveries with short evidence, and the Outcomes & Retrospective is written at completion. Each revision updates every section it touches and adds a dated note at the bottom saying what changed and why. Restarting from only the plan must always work.
+- **Prototype the unknowns.** A risky unknown (a library's behavior, feasibility, performance) gets its own milestone labeled prototyping, with how to run it and the criteria to promote or discard it, before the milestones that depend on it.
 - **Test at the fewest, highest seams.** Prefer an existing seam to a new one; the ideal count across the change is one. Name the seam(s) and any prior art (similar tests in the codebase) so the implementer tests external behavior, not internals.
 - **Claim strength = proof strength.** "Exact"/"complete"/"durable" claims need a check that distinguishes a real implementation from a partial one that still exits 0.
 - Every cited `file:line` verified against current repo state at write time AND again at execution time.

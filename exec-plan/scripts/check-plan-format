@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# Check that ExecPlans use the strict milestone format of TEMPLATE.md.
+#
+# Rules per plan file:
+#   1. Exactly one level-2 heading starts with "## Milestones".
+#   2. Every milestone is a heading "### Milestone N - <title>".
+#   3. Milestones are numbered 1..N in document order with no gaps.
+#   4. Every milestone heading sits under the "## Milestones" section.
+#   5. No other milestone form is left: no other milestone-like heading
+#      anywhere, and inside "## Milestones" no paragraph or list item that
+#      opens like a milestone ("Milestone 2:", "**M2.**", "M2,", "1. ...").
+#   6. With --since REF: at most 3% of the words in the file at REF are gone,
+#      so a format conversion cannot silently drop content.
+# Fenced code blocks are ignored.
+#
+# Usage: check-plan-format [--since REF] PLAN_FILE...
+# Exit 1 when any file fails, 2 on bad usage.
+import re
+import subprocess
+import sys
+from collections import Counter
+
+MILESTONE_HEADING = re.compile(r"^### Milestone (\d+) - \S.*$")
+OLD_FORM = re.compile(
+    r"^(\*\*)?(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])([ \t]*[-.:,)–—]|\*\*|[ \t]+\w)"
+    r"|^(\*\*)?M\d+[a-z]?(\*\*)?[.:,)]"
+    r"|^#{1,6} +(Milestone|M|Task|Step|Phase) ?\d"
+)
+FENCE = re.compile(r"^[ \t]*(```|~~~)")
+WORD = re.compile(r"[A-Za-z0-9_]+")
+MAX_REMOVED_SHARE = 0.03
+
+
+def words(text):
+    return Counter(w.lower() for w in WORD.findall(text))
+
+
+def format_errors(text):
+    errs = []
+    infence = False
+    section = ""
+    milestone_sections = 0
+    nums = []
+    for i, line in enumerate(text.splitlines(), 1):
+        if FENCE.match(line):
+            infence = not infence
+            continue
+        if infence:
+            continue
+        if line.startswith("## "):
+            section = line
+            if line.startswith("## Milestones"):
+                milestone_sections += 1
+            continue
+        in_milestones = section.startswith("## Milestones")
+        m = MILESTONE_HEADING.match(line)
+        if m:
+            nums.append(int(m.group(1)))
+            if not in_milestones:
+                errs.append(f"{i}: milestone heading outside '## Milestones'")
+            continue
+        if OLD_FORM.match(line) and (in_milestones or line.startswith("#")):
+            errs.append(f"{i}: other milestone form: {line[:70]}")
+        if in_milestones and not nums and re.match(r"^\d+\.\s", line):
+            errs.append(f"{i}: numbered list item where milestone headings belong: {line[:60]}")
+    if milestone_sections != 1:
+        errs.append(f"expected one '## Milestones' section, found {milestone_sections}")
+    if not nums:
+        errs.append("no '### Milestone N - <title>' heading")
+    elif nums != list(range(1, len(nums) + 1)):
+        errs.append(f"milestones not numbered 1..N in order: {nums}")
+    return errs
+
+
+def content_loss(path, text, ref):
+    shown = subprocess.run(["git", "show", f"{ref}:{path}"], capture_output=True, text=True)
+    if shown.returncode != 0:
+        return []
+    before, after = words(shown.stdout), words(text)
+    removed = sum((before - after).values())
+    total = max(1, sum(before.values()))
+    if removed / total > MAX_REMOVED_SHARE:
+        return [f"content loss since {ref}: {removed} of {total} words removed"]
+    return []
+
+
+def main(argv):
+    since = None
+    if argv[:1] == ["--since"]:
+        if len(argv) < 3:
+            print("usage: check-plan-format [--since REF] PLAN_FILE...", file=sys.stderr)
+            return 2
+        since, argv = argv[1], argv[2:]
+    if not argv:
+        print("usage: check-plan-format [--since REF] PLAN_FILE...", file=sys.stderr)
+        return 2
+    failing = 0
+    for path in argv:
+        text = open(path, encoding="utf-8").read()
+        errs = format_errors(text)
+        if since:
+            errs += content_loss(path, text, since)
+        if errs:
+            failing += 1
+            print(f"FAIL {path}")
+            for e in errs[:8]:
+                print(f"     {e}")
+    print(f"{len(argv) - failing} ok, {failing} failing")
+    return 1 if failing else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

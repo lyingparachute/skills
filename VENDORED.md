@@ -28,7 +28,7 @@ These started as his and have since diverged, some heavily. Diff against that co
 | `writing-great-skills` | His `writing-for-agents`, renamed and reworked, with our `GLOSSARY.md`. |
 | `judo-review` | His `code-review`, renamed, then rewritten: two axes, `STANDARDS.md`, severity and disposition tags. |
 | `flow` | His `ask-matt`, renamed and rebuilt around our chains. |
-| `exec-plan` | Ours, replacing his `to-spec` and `to-tickets`. `PLANS.md` is OpenAI's ExecPlan spec. |
+| `exec-plan` | Ours, replacing his `to-spec` and `to-tickets`. Its rules and `TEMPLATE.md` absorb what was kept from OpenAI's ExecPlan spec (`PLANS.md`, removed). |
 
 Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`orchestrate` covers it), `chief-of-staff`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
 
