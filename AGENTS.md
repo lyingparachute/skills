@@ -77,12 +77,8 @@
 
 ## Planning
 
-- **Plan before code.** Every non-trivial task starts with a written plan - problem, target state, acceptance criteria. Explore requirements and constraints before committing to a plan.
-- **Plan = self-contained brief for a senior dev with zero background.** Explain *why now*, problem solved, intent per decision, alternatives considered and rejected. Cover: background, scope + non-goals, invariants, risks/open questions, binary DoD. **All architectural decisions locked in plan** - module boundaries, patterns, abstractions, dependency direction, public API shape, data model. Implementer handles tactical execution (naming, control flow, helper extraction, test layout), never design. No code, no pseudo-code, no step-by-step. Reader asks "why this approach?" → plan answers without digging. Plans are briefs, not prescriptive code-per-step runbooks.
+- **Plan before code.** Every non-trivial task starts with a written plan from the `exec-plan` skill. It owns what a plan contains, its template and format check, and its critic gate. Explore requirements and constraints before committing to a plan.
 - **Bite-sized tasks.** One task = one concern = one verifiable outcome. No monolithic prompts.
-- **Acceptance criteria binary.** Concrete pass/fail with example inputs and expected outputs. Vague ("should work correctly") = not a criterion.
-- **Claim strength must match proof strength.** Every non-trivial plan claim needs a binary acceptance check that proves the same strength of claim. If a plan says "exact", "recursive", "durable", "full mirror", or "complete", its verification must distinguish a real implementation from a weaker partial implementation that merely still exits `0`.
-- **Plan = living document.** Update as decisions change. Source of truth across sessions, not one-time artifact.
 
 ## Testing & Delivery
 
@@ -104,13 +100,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## "Implement the plan" / "execute the plan"
 
-- Plan = contract. Follow Scope, Non-goals, DoD literally. No drift.
-- Verify every cited `file:line` against current repo state before acting.
-- Hit a dependency on another plan? STOP and report; do not implement it.
-- One subagent per independent task. After each: separate verification subagent (not the implementer) runs the focused test, checks DoD bullet, greps for regressions.
-- Before "done": run every DoD verification command, paste actual output. No claim without evidence.
-- On completion: update plan `Status:` line to `landed - <commit sha>`, tick DoD checkboxes, commit code (NOT the plan file itself).
-- Report: what changed, tests run, deviations, follow-ups belonging to other plans.
+- Use `/implement` (one agent, the light path) or `/orchestrate` (fresh subagent per milestone, critic, gate; for big or risky plans). The skill owns the protocol.
 
 ## "Review the implementation" / "verify the implementation"
 

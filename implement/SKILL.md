@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 Before writing any code, pre-flight the plan: call the Skill tool with `exec-plan`, then check: is it **ready** as that skill defines ready (critic gate passed, `Status: ready`)? A plan without that gate is a **draft**, however confident it reads, and a `ready` stamp you didn't witness still deserves a spot-check. If it's a draft, or the `ready` claim doesn't hold up, STOP. Do not implement it. Tell the user plainly what is missing, ask the questions the plan should have answered, and route them to /exec-plan to run the critic gate or /grilling to stress-test it. Implementing a draft faithfully just ships a bad plan, so a silent "looks fine" here is the failure, not the delay.
 
-Once the plan is ready, implement the work it describes. Follow its Scope, Non-goals, and Definition of Done literally, with no drift. Every DoD bullet is a binary check the implementation must satisfy before you call it done.
+Once the plan is ready, implement the work it describes. Re-check every cited `file:line` against the current repo before acting on it. Follow its Scope, Non-goals, and Definition of Done literally, with no drift. Every DoD bullet is a binary check the implementation must satisfy before you call it done.
 
 Keep the plan current as you go: it is the cross-session source of truth, so tick its Progress boxes and update `Status` as work lands. If you hit a dependency on another plan, STOP and report it; do not implement that other plan. A plan in a feature folder: every plan in its index row's "starts after" must have landed, and its row follows its `Status` (see /exec-plan). A plan's "do NOT remove X" premise can be invalidated by a later-landed change, so verify such premises against committed code before enforcing them.
 
@@ -19,3 +19,5 @@ Once done, call the Skill tool with `judo-review` to review the work: it hunts t
 Commit to the current branch once per milestone: exactly one commit after the milestone is complete and verified, holding its slices, tests, docs and review fixes; amend it until work on the next milestone begins. When the last milestone is committed, set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
 
 When every milestone is committed and the critic subagent's `judo-review` verdict is `APPROVE`, call the Skill tool with `plan-retire` to close out the plan - extract durable decisions, delete the rest. Merge is not required.
+
+Report: what changed, every DoD command with its actual output, deviations from the plan, and follow-ups that belong to other plans.
