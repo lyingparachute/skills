@@ -16,6 +16,7 @@ Start every new plan from [`TEMPLATE.md`](TEMPLATE.md): it is the skeleton, and 
 A plan is a brief for a senior dev with zero background. Required sections:
 
 - **Status:** line (`draft` → `ready` → `landed - <sha>` / `blocked - <reason>`)
+- **Tier** line, when the product sells plans: the plan or capability key that gates this work (or "all plans") and why it belongs there, by the repo's placement rule. No `ready` without it
 - **Background / why now** - problem, evidence, what happens if deferred
 - **User stories** - the feature from the user's perspective, as `As an <actor>, I want <capability>, so that <benefit>`. The scope-completeness check: a capability with no story is out of scope until one exists. Internal/refactor work with no external actor → say so and skip
 - **Scope + Non-goals** - explicit exclusions kill drift

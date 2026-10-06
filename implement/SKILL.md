@@ -16,6 +16,6 @@ Run typechecking regularly, single test files regularly, and the full test suite
 
 Once done, call the Skill tool with `judo-review` to review the work: it hunts the code-judo moves that leave the codebase more enterprise-level than before. Handle its findings by calling the Skill tool with `receiving-code-review`, which sets what you fix now and what becomes a followup plan. Accept no weak code.
 
-Commit your work to the current branch, then set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
+Commit to the current branch once per milestone: exactly one commit after the milestone is complete and verified, holding its slices, tests, docs and review fixes; amend it until work on the next milestone begins. When the last milestone is committed, set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
 
 When every milestone is committed and the critic subagent's `judo-review` verdict is `APPROVE`, call the Skill tool with `plan-retire` to close out the plan - extract durable decisions, delete the rest. Merge is not required.

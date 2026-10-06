@@ -2,6 +2,8 @@
 
 Status: draft - <what is pending, e.g. "critic round 1 pending">
 
+Tier: <capability key or "all plans"> - <why, by the repo's placement rule>. Delete this line when the product has no paid tiers.
+
 This ExecPlan is a living document. Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective are kept current as work proceeds. Repo plan rules: <path to the repo's own plan rules, or "none">. Starts after: <plan titles, or "nothing">.
 
 ## Progress
