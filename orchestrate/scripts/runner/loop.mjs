@@ -1,4 +1,4 @@
-import { REVIEW, TRIAGE, WORKER_REPORT } from './contract.mjs'
+import { REVIEW, SEVERITIES, TRIAGE, WORKER_REPORT } from './contract.mjs'
 import { criticPrompt, fixerPrompt, implementerPrompt, triagePrompt } from './prompts.mjs'
 
 export const MAX_REVIEW_ROUNDS = 2
@@ -10,6 +10,8 @@ const IDLE = { id: '', base: '', startHead: '', brief: '', message: '', tests: [
 
 const stopped = (reason, detail) => ({ stop: { reason, detail } })
 const unique = list => [...new Set(list)]
+const bySeverity = findings => Object.fromEntries(SEVERITIES.map(severity => [severity, findings.filter(f => f.severity === severity).length]).filter(([, count]) => count))
+const tally = list => list.reduce((counts, key) => ({ ...counts, [key]: (counts[key] ?? 0) + 1 }), {})
 const cell = text => String(text).replace(/\s+/g, ' ').replace(/\|/g, '\\|')
 const subject = message => message.split('\n')[0]
 
@@ -32,28 +34,36 @@ export async function runPlan(ctx) {
   const stored = repo.loadState(fresh)
   const loaded = { ...fresh, ...stored, inProgress: { ...IDLE, ...stored.inProgress } }
   const state = loaded.plan === planReader.plan || loaded.status.state !== 'completed' ? loaded : fresh
+  const isNew = stored === fresh || state === fresh
   let outcome
   try {
-    outcome = await guarded(ctx, state)
+    outcome = await guarded(ctx, state, isNew)
   } catch (error) {
     outcome = stopped('runner-error', error.message)
   }
   state.status = outcome.stop ? { state: 'stopped', ...outcome.stop } : { state: 'completed' }
+  ctx.journal.emit({ type: 'end', ...state.status })
   repo.saveState(state)
   return state.status
 }
 
-async function guarded(ctx, state) {
+async function guarded(ctx, state, isNew) {
   if (state.plan !== ctx.planReader.plan) return stopped('plan-mismatch', `${ctx.repo.stateFile} holds the unfinished plan ${state.plan}`)
-  const unknown = ctx.accepted.filter(id => id !== state.inProgress.id && id !== CLOSE_OUT && !state.completed.includes(id))
-  if (unknown.length) return stopped('bad-accept', `nothing in progress to accept for: ${unknown.join(', ')}`)
   state.status = { state: 'running', pid: process.pid }
   ctx.repo.saveState(state)
-  const ids = ctx.planReader.milestones()
-  if (!ids.ok) return stopped('plan-format', ids.error)
-  const strangers = ctx.humanGates.filter(id => !ids.value.includes(id))
+  const milestones = ctx.planReader.milestones()
+  if (!milestones.ok) return stopped('plan-format', milestones.error)
+  ctx.journal.emit({
+    type: 'run-start', fresh: isNew, plan: state.plan, cap: ctx.cap, agentsUsed: state.agentsUsed, completed: state.completed, milestones: milestones.value,
+  })
+  const unknown = ctx.accepted.filter(id => id !== state.inProgress.id && id !== CLOSE_OUT && !state.completed.includes(id))
+  if (unknown.length) return stopped('bad-accept', `nothing in progress to accept for: ${unknown.join(', ')}`)
+  const ids = milestones.value.map(m => m.id)
+  const strangers = ctx.humanGates.filter(id => !ids.includes(id))
   if (strangers.length) return stopped('unknown-milestone', `--human-gate names no milestone of the plan: ${strangers.join(', ')}; see task-brief --titles`)
-  for (const id of ids.value.filter(id => !state.completed.includes(id))) {
+  for (const [index, { id, title }] of milestones.value.entries()) {
+    if (state.completed.includes(id)) continue
+    ctx.journal.emit({ type: 'milestone-start', id, title, index: index + 1, total: ids.length })
     const outcome = await advance(ctx, state, id)
     if (outcome.stop) return outcome
   }
@@ -83,13 +93,15 @@ async function startMilestone(ctx, state, id) {
   const resuming = state.inProgress.id === id && !repo.isClean()
   if (!resuming) {
     const startHead = repo.head()
-    const redBefore = (await repo.runGate(ctx.gates, `m${id}-baseline`)).anyRed
+    const baseline = await repo.runGate(ctx.gates, `m${id}-baseline`)
+    const redBefore = baseline.anyRed
+    ctx.journal.emit({ type: 'baseline', label: `m${id}-baseline`, red: redBefore, file: baseline.file })
     state.knownRed = redBefore
     state.inProgress = { ...IDLE, id, base: state.pendingBase || startHead, startHead, brief: ctx.planReader.brief(id), redBefore }
     repo.saveState(state)
   }
   const prompt = implementerPrompt({ plan: ctx.planReader.plan, id, brief: state.inProgress.brief, resuming })
-  const built = await work(ctx, state, 'implementer', prompt)
+  const built = await work(ctx, state, 'implementer', prompt, `m${id}`)
   if (built.stop) return built
   const { commitMessage, testCommands: tests } = built.value
   state.inProgress = { ...state.inProgress, message: commitMessage.trim(), tests }
@@ -125,8 +137,19 @@ async function acceptMilestone(ctx, state, id) {
 
 async function gateOnly(ctx, label, tests, { advisory, base }) {
   ctx.repo.stageAll()
-  const gate = await ctx.repo.runGate(unique([...ctx.gates, ...tests]), label, { advisory, files: ctx.repo.changedFiles(base) })
-  return gate.green ? {} : stopped('gate-red', `${label}: ${gate.failed.join(', ')} failed, see ${gate.file}`)
+  const result = await gate(ctx, unique([...ctx.gates, ...tests]), label, { advisory, files: ctx.repo.changedFiles(base) })
+  return result.green ? {} : stopped('gate-red', `${label}: ${result.failed.join(', ')} failed, see ${result.file}`)
+}
+
+async function gate(ctx, commands, label, options) {
+  const result = await ctx.repo.runGate(commands, label, options)
+  ctx.journal.emit({ type: 'gate', label, green: result.green, failed: result.failed, file: result.file })
+  return result
+}
+
+function commit(ctx, message) {
+  ctx.repo.commit(message)
+  ctx.journal.emit({ type: 'commit', sha: ctx.repo.short(ctx.repo.head()), subject: subject(message) })
 }
 
 function finish(ctx, state, id) {
@@ -137,7 +160,7 @@ function finish(ctx, state, id) {
   }
   state.inProgress = { ...state.inProgress, committing: true }
   repo.saveState(state)
-  repo.commit(state.inProgress.message)
+  commit(ctx, state.inProgress.message)
   return record(ctx, state, id)
 }
 
@@ -152,11 +175,13 @@ function record(ctx, state, id) {
   state.completed.push(id)
   state.inProgress = IDLE
   repo.saveState(state)
+  ctx.journal.emit({ type: 'milestone-done', id, review })
   return {}
 }
 
 async function closeOut(ctx, state) {
   const { repo } = ctx
+  ctx.journal.emit({ type: 'close-out-start' })
   let message = CLOSE_OUT_MESSAGE
   if (ctx.accepted.includes(CLOSE_OUT)) {
     const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands, { advisory: state.knownRed, base: state.base0 })
@@ -170,7 +195,7 @@ async function closeOut(ctx, state) {
     message = reviewed.fixMessage || CLOSE_OUT_MESSAGE
   }
   repo.stageAll()
-  if (repo.stagedPaths('HEAD').length) repo.commit(message)
+  if (repo.stagedPaths('HEAD').length) commit(ctx, message)
   repo.ledger(`${ctx.planReader.plan} close-out: whole-branch review done (commits ${repo.short(state.base0)}..${repo.short(repo.head())}, agents used ${state.agentsUsed})`)
   state.closedOut = true
   repo.saveState(state)
@@ -185,24 +210,26 @@ async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief,
     const tag = `${label}-r${round}`
     repo.stageAll()
     const review = repo.writePackage(base, tag)
-    const gate = await repo.runGate(unique([...ctx.gates, ...named]), tag, { advisory, files: repo.changedFiles(base) })
-    const critique = await dispatch(ctx, state, role, criticPrompt({ brief, review, gate }), REVIEW)
+    const gated = await gate(ctx, unique([...ctx.gates, ...named]), tag, { advisory, files: repo.changedFiles(base) })
+    const critique = await dispatch(ctx, state, role, criticPrompt({ brief, review, gate: gated }), REVIEW, tag)
     if (critique.stop) return critique
     const findings = [
       ...critique.value.standards.map(f => ({ axis: 'standards', ...f })),
       ...critique.value.spec.map(f => ({ axis: 'spec', ...f })),
     ]
+    ctx.journal.emit({ type: 'findings', step: tag, role, total: findings.length, severities: bySeverity(findings) })
     const triaged = await triage(ctx, state, { brief, review, findings, tag, unit })
     if (triaged.stop) return triaged
     const fixes = [
       ...triaged.value,
-      ...(gate.green ? [] : [gateFinding(gate)]),
+      ...(gated.green ? [] : [gateFinding(gated)]),
       ...(named.length || closing ? [] : [NO_TESTS_FINDING]),
     ]
     if (!fixes.length) return { fixMessage }
     const fixFile = repo.writeJson(`fixes-${tag}.json`, fixes)
+    ctx.journal.emit({ type: 'fixes', step: tag, count: fixes.length, file: fixFile })
     if (round === MAX_REVIEW_ROUNDS) return stopped('open-findings', `${unit}: ${fixes.length} finding(s) left after ${MAX_REVIEW_ROUNDS} review rounds, see ${fixFile}`)
-    const fixed = await work(ctx, state, 'fixer', fixerPrompt({ brief, review, fixes: fixFile }))
+    const fixed = await work(ctx, state, 'fixer', fixerPrompt({ brief, review, fixes: fixFile }), tag)
     if (fixed.stop) return fixed
     named = unique([...named, ...fixed.value.testCommands])
     state.testCommands = unique([...state.testCommands, ...fixed.value.testCommands])
@@ -224,13 +251,14 @@ const NO_TESTS_FINDING = {
 async function triage(ctx, state, { brief, review, findings, tag, unit }) {
   if (!findings.length) return { value: [] }
   const file = ctx.repo.writeJson(`findings-${tag}.json`, findings.map((finding, index) => ({ index, ...finding })))
-  const judged = await dispatch(ctx, state, 'triage', triagePrompt({ brief, review, findings: file }), TRIAGE)
+  const judged = await dispatch(ctx, state, 'triage', triagePrompt({ brief, review, findings: file }), TRIAGE, tag)
   if (judged.stop) return judged
   const indexes = judged.value.verdicts.map(v => v.index).sort((a, b) => a - b)
   if (indexes.join() !== findings.map((_, index) => index).join()) {
     return stopped('agent-failed', `triage must give exactly one verdict per finding in ${file}, got indexes ${indexes.join(', ') || 'none'}`)
   }
   const verdicts = new Map(judged.value.verdicts.map(v => [v.index, v]))
+  ctx.journal.emit({ type: 'triage', step: tag, verdicts: tally(judged.value.verdicts.map(v => v.verdict)) })
   findings.forEach((finding, index) => {
     const { verdict, reason } = verdicts.get(index)
     if (verdict === 'fix-now') return
@@ -239,18 +267,21 @@ async function triage(ctx, state, { brief, review, findings, tag, unit }) {
   return { value: findings.filter((_, index) => verdicts.get(index).verdict === 'fix-now') }
 }
 
-async function work(ctx, state, role, prompt) {
-  const reply = await dispatch(ctx, state, role, prompt, WORKER_REPORT)
+async function work(ctx, state, role, prompt, step) {
+  const reply = await dispatch(ctx, state, role, prompt, WORKER_REPORT, step)
   if (reply.stop) return reply
   if (reply.value.status === 'blocked') return stopped('blocked', `${role}: ${reply.value.summary}`)
   return reply.value.commitMessage.trim() ? reply : stopped('agent-failed', `${role} returned no commit message`)
 }
 
-async function dispatch(ctx, state, role, prompt, schema) {
+async function dispatch(ctx, state, role, prompt, schema, step) {
   if (state.agentsUsed >= ctx.cap) return stopped('cap', `the next ${role} would exceed the agent cap of ${ctx.cap}`)
   state.agentsUsed += 1
   ctx.repo.saveState(state)
+  ctx.journal.emit({ type: 'agent-start', role, step, agentsUsed: state.agentsUsed, cap: ctx.cap })
+  const started = Date.now()
   const reply = await ctx.agent(role, prompt, schema)
+  ctx.journal.emit({ type: 'agent-end', role, step, ok: reply.ok, ms: Date.now() - started, ...(reply.ok ? {} : { error: reply.error }) })
   if (reply.ok) return { value: reply.value }
   return stopped(reply.kind === 'transient' ? 'rate-limited' : 'agent-failed', `${role}: ${reply.error}`)
 }

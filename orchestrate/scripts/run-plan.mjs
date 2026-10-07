@@ -1,23 +1,21 @@
 #!/usr/bin/env node
-import { execFileSync } from 'node:child_process'
-import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync, statSync } from 'node:fs'
-import { dirname, join, relative, resolve } from 'node:path'
-import { setTimeout as wait } from 'node:timers/promises'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { constants } from 'node:os'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
-import { createAgent, DEFAULT_AGENT_TIMEOUT_MS, DEFAULT_IDLE_TIMEOUT_MS, HARNESSES, jsonFromText } from './runner/harness.mjs'
+import { createAgent, DEFAULT_AGENT_TIMEOUT_MS, DEFAULT_IDLE_TIMEOUT_MS, HARNESSES } from './runner/harness.mjs'
+import { createJournal } from './runner/journal.mjs'
 import { CLOSE_OUT, ROLES, runPlan } from './runner/loop.mjs'
 import { createPlanReader, createRepo } from './runner/repo.mjs'
+import { follow, readStatus, statusLine, storedState } from './runner/status.mjs'
 
 const MS_PER_MINUTE = 60 * 1000
-const MS_PER_SECOND = 1000
-const WATCH_INTERVAL_MS = 30 * 1000
-const LAST_LINE_LENGTH = 160
-const LOG_TAIL_BYTES = 64 * 1024
 const OPENCODE_FREE_MODEL = 'opencode/muse-spark-1.3-contributor-free'
 const OPENCODE_FREE_PROVIDER = 'opencode/'
 const USAGE = `usage: run-plan.mjs --plan PLAN --harness ${HARNESSES.join('|')} --cap N [options]
-       run-plan.mjs --status [--watch]
+       run-plan.mjs --status [--json] | --follow
 
   --model ID | ROLE=ID       model for every role, or for one role (${ROLES.join(', ')});
                              opencode defaults to ${OPENCODE_FREE_MODEL}
@@ -30,8 +28,12 @@ const USAGE = `usage: run-plan.mjs --plan PLAN --harness ${HARNESSES.join('|')} 
   --agent-timeout-min N      hard limit per worker (default ${DEFAULT_AGENT_TIMEOUT_MS / MS_PER_MINUTE})
   --idle-timeout-min N       kill and retry a worker silent this long (default ${DEFAULT_IDLE_TIMEOUT_MS / MS_PER_MINUTE})
   --any-provider             allow opencode models outside ${OPENCODE_FREE_PROVIDER}
-  --status [--watch]         print the run status; --watch repeats it until the run ends`
-const EXIT = { completed: 0, usage: 2, stopped: 3 }
+  --notify                   desktop notification when the run stops or completes
+  --status [--json]          print the run status as one line, or as JSON
+  --follow                   print the run's timeline as it happens, until the run ends
+                             (--status --watch is the old name for it)`
+const EXIT = { completed: 0, crashed: 1, usage: 2, stopped: 3 }
+const SIGNAL_EXIT_BASE = 128
 
 function usage(problem) {
   console.error(`${problem}\n${USAGE}`)
@@ -55,7 +57,10 @@ function parseCommandLine() {
         'review-docs': { type: 'boolean', default: false },
         'agent-timeout-min': { type: 'string', default: String(DEFAULT_AGENT_TIMEOUT_MS / MS_PER_MINUTE) },
         'idle-timeout-min': { type: 'string', default: String(DEFAULT_IDLE_TIMEOUT_MS / MS_PER_MINUTE) },
+        notify: { type: 'boolean', default: false },
         status: { type: 'boolean', default: false },
+        json: { type: 'boolean', default: false },
+        follow: { type: 'boolean', default: false },
         watch: { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
       },
@@ -74,63 +79,6 @@ if (values.help) {
 const scriptsDir = dirname(fileURLToPath(import.meta.url))
 const workspace = execFileSync(join(scriptsDir, 'workspace'), { encoding: 'utf8' }).trim()
 const root = dirname(workspace)
-const stateFile = join(workspace, 'run-state.json')
-
-function isAlive(pid) {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch (error) {
-    return error.code === 'EPERM'
-  }
-}
-
-const storedState = () => (existsSync(stateFile) ? JSON.parse(readFileSync(stateFile, 'utf8')) : { status: { state: 'not-started' } })
-const isRunning = status => status.state === 'running' && isAlive(status.pid)
-
-function lastActivity(pid) {
-  const logs = readdirSync(workspace).filter(name => name.startsWith(`agent-${pid}-`) && name.endsWith('.log')).map(name => join(workspace, name))
-  if (!logs.length) return { activeLog: '(no agent started yet)' }
-  const activeLog = logs.reduce((newest, log) => (statSync(log).mtimeMs > statSync(newest).mtimeMs ? log : newest))
-  const lines = tail(activeLog).split('\n').filter(line => line.trim())
-  const lastLine = lines.length ? summarize(lines.at(-1)) : '(no output yet)'
-  return { activeLog, idleSeconds: Math.round((Date.now() - statSync(activeLog).mtimeMs) / MS_PER_SECOND), lastLine: lastLine.slice(0, LAST_LINE_LENGTH) }
-}
-
-function tail(file) {
-  const size = statSync(file).size
-  const length = Math.min(size, LOG_TAIL_BYTES)
-  const buffer = Buffer.alloc(length)
-  const fd = openSync(file, 'r')
-  readSync(fd, buffer, 0, length, size - length)
-  closeSync(fd)
-  return buffer.toString('utf8')
-}
-
-function summarize(line) {
-  if (!line.startsWith('{')) return line
-  const event = jsonFromText(line)
-  if (!event.ok) return `(not a complete JSON event: ${line})`
-  const part = event.value.part ?? {}
-  return [event.value.type, part.tool, part.state?.status, part.text].filter(Boolean).join(' ')
-}
-
-function currentStatus() {
-  const { status, agentsUsed, completed, plan } = storedState()
-  if (status.state === 'running' && !isRunning(status)) {
-    return { state: 'crashed', detail: `runner ${status.pid} died; see .orchestrate/run.log`, plan, agentsUsed, completed }
-  }
-  return { ...status, plan, agentsUsed, completed, ...(status.state === 'running' ? lastActivity(status.pid) : {}) }
-}
-
-async function printStatus(watch) {
-  for (;;) {
-    const status = currentStatus()
-    console.log(JSON.stringify(status))
-    if (!watch || status.state !== 'running') return
-    await wait(WATCH_INTERVAL_MS)
-  }
-}
 
 function perRole(flag, entries) {
   const empty = entries.filter(entry => entry === '' || entry.endsWith('='))
@@ -161,18 +109,69 @@ function positiveInteger(flag, value) {
   return number
 }
 
-if (values.watch && !values.status) usage('--watch works only with --status')
+const print = line => console.log(line)
+
+function notify(status) {
+  if (!values.notify) return
+  const text = status.state === 'completed' ? `completed ${basename(values.plan)}` : `stopped (${status.reason}): ${basename(values.plan)}`
+  const run = process.platform === 'darwin'
+    ? spawnSync('osascript', ['-e', 'on run argv', '-e', 'display notification (item 1 of argv) with title "orchestrate"', '-e', 'end run', text])
+    : spawnSync('notify-send', ['orchestrate', text])
+  if (run.status !== 0) console.error(`--notify failed: ${run.error?.message ?? run.stderr}`)
+}
+
+function killWorkerOnExit(repo, journal, interrupt) {
+  const onSignal = signal => {
+    interrupt.abort()
+    const status = { state: 'stopped', reason: 'interrupted', detail: `the runner got ${signal}; rerun the same command to resume` }
+    journal.emit({ type: 'end', ...status })
+    repo.saveState({ ...storedState(workspace), status })
+    notify(status)
+    process.exit(SIGNAL_EXIT_BASE + constants.signals[signal])
+  }
+  const onCrash = error => {
+    interrupt.abort()
+    const reason = error instanceof Error ? error.stack : String(error)
+    console.error(reason)
+    const status = { state: 'stopped', reason: 'runner-error', detail: `the runner crashed: ${reason.split('\n')[0]}` }
+    try {
+      journal.emit({ type: 'end', ...status })
+    } catch (journalError) {
+      console.error(`could not record the crash in the journal: ${journalError.message}`)
+    }
+    notify(status)
+    process.exit(EXIT.crashed)
+  }
+  const handlers = [['SIGINT', onSignal], ['SIGTERM', onSignal], ['uncaughtException', onCrash], ['unhandledRejection', onCrash]]
+  handlers.forEach(([event, handler]) => process.on(event, handler))
+  return () => handlers.forEach(([event, handler]) => process.off(event, handler))
+}
+
+if (values.json && !values.status) usage('--json works only with --status')
+if (values.watch && !values.status) usage('--watch works only with --status; use --follow')
+if (values.follow || values.watch) {
+  console.log(statusLine(await follow(workspace, print)))
+  process.exit(EXIT.completed)
+}
 if (values.status) {
-  await printStatus(values.watch)
+  const status = readStatus(workspace)
+  console.log(values.json ? JSON.stringify(status) : statusLine(status))
   process.exit(EXIT.completed)
 }
 if (!values.plan || !existsSync(values.plan)) usage(`no such plan: ${values.plan ?? '(none)'}`)
 if (!HARNESSES.includes(values.harness)) usage(`unknown harness: ${values.harness ?? '(none)'}`)
-if (isRunning(storedState().status)) usage(`a runner is already working in this repo (pid ${storedState().status.pid})`)
+const previous = readStatus(workspace)
+if (previous.state === 'running') usage(`a runner is already working in this repo (pid ${previous.pid})`)
+if (previous.orphanWorker) usage(`a worker from the last run is still running (pid ${previous.orphanWorker}): kill it with kill -9 -${previous.orphanWorker}, then rerun`)
 
+const interrupt = new AbortController()
+const repo = createRepo(root, workspace, { signal: interrupt.signal })
+const journal = createJournal(workspace, { print })
+const releaseExitHandlers = killWorkerOnExit(repo, journal, interrupt)
 const status = await runPlan({
   planReader: createPlanReader(relative(root, resolve(values.plan)), scriptsDir, root),
-  repo: createRepo(root, workspace),
+  repo,
+  journal,
   agent: createAgent({
     harness: values.harness,
     models: parseModels(values.harness, values.model, values['any-provider']),
@@ -181,6 +180,8 @@ const status = await runPlan({
     workspace,
     timeoutMs: positiveInteger('--agent-timeout-min', values['agent-timeout-min']) * MS_PER_MINUTE,
     idleMs: positiveInteger('--idle-timeout-min', values['idle-timeout-min']) * MS_PER_MINUTE,
+    onEvent: event => journal.emit(event),
+    signal: interrupt.signal,
   }),
   cap: positiveInteger('--cap', values.cap),
   gates: values.gate,
@@ -188,5 +189,6 @@ const status = await runPlan({
   accepted: values.accept,
   reviewDocs: values['review-docs'],
 })
-console.log(JSON.stringify(status))
+releaseExitHandlers()
+notify(status)
 process.exit(status.state === 'completed' ? EXIT.completed : EXIT.stopped)

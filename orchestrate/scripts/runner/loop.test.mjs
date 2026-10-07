@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { createJournal, readEvents } from './journal.mjs'
 import { runPlan } from './loop.mjs'
 import { createPlanReader, createRepo } from './repo.mjs'
 
@@ -29,6 +30,7 @@ Write two.txt.
 
 let root
 let workspace
+let printed
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 const write = (file, text = file) => () => writeFileSync(join(root, file), text)
 const report = (commitMessage, testCommands) => ({ status: 'done', summary: 'done', testCommands, concerns: [], commitMessage })
@@ -60,6 +62,7 @@ async function run(steps, options = {}) {
   const status = await runPlan({
     planReader: createPlanReader(options.plan ?? PLAN, scriptsDir, root),
     repo: createRepo(root, workspace),
+    journal: createJournal(workspace, { print: line => printed.push(line) }),
     agent: scripted.agent,
     cap: 50,
     gates: ['true'],
@@ -86,6 +89,7 @@ beforeEach(() => {
   git('add', PLAN)
   git('commit', '--quiet', '-m', 'plan')
   workspace = execFileSync(join(scriptsDir, 'workspace'), { cwd: root, encoding: 'utf8' }).trim()
+  printed = []
 })
 
 afterEach(() => rmSync(root, { recursive: true, force: true }))
@@ -382,4 +386,83 @@ test('a finished plan gives way to the next one; an unfinished one does not', as
   await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
   const next = await run([build('a.txt', 'feat: a'), critic(), build('b.txt', 'feat: b'), critic(), reviewer()], { plan: 'next.md' })
   assert.equal(next.status.state, 'completed')
+})
+
+const livePage = () => readFileSync(join(workspace, 'live.html'), 'utf8')
+const eventTypes = () => readEvents(workspace).map(event => event.type)
+
+test('the run prints a readable timeline and records the same steps as events', async () => {
+  const { status } = await run([
+    build('one.txt', 'feat: one'),
+    critic({ standards: [{ ...finding('nit'), severity: 'NIT' }, finding('bad name')], spec: [{ ...finding('scope'), severity: 'BLOCKER' }] }),
+    step('triage', { verdicts: [0, 1, 2].map(index => ({ index, verdict: index ? 'fix-now' : 'reject', reason: 'see one.txt:1' })) }),
+    step('fixer', report('fix: name', ['test -f one.txt'])), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.equal(status.state, 'completed')
+  const log = printed.join('\n')
+  for (const line of [
+    /^\d\d:\d\d:\d\d {2}run started: plan\.md, 0\/2 milestones done, agents 0\/50$/m,
+    /milestone 1 \(1\/2\): First file$/m,
+    /m1-baseline: gate green$/m,
+    /m1 implementer started \(agent 1\/50\)$/m,
+    /m1-r1 critic found 1 BLOCKER, 1 MAJOR, 1 NIT$/m,
+    /m1-r1 triage: 1 reject, 2 fix-now$/m,
+    /m1-r1 2 findings to fix, see \S+fixes-m1-r1\.json$/m,
+    /m1-r2 critic found nothing$/m,
+    /commit \w{7} feat: one$/m,
+    /milestone 1 complete \(review clean\)$/m,
+    /close-out: whole-branch review$/m,
+    /COMPLETED$/m,
+  ]) assert.match(log, line)
+  assert.equal(eventTypes().at(-1), 'end')
+  assert.equal(readEvents(workspace).length, printed.length)
+})
+
+test('the live page refreshes while running and shows the working agent', async () => {
+  let duringRun = ''
+  await run([
+    step('implementer', report('feat: one', ['test -f one.txt']), () => { write('one.txt')(); duringRun = livePage() }),
+    critic(), build('two.txt', 'feat: two'), critic(), reviewer(),
+  ])
+  assert.match(duringRun, /class="badge running"/)
+  assert.match(duringRun, /Working now: m1 implementer/)
+  assert.match(duringRun, /location\.reload\(\)/)
+  assert.match(duringRun, /<li class="m-active">.*First file/)
+  const finished = livePage()
+  assert.match(finished, /class="badge completed"/)
+  assert.doesNotMatch(finished, /location\.reload\(\)/)
+  assert.doesNotMatch(finished, /Working now/)
+})
+
+test('a stop shows on the live page with links to the files it names', async () => {
+  const stuck = () => critic({ standards: [finding('still bad')], spec: [] })
+  await run([build('one.txt', 'feat: one'), stuck(), verdict('fix-now'), step('fixer', report('fix: try', [])), stuck(), verdict('fix-now')])
+  const page = livePage()
+  assert.match(page, /Stopped: open-findings/)
+  assert.match(page, /<a href="fixes-m1-r2\.json">fixes-m1-r2\.json<\/a>/)
+  assert.match(printed.at(-1), /STOPPED open-findings: plan\.md#1: 1 finding\(s\) left/)
+})
+
+test('plan text on the live page is escaped', async () => {
+  writeFileSync(join(root, PLAN), planText('Plan').replace('First file', 'Use <script>alert(1)</script> & co'))
+  git('commit', '--quiet', '-am', 'odd title')
+  await run([build('one.txt', 'feat: one')], { cap: 1 })
+  assert.match(livePage(), /Use &lt;script&gt;alert\(1\)&lt;\/script&gt; &amp; co/)
+  assert.doesNotMatch(livePage(), /<script>alert/)
+})
+
+test('a rerun resumes the same timeline; the next plan starts a new one', async () => {
+  writeFileSync(join(root, 'next.md'), planText('Next'))
+  git('add', 'next.md')
+  git('commit', '--quiet', '-m', 'next plan')
+  await run([build('one.txt', 'feat: one')], { cap: 1 })
+  await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  const starts = readEvents(workspace).filter(event => event.type === 'run-start')
+  assert.deepEqual(starts.map(event => event.fresh), [true, false])
+  await run([build('a.txt', 'feat: a'), critic(), build('b.txt', 'feat: b'), critic(), reviewer()], { plan: 'next.md' })
+  const [first] = readEvents(workspace)
+  assert.equal(first.plan, 'next.md')
+  assert.equal(first.fresh, true)
 })

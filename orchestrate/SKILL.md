@@ -49,10 +49,20 @@ mkdir -p .orchestrate && nohup node <skill>/scripts/run-plan.mjs --plan PLAN \
   --harness opencode|claude|grok|codex --cap N \
   [--model ID] [--model ROLE=ID]... [--effort LEVEL] [--effort ROLE=LEVEL]... \
   --gate "LINT CMD" --gate "TYPECHECK CMD" [--human-gate ID]... [--accept ID]... \
-  [--review-docs] [--agent-timeout-min N] > .orchestrate/run.log 2>&1 &
+  [--review-docs] [--agent-timeout-min N] [--notify] > .orchestrate/run.log 2>&1 &
 ```
 
-`nohup` and `&` keep it alive after your shell tool returns; in Claude Code the Bash tool's background mode does the same and tells you when it ends. Workers get 90 minutes each (`--agent-timeout-min N`). OpenCode streams events, so an OpenCode worker silent for 15 minutes (`--idle-timeout-min N`) counts as stalled - on free models usually a rate limit, though a test suite quiet that long trips it too, so raise the limit for one. Claude, Grok and Codex print only at the end and get the 90-minute limit alone. Retried up to 5 times, waiting 30 seconds and doubling, about 15 minutes in all: OpenCode stalls, OpenCode rate limits and provider errors, and Claude 429 and 5xx errors. Grok and Codex errors are not retried. Retries do not count against the cap; an implementer or fixer retry is told to continue from the partial work. Poll with `node <skill>/scripts/run-plan.mjs --status`, waiting between polls with a `sleep` shorter than your shell tool's timeout. The status is `running`, `completed`, `stopped` with a reason and detail, or `crashed`. While running it also shows the active agent log, `idleSeconds` since its last output, and that output's last line, so a working worker and a stuck one look different. `--status --watch` repeats it every 30 seconds until the run ends.
+`nohup` and `&` keep it alive after your shell tool returns; in Claude Code the Bash tool's background mode does the same and tells you when it ends. Workers get 90 minutes each (`--agent-timeout-min N`). Every harness streams its events, so a worker silent for 15 minutes (`--idle-timeout-min N`) counts as stalled - on free models usually a rate limit, though a test suite quiet that long trips it too, so raise the limit for one. Retried up to 5 times, waiting 30 seconds and doubling, about 15 minutes in all: stalls, OpenCode rate limits and provider errors, and Claude 429 and 5xx errors. Other Grok and Codex errors are not retried. Retries do not count against the cap; an implementer or fixer retry is told to continue from the partial work. Ctrl-C or `kill PID` on the runner kills its worker and stops the run as `interrupted`.
+
+## Watching a run
+
+- **The user's view** is `.orchestrate/live.html`: milestones, the working agent's latest tool calls, the timeline, and the stop reason with links to the files it names. The runner rewrites it on every event, and it reloads itself while the run is going. Open it for the user once `--status` prints its `live view:` line (`open` on macOS, `xdg-open` on Linux).
+- **Your view** is `node <skill>/scripts/run-plan.mjs --status`: one line with the state, milestone, active agent and its run time, agents against the cap, time since the worker's last output, and its last tool call or message - so a working worker and a stuck one look different. `--status --json` gives the same as JSON. Poll it, waiting between polls with a `sleep` shorter than your shell tool's timeout.
+- **What happened** is `.orchestrate/run.log`: one timestamped line per step (gates, agents, findings by severity, triage verdicts, commits, the stop) with worker tool calls indented. `--follow` prints the same lines live and exits when the run ends. Open an agent log only when a line points you there.
+
+`--notify` pops a desktop notification when the run stops, completes, is interrupted, or crashes; pass it unless the user says otherwise, so a stop does not sit unseen.
+
+A runner that died shows as `crashed`. If its worker outlived it, the status names the pid, and the runner refuses to start until that worker is killed.
 
 On a stop, act on the reason, then rerun the same command. The rerun skips completed milestones and picks up the one in progress where it stopped: a failed implementer's partial work goes to a new implementer, and a stop in review resumes the review on the current tree, so your manual fixes get reviewed too. An `--accept` for a milestone that is already done is ignored, so you can keep it in the command.
 
@@ -64,6 +74,7 @@ On a stop, act on the reason, then rerun the same command. The rerun skips compl
 | `gate-red` | Read the gate log in the detail, fix the cause, rerun. |
 | `dirty-tree` | Uncommitted work that no milestone owns. Discard it, rerun. |
 | `cap` | Report agents used against the cap; rerun with the cap the user approves. |
+| `interrupted` | Someone stopped the runner. Rerun when the user wants it going again; partial work is kept. |
 | `rate-limited` | Retries ran out on a rate limit or a stall. Wait for the limit to lift, or switch the role to another free model with `--model ROLE=ID`, then rerun; partial work is kept. |
 | `agent-failed`, `runner-error`, `crashed` | Read the agent log named in the detail, or `.orchestrate/run.log`. Fix the harness or credential cause, then rerun. |
 | `bad-accept`, `unknown-milestone` | A flag named a milestone that is not in progress, or not in the plan; check `task-brief --titles` and fix the flag. |
@@ -79,6 +90,7 @@ When a plan in a feature folder lands (after its close-out), sync the **embedded
 
 `.orchestrate/` is scaffolding, never committed (the workspace script ignores it). It holds:
 
+- `run.log`, `events.jsonl`, `live.html` - the run's timeline as text, as JSON events, and as the user's page. A new plan's run starts a new timeline.
 - `run-state.json` - the runner's own state: completed milestones, agents used, the milestone in progress, the status. Trust it and `git log` over recollection after compaction. A new plan's run replaces it only once the old plan has completed.
 - `progress.md` - one ledger line per completed milestone, and one decision row per finding triage rejected or deferred: `| plan#milestone | decision | why | evidence | result |`. Every call you make that the plan did not make gets a row here too, with evidence as a pointer (a commit sha, a `file:line`, a findings file, a test name), never a paragraph. Rows are append-only; a reversed call gets a new row.
 - Briefs, review packages, gate logs, findings, and one log per agent.

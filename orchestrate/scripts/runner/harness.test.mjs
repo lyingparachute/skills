@@ -8,7 +8,7 @@ import { createAgent } from './harness.mjs'
 
 const ANSWER = { type: 'object', properties: { answer: { type: 'integer' } }, required: ['answer'], additionalProperties: false }
 const CLAUDE_REPLY = { type: 'result', subtype: 'success', is_error: false, result: '{"answer":5}', structured_output: { answer: 5 } }
-const GROK_REPLY = { text: '{"answer":5}', stopReason: 'end_turn', structuredOutput: { answer: 5 } }
+const GROK_REPLY = { type: 'end', stopReason: 'end_turn', structuredOutput: { answer: 5 } }
 const opencodeEvents = text => [
   { type: 'step_start', sessionID: 'ses_1', part: { type: 'step-start' } },
   { type: 'text', sessionID: 'ses_1', part: { type: 'text', text } },
@@ -56,7 +56,7 @@ afterEach(() => {
 test('claude: structured_output is the reply, with the model and schema passed', async () => {
   fakeCli('claude', printing(JSON.stringify(CLAUDE_REPLY)))
   assert.deepEqual(await ask('claude'), { ok: true, value: { answer: 5 } })
-  assert.match(callsTo('claude')[0], /--json-schema .*"answer".* --model model-x --dangerously-skip-permissions/)
+  assert.match(callsTo('claude')[0], /--output-format stream-json --verbose --json-schema .*"answer".* --model model-x --dangerously-skip-permissions/)
 })
 
 test('claude: an error result fails with its message', async () => {
@@ -67,13 +67,18 @@ test('claude: an error result fails with its message', async () => {
 test('grok: structuredOutput is the reply', async () => {
   fakeCli('grok', printing(JSON.stringify(GROK_REPLY)))
   assert.deepEqual(await ask('grok'), { ok: true, value: { answer: 5 } })
-  assert.match(callsTo('grok')[0], /-m model-x --always-approve/)
+  assert.match(callsTo('grok')[0], /--output-format streaming-json --json-schema .* -m model-x --always-approve/)
+})
+
+test('grok: an error event fails with its message', async () => {
+  fakeCli('grok', `${printing(JSON.stringify({ type: 'error', message: "Couldn't set model 'x': unknown model id" }))}; exit 1`)
+  assert.deepEqual(failure(await ask('grok')), { ok: false, error: "grok exited 1: Couldn't set model 'x': unknown model id", kind: 'process' })
 })
 
 test('codex: the -o file is the reply', async () => {
   fakeCli('codex', `while [ "$1" != "-o" ]; do shift; done; echo '{"answer":5}' > "$2"`)
   assert.deepEqual(await ask('codex'), { ok: true, value: { answer: 5 } })
-  assert.match(callsTo('codex')[0], /^exec --output-schema \S+\.schema\.json -o \S+ -m model-x --sandbox workspace-write/)
+  assert.match(callsTo('codex')[0], /^exec --json --output-schema \S+\.schema\.json -o \S+ -m model-x --sandbox workspace-write/)
 })
 
 test('opencode: JSON inside a fenced reply is extracted', async () => {
@@ -133,10 +138,75 @@ test('a reviewing role retries with its prompt unchanged', async () => {
   assert.doesNotMatch(callsTo('opencode')[1], /cut off by a provider error/)
 })
 
-test('a harness that prints only at the end is not killed for being quiet', async () => {
-  fakeCli('claude', `sleep 4; ${printing(JSON.stringify(CLAUDE_REPLY))}`)
-  assert.deepEqual(await agentFor('claude', { idleMs: 3000 })('critic', 'go', ANSWER), { ok: true, value: { answer: 5 } })
-  assert.deepEqual(waits, [])
+const stallOnce = (harness, reply) => {
+  fakeCli(harness, `if [ -f "${dir}/stalled" ]; then ${printing(reply)}; else sleep 30; fi`)
+  const marked = async ms => { waits.push(ms); writeFileSync(join(dir, 'stalled'), '') }
+  return agentFor(harness, { idleMs: 3000, sleep: marked })('critic', 'go', ANSWER)
+}
+
+test('claude: a silent worker is killed as a stall and retried', async () => {
+  assert.deepEqual(await stallOnce('claude', JSON.stringify(CLAUDE_REPLY)), { ok: true, value: { answer: 5 } })
+  assert.deepEqual(waits, [30000])
+})
+
+const streamOf = (...events) => events.map(event => JSON.stringify(event)).join('\n')
+const activityOf = async (harness, stream, body = printing(stream)) => {
+  const seen = []
+  fakeCli(harness, body)
+  const reply = await agentFor(harness, { onEvent: event => seen.push(event) })('critic', 'go', ANSWER)
+  assert.equal(reply.ok, true, reply.error)
+  return seen
+}
+const texts = seen => seen.filter(event => event.type === 'activity').map(event => event.text)
+
+test('claude: tool calls and text in the stream become activity, after an attempt event with the log', async () => {
+  const seen = await activityOf('claude', streamOf(
+    { type: 'system', subtype: 'init' },
+    { type: 'assistant', message: { content: [{ type: 'text', text: '\nReading the brief.\nMore.' }, { type: 'tool_use', name: 'Bash', input: { command: 'npm test -- retry' } }, { type: 'tool_use', name: 'StructuredOutput', input: { answer: 5 } }] } },
+    CLAUDE_REPLY,
+  ))
+  assert.deepEqual(texts(seen), ['Reading the brief.', 'Bash npm test -- retry'])
+  const [attempt] = seen
+  assert.equal(attempt.type, 'attempt')
+  assert.equal(attempt.harness, 'claude')
+  assert.ok(attempt.pid > 0)
+  assert.match(attempt.log, /agent-\d+-\d+-critic\.log$/)
+})
+
+test('grok, codex and opencode streams become activity too', async () => {
+  assert.deepEqual(texts(await activityOf('grok', streamOf(
+    { type: 'tool_call', toolName: 'run_terminal_command', rawInput: { command: 'ls src' } },
+    { type: 'text', data: '{"' },
+    GROK_REPLY,
+  ))), ['run_terminal_command ls src'])
+  const codexEvents = streamOf(
+    { type: 'item.started', item: { type: 'command_execution', command: 'npm test' } },
+    { type: 'item.completed', item: { type: 'command_execution', command: 'npm test' } },
+    { type: 'item.completed', item: { type: 'file_change', changes: [{ path: 'src/a.ts' }] } },
+  )
+  assert.deepEqual(texts(await activityOf('codex', codexEvents, `${printing(codexEvents)}; while [ "$1" != "-o" ]; do shift; done; echo '{"answer":5}' > "$2"`)), ['$ npm test', 'edit src/a.ts'])
+  const opencodeTool = JSON.stringify({ type: 'tool_use', part: { tool: 'read', state: { input: { filePath: 'a.ts' } } } })
+  assert.deepEqual(texts(await activityOf('opencode', `${opencodeTool}\n${opencodeEvents('{"answer": 5}')}`)), ['read a.ts', '{"answer": 5}'])
+})
+
+test('a retry is reported with its wait and cause', async () => {
+  const seen = []
+  fakeCli('opencode', `if [ -f "${dir}/limited" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/limited"; ${printing(rateLimitEvent)}; exit 1; fi`)
+  await agentFor('opencode', { onEvent: event => seen.push(event) })('critic', 'go', ANSWER)
+  const retry = seen.find(event => event.type === 'retry')
+  assert.equal(retry.waitMs, 30000)
+  assert.match(retry.error, /Rate limit exceeded/)
+})
+
+test('an aborted signal kills the worker and what it started', async () => {
+  fakeCli('grok', 'sleep 30 & sleep 30')
+  const interrupt = new AbortController()
+  setTimeout(() => interrupt.abort(), 200)
+  const started = Date.now()
+  const reply = await agentFor('grok', { signal: interrupt.signal })('critic', 'go', ANSWER)
+  assert.equal(reply.ok, false)
+  assert.match(reply.error, /grok was killed: the runner was interrupted/)
+  assert.ok(Date.now() - started < 5000)
 })
 
 test('opencode: a rate limit that never clears fails after five retries', async () => {
@@ -168,9 +238,7 @@ test('--effort reaches each harness under its own flag', async () => {
 })
 
 test('a worker that goes silent is killed and retried as a stall', async () => {
-  fakeCli('opencode', `if [ -f "${dir}/stalled" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/stalled"; sleep 30; fi`)
-  const reply = await agentFor('opencode', { idleMs: 3000 })('critic', 'go', ANSWER)
-  assert.deepEqual(reply, { ok: true, value: { answer: 5 } })
+  assert.deepEqual(await stallOnce('opencode', opencodeEvents('{"answer": 5}')), { ok: true, value: { answer: 5 } })
   assert.deepEqual(waits, [30000])
 })
 

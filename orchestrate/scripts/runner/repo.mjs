@@ -13,9 +13,9 @@ const shellQuote = path => `'./${path.replaceAll("'", "'\\''")}'`
 const scopedTo = (command, files) => (command.includes(FILES_PLACEHOLDER) ? command.replaceAll(FILES_PLACEHOLDER, files.map(shellQuote).join(' ')) : command)
 const isScoped = command => command.includes(FILES_PLACEHOLDER)
 
-async function sh(command, cwd) {
+async function sh(command, cwd, signal) {
   let output = ''
-  const run = await runBounded('sh', ['-c', command], { cwd, timeoutMs: GATE_COMMAND_TIMEOUT_MS, onOutput: chunk => { output += chunk } })
+  const run = await runBounded('sh', ['-c', command], { cwd, signal, timeoutMs: GATE_COMMAND_TIMEOUT_MS, onOutput: chunk => { output += chunk } })
   return { code: run.code, output: run.problem ? `${output}\n${run.problem}` : output }
 }
 
@@ -30,15 +30,23 @@ const git = (cwd, args) => gitOutput(cwd, args).trim()
 const gitPaths = (cwd, [command, ...options]) =>
   gitOutput(cwd, ['-c', 'core.quotepath=false', command, '-z', ...options]).split('\0').filter(Boolean)
 
+const titleOf = (id, line) => line
+  .replace(/^(#+|[-*]\s*(\[.\])?)\s*/, '')
+  .replace(/\*\*/g, '')
+  .replace(new RegExp(`^((Milestone|Task|Step|Phase|M)\\s*)?${id}\\b[\\s.:)\u2013\u2014-]*`, 'i'), '')
+  .trim() || line
+
 export function createPlanReader(plan, scriptsDir, cwd) {
   const taskBrief = join(scriptsDir, 'task-brief')
   return {
     plan,
     milestones() {
-      const run = spawnSync(taskBrief, [plan, '--list'], { cwd, encoding: 'utf8' })
-      return run.status === 0
-        ? ok(run.stdout.split('\n').filter(Boolean))
-        : fail(`task-brief --list exited ${run.status}: ${run.stderr.trim()}`)
+      const run = spawnSync(taskBrief, [plan, '--titles'], { cwd, encoding: 'utf8' })
+      if (run.status !== 0) return fail(`task-brief --titles exited ${run.status}: ${run.stderr.trim()}`)
+      return ok(run.stdout.split('\n').filter(Boolean).map(line => {
+        const [id, heading] = line.split('\t')
+        return { id, title: titleOf(id, heading) }
+      }))
     },
     brief(id) {
       const run = spawnSync(taskBrief, [plan, id], { cwd, encoding: 'utf8' })
@@ -48,7 +56,7 @@ export function createPlanReader(plan, scriptsDir, cwd) {
   }
 }
 
-export function createRepo(cwd, workspace) {
+export function createRepo(cwd, workspace, { signal } = {}) {
   const stateFile = join(workspace, 'run-state.json')
   const ledgerFile = join(workspace, 'progress.md')
 
@@ -81,7 +89,7 @@ export function createRepo(cwd, workspace) {
       const runs = []
       for (const command of commands) {
         const skipped = isScoped(command) && !files.length
-        const run = skipped ? { code: 0, output: '(skipped: no changed files)' } : await sh(scopedTo(command, files), cwd)
+        const run = skipped ? { code: 0, output: '(skipped: no changed files)' } : await sh(scopedTo(command, files), cwd, signal)
         runs.push({ command, advisory: advisory.includes(command), ...run })
       }
       const heading = r => `$ ${scopedTo(r.command, files)}${r.advisory ? '  (advisory: red before this change)' : ''}\nexit ${r.code}`
