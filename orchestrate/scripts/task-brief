@@ -19,13 +19,14 @@
 # The first block wins.
 #
 # Usage: task-brief PLAN_FILE MILESTONE_ID [OUTFILE]
-#        task-brief PLAN_FILE --list
-# Prints "wrote <path>: <n> lines", or with --list one id per line.
+#        task-brief PLAN_FILE --list | --titles
+# Prints "wrote <path>: <n> lines", with --list one id per line, or with
+# --titles one "<id><TAB><milestone line>" per line.
 # Exit 3 when the milestone (or, with --list, any milestone) is not found.
 # Default OUTFILE: <repo-root>/.orchestrate/task-<ID>-brief.md
 set -euo pipefail
 
-usage() { echo "usage: task-brief PLAN_FILE MILESTONE_ID [OUTFILE] | task-brief PLAN_FILE --list" >&2; exit 2; }
+usage() { echo "usage: task-brief PLAN_FILE MILESTONE_ID [OUTFILE] | task-brief PLAN_FILE --list|--titles" >&2; exit 2; }
 [ $# -ge 2 ] && [ $# -le 3 ] || usage
 
 plan=$1
@@ -33,7 +34,8 @@ id=$2
 [ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
 
 mode=brief
-if [ "$id" = "--list" ]; then
+if [ "$id" = "--list" ] || [ "$id" = "--titles" ]; then
+  titles=$([ "$id" = "--titles" ] && echo 1 || echo 0)
   [ $# -eq 2 ] || usage
   mode=list
   id=""
@@ -106,7 +108,7 @@ prog='
     if (infence) next
     f = form_of($0)
     if (f >= 2) strong = 1
-    if (f > 0) { n_ids++; ids[n_ids] = lid; idform[n_ids] = f }
+    if (f > 0) { n_ids++; ids[n_ids] = lid; idform[n_ids] = f; idline[n_ids] = $0 }
     if (f > 0 && lid == want && f > best) best = f
     next
   }
@@ -145,7 +147,7 @@ prog='
   END {
     if (mode == "list") {
       top = strong ? 2 : 1
-      for (i = 1; i <= n_ids; i++) if (idform[i] >= top && !seen[ids[i]]++) { print ids[i]; any = 1 }
+      for (i = 1; i <= n_ids; i++) if (idform[i] >= top && !seen[ids[i]]++) { print (titles ? ids[i] "\t" idline[i] : ids[i]); any = 1 }
       if (!any) exit 3
     } else if (!printed) exit 3
   }
@@ -153,7 +155,7 @@ prog='
 
 if [ "$mode" = list ]; then
   set +e
-  awk -v want="" -v mode=list "$prog" "$plan" "$plan"
+  awk -v want="" -v mode=list -v titles="$titles" "$prog" "$plan" "$plan"
   rc=$?
   set -e
   [ $rc -eq 0 ] || echo "no milestones found in ${plan}" >&2

@@ -98,6 +98,9 @@ plan list <<'EOF'
 EOF
 expect list-checkbox list 2 0 "check two" "check one"
 expect_list list-ids list "1 2 "
+got=$("$tb" "$work/list.md" --titles 2>/dev/null | head -1)
+want=$(printf '1\t- [ ] **M1 - Token.**')
+if [ "$got" = "$want" ]; then echo "ok   list-titles"; else echo "FAIL list-titles: got '$got'"; fail=1; fi
 
 plan none <<'EOF'
 ## Plan of work
