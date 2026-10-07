@@ -31,11 +31,11 @@ Every worker is a fresh headless process of the harness you name, so subagent ru
 Read every plan in scope once. A feature folder is in scope plan by plan, in its index's build order; every plan's "starts after" must have landed or be earlier in this run, else that plan waits. Then ask the user **one** batched question, always, because it carries the agent cap:
 
 1. **Contradictions** - internal ones, and anything the plan mandates that a review rubric would flag as a defect (finding beside the plan text, asking which governs).
-2. **Budget** - `scripts/task-brief PLAN --list` prints each plan's milestone ids. Expected agents: 2 per code milestone (implementer, critic), 1 per light milestone, 1 for the close-out. Worst case: 6 per code milestone and 5 for the close-out (critic, triage, fixer, critic, triage). The user approves a cap per plan; the runner stops before the dispatch that would pass it.
+2. **Budget** - `scripts/task-brief PLAN --titles` prints each plan's milestone ids with their headings; use these ids in every flag. Expected agents: 2 per code milestone (implementer, critic), 1 per light milestone, 1 for the close-out. Worst case: 6 per code milestone and 5 for the close-out (critic, triage, fixer, critic, triage). The user approves a cap per plan; the runner stops before the dispatch that would pass it.
 3. **Human gates** - milestones that need a person: a browser check, a real credential or production account, a manual deploy step, an owner decision. List them with when they fall in the run.
 4. **Environment** - the services the DoD commands need (local database stack, env files, running app). Probe each with one cheap command; list what is down.
-5. **Harness and models** - the harness that runs the workers (the one you are in, unless the user says otherwise) and one model per role: implementer, critic, triage, fixer, reviewer. Least powerful model that can do the role: cheapest tier only for transcription or single-file mechanical work; mid-tier floor for critic, triage, and prose-spec implementers; most capable for the reviewer.
-6. **Gate commands** - lint and type check for the repo, from its rules file or build config. The runner adds each milestone's focused tests.
+5. **Harness and models** - the harness that runs the workers (the one you are in, unless the user says otherwise) and one model per role: implementer, critic, triage, fixer, reviewer. Least powerful model that can do the role: cheapest tier only for transcription or single-file mechanical work; mid-tier floor for critic, triage, and prose-spec implementers; most capable for the reviewer. `--model ID` sets every role and `--model ROLE=ID` overrides one. In OpenCode every role defaults to the free `opencode/muse-spark-1.3-contributor-free`, and the runner refuses a model outside the `opencode/` provider unless the user asks for `--any-provider`. Reasoning effort works the same way: `--effort LEVEL` (alias `--variant`) or `--effort ROLE=LEVEL`, sent as OpenCode's variant, Claude's and Grok's effort, or Codex's reasoning effort; muse-spark takes `minimal` to `xhigh`.
+6. **Gate commands** - lint and type check, scoped to the change where the repo allows it: `{files}` in a command becomes every changed file, quoted and prefixed with `./`, docs included, so filter by type inside the command when the tool needs it (`--gate "npx eslint --no-error-on-unmatched-pattern {files}"`); a repo with its own change-surface gates gets those. A scoped command with no changed files is skipped and logged as skipped. A scoped command blocks, old errors in touched files included (Boy Scout rule). A repo-wide command already red before a milestone starts is advisory for that milestone: the critic sees its output, but it never blocks. Focused tests always block.
 7. **Docs as code** - in a repo where `.md` files are the product (a skills repo, a docs site), pass `--review-docs` so no milestone counts as light.
 
 Pre-flight is done when the user has answered every item and the tree is clean.
@@ -47,12 +47,12 @@ Start the runner detached from the repo root, one plan per run:
 ```
 mkdir -p .orchestrate && nohup node <skill>/scripts/run-plan.mjs --plan PLAN \
   --harness opencode|claude|grok|codex --cap N \
-  --model implementer=ID --model critic=ID --model triage=ID --model fixer=ID --model reviewer=ID \
+  [--model ID] [--model ROLE=ID]... [--effort LEVEL] [--effort ROLE=LEVEL]... \
   --gate "LINT CMD" --gate "TYPECHECK CMD" [--human-gate ID]... [--accept ID]... \
   [--review-docs] [--agent-timeout-min N] > .orchestrate/run.log 2>&1 &
 ```
 
-`nohup` and `&` keep it alive after your shell tool returns; in Claude Code the Bash tool's background mode does the same and tells you when it ends. Workers get 90 minutes each; raise it with `--agent-timeout-min N` for big milestones. Poll with `node <skill>/scripts/run-plan.mjs --status`, waiting between polls with a `sleep` shorter than your shell tool's timeout. The status is `running`, `completed`, `stopped` with a reason and detail, or `crashed`.
+`nohup` and `&` keep it alive after your shell tool returns; in Claude Code the Bash tool's background mode does the same and tells you when it ends. Workers get 90 minutes each (`--agent-timeout-min N`). OpenCode streams events, so an OpenCode worker silent for 15 minutes (`--idle-timeout-min N`) counts as stalled - on free models usually a rate limit, though a test suite quiet that long trips it too, so raise the limit for one. Claude, Grok and Codex print only at the end and get the 90-minute limit alone. Retried up to 5 times, waiting 30 seconds and doubling, about 15 minutes in all: OpenCode stalls, OpenCode rate limits and provider errors, and Claude 429 and 5xx errors. Grok and Codex errors are not retried. Retries do not count against the cap; an implementer or fixer retry is told to continue from the partial work. Poll with `node <skill>/scripts/run-plan.mjs --status`, waiting between polls with a `sleep` shorter than your shell tool's timeout. The status is `running`, `completed`, `stopped` with a reason and detail, or `crashed`. While running it also shows the active agent log, `idleSeconds` since its last output, and that output's last line, so a working worker and a stuck one look different. `--status --watch` repeats it every 30 seconds until the run ends.
 
 On a stop, act on the reason, then rerun the same command. The rerun skips completed milestones and picks up the one in progress where it stopped: a failed implementer's partial work goes to a new implementer, and a stop in review resumes the review on the current tree, so your manual fixes get reviewed too. An `--accept` for a milestone that is already done is ignored, so you can keep it in the command.
 
@@ -64,8 +64,9 @@ On a stop, act on the reason, then rerun the same command. The rerun skips compl
 | `gate-red` | Read the gate log in the detail, fix the cause, rerun. |
 | `dirty-tree` | Uncommitted work that no milestone owns. Discard it, rerun. |
 | `cap` | Report agents used against the cap; rerun with the cap the user approves. |
-| `agent-failed`, `runner-error`, `crashed` | Read the agent log named in the detail, or `.orchestrate/run.log`. Fix the harness, credential, or rate-limit cause, then rerun. |
-| `bad-accept` | `--accept` named a milestone that is not in progress; drop it. |
+| `rate-limited` | Retries ran out on a rate limit or a stall. Wait for the limit to lift, or switch the role to another free model with `--model ROLE=ID`, then rerun; partial work is kept. |
+| `agent-failed`, `runner-error`, `crashed` | Read the agent log named in the detail, or `.orchestrate/run.log`. Fix the harness or credential cause, then rerun. |
+| `bad-accept`, `unknown-milestone` | A flag named a milestone that is not in progress, or not in the plan; check `task-brief --titles` and fix the flag. |
 | `plan-format`, `plan-mismatch` | Fix the plan's milestone headings with `exec-plan`, or finish the unfinished plan named in the detail first. |
 
 `--accept ID` tells the runner a person checked the current tree for milestone ID: it runs the gate and commits without another review. The ledger says `human-checked` when the critic had already passed it, else `accepted`, and the next code milestone's review covers an `accepted` diff.

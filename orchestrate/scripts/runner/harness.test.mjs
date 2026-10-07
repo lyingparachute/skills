@@ -31,13 +31,19 @@ function printing(text) {
   writeFileSync(file, `${text}\n`)
   return `cat '${file}'`
 }
-const ask = (harness, timeoutMs) => createAgent({ harness, models: { critic: 'model-x' }, cwd: dir, workspace: dir, timeoutMs })('critic', 'What is 2+3?', ANSWER)
+let waits = []
+const agentFor = (harness, options = {}) => createAgent({
+  harness, models: { critic: 'model-x' }, cwd: dir, workspace: dir, sleep: async ms => { waits.push(ms) }, ...options,
+})
+const ask = (harness, timeoutMs, role = 'critic') => agentFor(harness, { timeoutMs, models: { [role]: 'model-x' } })(role, 'What is 2+3?', ANSWER)
+const rateLimitEvent = JSON.stringify({ type: 'error', sessionID: 'ses_1', error: { name: 'APIError', data: { message: 'Rate limit exceeded.', statusCode: 429, isRetryable: true } } })
 const failure = reply => ({ ...reply, error: reply.error.replace(/, log: \S+$/, '') })
 const callsTo = name => readFileSync(join(dir, `${name}.args`), 'utf8').split(`${CALL_MARK}\n`).slice(1)
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'harness-test-'))
   mkdirSync(join(dir, 'bin'))
+  waits = []
   savedPath = process.env.PATH
   process.env.PATH = `${join(dir, 'bin')}:${savedPath}`
 })
@@ -112,6 +118,60 @@ test('a hung worker and what it started are killed at the timeout', async () => 
   const started = Date.now()
   assert.deepEqual(failure(await ask('grok', 200)), { ok: false, error: 'grok timed out after 200 ms', kind: 'process' })
   assert.ok(Date.now() - started < 5000)
+})
+
+test('opencode: a rate limit is retried with growing waits, and the retry is told to continue', async () => {
+  fakeCli('opencode', `if [ -f "${dir}/limited" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/limited"; ${printing(rateLimitEvent)}; exit 1; fi`)
+  assert.deepEqual(await ask('opencode', undefined, 'implementer'), { ok: true, value: { answer: 5 } })
+  assert.deepEqual(waits, [30000])
+  assert.match(callsTo('opencode')[1], /cut off by a provider error/)
+})
+
+test('a reviewing role retries with its prompt unchanged', async () => {
+  fakeCli('opencode', `if [ -f "${dir}/limited" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/limited"; ${printing(rateLimitEvent)}; exit 1; fi`)
+  assert.deepEqual(await ask('opencode'), { ok: true, value: { answer: 5 } })
+  assert.doesNotMatch(callsTo('opencode')[1], /cut off by a provider error/)
+})
+
+test('a harness that prints only at the end is not killed for being quiet', async () => {
+  fakeCli('claude', `sleep 4; ${printing(JSON.stringify(CLAUDE_REPLY))}`)
+  assert.deepEqual(await agentFor('claude', { idleMs: 3000 })('critic', 'go', ANSWER), { ok: true, value: { answer: 5 } })
+  assert.deepEqual(waits, [])
+})
+
+test('opencode: a rate limit that never clears fails after five retries', async () => {
+  fakeCli('opencode', `${printing(rateLimitEvent)}; exit 1`)
+  const reply = failure(await ask('opencode'))
+  assert.equal(reply.kind, 'transient')
+  assert.match(reply.error, /Rate limit exceeded\..*still failing after 5 retries/)
+  assert.deepEqual(waits, [30000, 60000, 120000, 240000, 480000])
+  assert.equal(callsTo('opencode').length, 6)
+})
+
+test('claude: an overloaded API error is retried', async () => {
+  fakeCli('claude', `if [ -f "${dir}/busy" ]; then ${printing(JSON.stringify(CLAUDE_REPLY))}; else touch "${dir}/busy"; ${printing(JSON.stringify({ ...CLAUDE_REPLY, is_error: true, result: 'Overloaded', api_error_status: 529 }))}; fi`)
+  assert.deepEqual(await ask('claude'), { ok: true, value: { answer: 5 } })
+  assert.deepEqual(waits, [30000])
+})
+
+test('--effort reaches each harness under its own flag', async () => {
+  const efforts = { critic: 'xhigh' }
+  fakeCli('opencode', printing(opencodeEvents('{"answer": 5}')))
+  fakeCli('claude', printing(JSON.stringify(CLAUDE_REPLY)))
+  fakeCli('grok', printing(JSON.stringify(GROK_REPLY)))
+  fakeCli('codex', `while [ "$1" != "-o" ]; do shift; done; echo '{"answer":5}' > "$2"`)
+  for (const harness of ['opencode', 'claude', 'grok', 'codex']) await agentFor(harness, { efforts })('critic', 'go', ANSWER)
+  assert.match(callsTo('opencode')[0], /-m model-x --variant xhigh /)
+  assert.match(callsTo('claude')[0], /--model model-x --effort xhigh /)
+  assert.match(callsTo('grok')[0], /-m model-x --reasoning-effort xhigh /)
+  assert.match(callsTo('codex')[0], /-m model-x -c model_reasoning_effort=xhigh /)
+})
+
+test('a worker that goes silent is killed and retried as a stall', async () => {
+  fakeCli('opencode', `if [ -f "${dir}/stalled" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/stalled"; sleep 30; fi`)
+  const reply = await agentFor('opencode', { idleMs: 3000 })('critic', 'go', ANSWER)
+  assert.deepEqual(reply, { ok: true, value: { answer: 5 } })
+  assert.deepEqual(waits, [30000])
 })
 
 test('a non-zero exit fails and names the log file', async () => {

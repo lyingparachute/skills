@@ -5,6 +5,17 @@ import { runBounded } from './process.mjs'
 import { fail, ok } from './result.mjs'
 
 export const DEFAULT_AGENT_TIMEOUT_MS = 90 * 60 * 1000
+export const DEFAULT_IDLE_TIMEOUT_MS = 15 * 60 * 1000
+export const MAX_TRANSIENT_RETRIES = 5
+export const FIRST_BACKOFF_MS = 30 * 1000
+const RATE_LIMITED = 429
+const FIRST_SERVER_ERROR = 500
+const EDITING_ROLES = ['implementer', 'fixer']
+const RETRY_NOTE = 'An earlier attempt at this task was cut off by a provider error. Its uncommitted changes may be in the tree; check them and continue from there.'
+
+const isTransientStatus = status => status === RATE_LIMITED || status >= FIRST_SERVER_ERROR
+const option = (flag, value) => (value ? [flag, value] : [])
+const sleepFor = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 function parseJson(text) {
   try {
@@ -30,7 +41,11 @@ function lastOpencodeText(stdout) {
   const events = stdout.split('\n').map(parseObject).filter(line => line.ok).map(line => line.value)
   const session = events.find(event => event.sessionID)?.sessionID ?? ''
   const error = events.find(event => event.type === 'error')
-  if (error) return { session, ...fail(error.error?.data?.message ?? JSON.stringify(error.error ?? error)) }
+  if (error) {
+    const data = error.error?.data ?? {}
+    const kind = data.isRetryable === true || isTransientStatus(data.statusCode) ? 'transient' : 'process'
+    return { session, ...fail(data.message ?? JSON.stringify(error.error ?? error), kind) }
+  }
   const texts = events.filter(event => event.type === 'text').map(event => event.part?.text ?? '')
   return texts.length ? { session, ...ok(texts.at(-1)) } : { session, ...fail('no text in the reply', 'reply') }
 }
@@ -42,31 +57,35 @@ function field(reply, name) {
 
 const ADAPTERS = {
   claude: {
-    args: ({ prompt, schema, model }) => [
+    args: ({ prompt, schema, model, effort }) => [
       '-p', prompt, '--output-format', 'json', '--json-schema', JSON.stringify(schema),
-      '--model', model, '--dangerously-skip-permissions',
+      '--model', model, ...option('--effort', effort), '--dangerously-skip-permissions',
     ],
     extract: ({ stdout }) => {
       const reply = parseObject(stdout)
-      if (reply.ok && reply.value.is_error) return fail(String(reply.value.result))
+      if (reply.ok && reply.value.is_error) {
+        return fail(String(reply.value.result), isTransientStatus(reply.value.api_error_status) ? 'transient' : 'process')
+      }
       return field(reply, 'structured_output')
     },
   },
   grok: {
-    args: ({ prompt, schema, model }) => [
-      '-p', prompt, '--json-schema', JSON.stringify(schema), '-m', model, '--always-approve',
+    args: ({ prompt, schema, model, effort }) => [
+      '-p', prompt, '--json-schema', JSON.stringify(schema), '-m', model, ...option('--reasoning-effort', effort), '--always-approve',
     ],
     extract: ({ stdout }) => field(parseObject(stdout), 'structuredOutput'),
   },
   codex: {
-    args: ({ prompt, model, schemaFile, lastFile }) => [
-      'exec', '--output-schema', schemaFile, '-o', lastFile, '-m', model, '--sandbox', 'workspace-write', prompt,
+    args: ({ prompt, model, effort, schemaFile, lastFile }) => [
+      'exec', '--output-schema', schemaFile, '-o', lastFile, '-m', model,
+      ...option('-c', effort && `model_reasoning_effort=${effort}`), '--sandbox', 'workspace-write', prompt,
     ],
     extract: ({ lastFile }) => (existsSync(lastFile) ? parseObject(readFileSync(lastFile, 'utf8')) : fail('codex wrote no final message')),
   },
   opencode: {
-    args: ({ prompt, schema, model, session }) => [
-      'run', '--format', 'json', '--auto', '-m', model, ...(session ? ['-s', session] : []),
+    streams: true,
+    args: ({ prompt, schema, model, effort, session }) => [
+      'run', '--format', 'json', '--auto', '-m', model, ...option('--variant', effort), ...option('-s', session),
       session ? prompt : `${prompt}\n\nYour final message must be one JSON object that matches this JSON Schema, with no other text:\n${JSON.stringify(schema)}`,
     ],
     extract: ({ stdout }) => {
@@ -84,7 +103,9 @@ function checked(schema, reply) {
   return errors.length ? { ...reply, ...fail(`reply breaks the schema: ${errors.join('; ')}`, 'reply') } : reply
 }
 
-export function createAgent({ harness, models, cwd, workspace, timeoutMs = DEFAULT_AGENT_TIMEOUT_MS }) {
+export function createAgent({
+  harness, models, efforts = {}, cwd, workspace, timeoutMs = DEFAULT_AGENT_TIMEOUT_MS, idleMs = DEFAULT_IDLE_TIMEOUT_MS, sleep = sleepFor,
+}) {
   const adapter = ADAPTERS[harness]
   let calls = 0
 
@@ -94,13 +115,16 @@ export function createAgent({ harness, models, cwd, workspace, timeoutMs = DEFAU
     const files = { schemaFile: `${stem}.schema.json`, lastFile: `${stem}.last.json`, logFile: `${stem}.log` }
     writeFileSync(files.schemaFile, JSON.stringify(request.schema))
     writeFileSync(files.logFile, '')
-    const run = await runBounded(harness, adapter.args({ ...request, ...files, model: models[role] }), {
-      cwd, timeoutMs, onOutput: chunk => appendFileSync(files.logFile, chunk),
+    const run = await runBounded(harness, adapter.args({ ...request, ...files, model: models[role], effort: efforts[role] }), {
+      cwd, timeoutMs, idleMs: adapter.streams ? idleMs : undefined, onOutput: chunk => appendFileSync(files.logFile, chunk),
     })
     const where = `log: ${files.logFile}`
-    if (run.problem) return fail(`${run.problem}, ${where}`)
+    if (run.problem) return fail(`${run.problem}, ${where}`, run.stalled ? 'transient' : 'process')
     const reply = checked(request.schema, adapter.extract({ stdout: run.stdout, lastFile: files.lastFile }))
-    if (run.code !== 0) return fail(`${harness} exited ${run.code}${reply.ok ? '' : `: ${reply.error}`}, ${where}`)
+    if (run.code !== 0) {
+      const kind = !reply.ok && reply.kind === 'transient' ? 'transient' : 'process'
+      return fail(`${harness} exited ${run.code}${reply.ok ? '' : `: ${reply.error}`}, ${where}`, kind)
+    }
     return reply.ok ? reply : { ...reply, error: `${reply.error}, ${where}` }
   }
 
@@ -115,7 +139,12 @@ export function createAgent({ harness, models, cwd, workspace, timeoutMs = DEFAU
   }
 
   return async function agent(role, prompt, schema) {
-    const reply = await repaired(role, prompt, schema)
-    return reply.ok ? ok(reply.value) : fail(reply.error, reply.kind)
+    let reply = await repaired(role, prompt, schema)
+    for (let retry = 1; !reply.ok && reply.kind === 'transient' && retry <= MAX_TRANSIENT_RETRIES; retry += 1) {
+      await sleep(FIRST_BACKOFF_MS * 2 ** (retry - 1))
+      reply = await repaired(role, EDITING_ROLES.includes(role) ? `${prompt}\n\n${RETRY_NOTE}` : prompt, schema)
+    }
+    if (reply.ok) return ok(reply.value)
+    return reply.kind === 'transient' ? fail(`${reply.error} (still failing after ${MAX_TRANSIENT_RETRIES} retries)`, reply.kind) : fail(reply.error, reply.kind)
   }
 }

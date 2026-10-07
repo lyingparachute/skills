@@ -6,7 +6,7 @@ export const ROLES = ['implementer', 'critic', 'triage', 'fixer', 'reviewer']
 export const CLOSE_OUT = 'close-out'
 const CLOSE_OUT_MESSAGE = 'fix: close-out review findings'
 const DOC_FILE = /\.md$/
-const IDLE = { id: '', base: '', startHead: '', brief: '', message: '', tests: [], review: '', committing: false }
+const IDLE = { id: '', base: '', startHead: '', brief: '', message: '', tests: [], redBefore: [], review: '', committing: false }
 
 const stopped = (reason, detail) => ({ stop: { reason, detail } })
 const unique = list => [...new Set(list)]
@@ -19,6 +19,7 @@ const freshState = (plan, head) => ({
   agentsUsed: 0,
   completed: [],
   testCommands: [],
+  knownRed: [],
   pendingBase: '',
   inProgress: IDLE,
   closedOut: false,
@@ -28,7 +29,8 @@ const freshState = (plan, head) => ({
 export async function runPlan(ctx) {
   const { repo, planReader } = ctx
   const fresh = freshState(planReader.plan, repo.head())
-  const loaded = repo.loadState(fresh)
+  const stored = repo.loadState(fresh)
+  const loaded = { ...fresh, ...stored, inProgress: { ...IDLE, ...stored.inProgress } }
   const state = loaded.plan === planReader.plan || loaded.status.state !== 'completed' ? loaded : fresh
   let outcome
   try {
@@ -49,6 +51,8 @@ async function guarded(ctx, state) {
   ctx.repo.saveState(state)
   const ids = ctx.planReader.milestones()
   if (!ids.ok) return stopped('plan-format', ids.error)
+  const strangers = ctx.humanGates.filter(id => !ids.value.includes(id))
+  if (strangers.length) return stopped('unknown-milestone', `--human-gate names no milestone of the plan: ${strangers.join(', ')}; see task-brief --titles`)
   for (const id of ids.value.filter(id => !state.completed.includes(id))) {
     const outcome = await advance(ctx, state, id)
     if (outcome.stop) return outcome
@@ -79,7 +83,9 @@ async function startMilestone(ctx, state, id) {
   const resuming = state.inProgress.id === id && !repo.isClean()
   if (!resuming) {
     const startHead = repo.head()
-    state.inProgress = { ...IDLE, id, base: state.pendingBase || startHead, startHead, brief: ctx.planReader.brief(id) }
+    const redBefore = (await repo.runGate(ctx.gates, `m${id}-baseline`)).anyRed
+    state.knownRed = redBefore
+    state.inProgress = { ...IDLE, id, base: state.pendingBase || startHead, startHead, brief: ctx.planReader.brief(id), redBefore }
     repo.saveState(state)
   }
   const prompt = implementerPrompt({ plan: ctx.planReader.plan, id, brief: state.inProgress.brief, resuming })
@@ -100,8 +106,8 @@ async function reviewMilestone(ctx, state, id) {
   const changed = repo.stagedPaths(base)
   const light = !ctx.reviewDocs && changed.every(path => DOC_FILE.test(path))
   const checked = light
-    ? await gateOnly(ctx, `m${id}-light`, tests)
-    : await reviewRounds(ctx, state, { base, role: 'critic', label: `m${id}`, unit: `${ctx.planReader.plan}#${id}`, tests, brief })
+    ? await gateOnly(ctx, `m${id}-light`, tests, { advisory: state.inProgress.redBefore, base })
+    : await reviewRounds(ctx, state, { base, role: 'critic', label: `m${id}`, unit: `${ctx.planReader.plan}#${id}`, tests, brief, advisory: state.inProgress.redBefore })
   if (checked.stop) return checked
   state.inProgress = { ...state.inProgress, review: light ? 'light' : 'clean' }
   repo.saveState(state)
@@ -109,16 +115,17 @@ async function reviewMilestone(ctx, state, id) {
 }
 
 async function acceptMilestone(ctx, state, id) {
-  const checked = await gateOnly(ctx, `m${id}-accepted`, unique([...state.testCommands, ...state.inProgress.tests]))
+  const { redBefore: advisory, base } = state.inProgress
+  const checked = await gateOnly(ctx, `m${id}-accepted`, unique([...state.testCommands, ...state.inProgress.tests]), { advisory, base })
   if (checked.stop) return checked
   const review = state.inProgress.review === 'clean' ? 'human-checked' : 'accepted'
   state.inProgress = { ...state.inProgress, review }
   return finish(ctx, state, id)
 }
 
-async function gateOnly(ctx, label, tests) {
+async function gateOnly(ctx, label, tests, { advisory, base }) {
   ctx.repo.stageAll()
-  const gate = await ctx.repo.runGate(unique([...ctx.gates, ...tests]), label)
+  const gate = await ctx.repo.runGate(unique([...ctx.gates, ...tests]), label, { advisory, files: ctx.repo.changedFiles(base) })
   return gate.green ? {} : stopped('gate-red', `${label}: ${gate.failed.join(', ')} failed, see ${gate.file}`)
 }
 
@@ -152,12 +159,12 @@ async function closeOut(ctx, state) {
   const { repo } = ctx
   let message = CLOSE_OUT_MESSAGE
   if (ctx.accepted.includes(CLOSE_OUT)) {
-    const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands)
+    const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands, { advisory: state.knownRed, base: state.base0 })
     if (checked.stop) return checked
   } else {
     const reviewed = await reviewRounds(ctx, state, {
       base: state.base0, role: 'reviewer', label: CLOSE_OUT, unit: `${ctx.planReader.plan}#${CLOSE_OUT}`,
-      tests: state.testCommands, brief: ctx.planReader.plan, closing: true,
+      tests: state.testCommands, brief: ctx.planReader.plan, closing: true, advisory: state.knownRed,
     })
     if (reviewed.stop) return reviewed
     message = reviewed.fixMessage || CLOSE_OUT_MESSAGE
@@ -170,7 +177,7 @@ async function closeOut(ctx, state) {
   return {}
 }
 
-async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief, closing = false }) {
+async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief, advisory, closing = false }) {
   const { repo } = ctx
   let named = tests
   let fixMessage = ''
@@ -178,7 +185,7 @@ async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief,
     const tag = `${label}-r${round}`
     repo.stageAll()
     const review = repo.writePackage(base, tag)
-    const gate = await repo.runGate(unique([...ctx.gates, ...named]), tag)
+    const gate = await repo.runGate(unique([...ctx.gates, ...named]), tag, { advisory, files: repo.changedFiles(base) })
     const critique = await dispatch(ctx, state, role, criticPrompt({ brief, review, gate }), REVIEW)
     if (critique.stop) return critique
     const findings = [
@@ -244,5 +251,6 @@ async function dispatch(ctx, state, role, prompt, schema) {
   state.agentsUsed += 1
   ctx.repo.saveState(state)
   const reply = await ctx.agent(role, prompt, schema)
-  return reply.ok ? { value: reply.value } : stopped('agent-failed', `${role}: ${reply.error}`)
+  if (reply.ok) return { value: reply.value }
+  return stopped(reply.kind === 'transient' ? 'rate-limited' : 'agent-failed', `${role}: ${reply.error}`)
 }

@@ -50,7 +50,7 @@ function scriptedAgent(steps) {
     calls.push({ role, prompt })
     next.effect(prompt)
     if (next.value instanceof Error) throw next.value
-    return next.value.failure ? { ok: false, error: next.value.failure } : { ok: true, value: next.value }
+    return next.value.failure ? { ok: false, error: next.value.failure, kind: next.value.kind ?? 'process' } : { ok: true, value: next.value }
   }
   return { agent, calls, left: steps }
 }
@@ -154,6 +154,56 @@ test('a rerun after a failed implementer resumes its partial work', async () => 
   assert.match(second.calls[0].prompt, /An earlier implementer stopped partway/)
 })
 
+test('a worker that stays rate-limited stops the run as rate-limited, ready for a rerun', async () => {
+  const { status } = await run([step('implementer', { failure: 'Rate limit exceeded. (still failing after 5 retries)', kind: 'transient' })])
+  assert.equal(status.reason, 'rate-limited')
+})
+
+test('a {files} gate runs only on the changed files and blocks on old errors in them', async () => {
+  writeFileSync(join(root, 'one.txt'), 'lint-error')
+  writeFileSync(join(root, 'elsewhere.txt'), 'lint-error')
+  git('add', '-A')
+  git('commit', '--quiet', '-m', 'old lint debt')
+  const scoped = '! grep -qs lint-error {files}'
+  const { status, calls } = await run([
+    step('implementer', report('feat: one', ['test -f one.txt']), write('one.txt', 'lint-error, edited')), critic(),
+    step('fixer', report('fix: lint', ['test -f one.txt']), write('one.txt', 'clean')), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ], { gates: [scoped] })
+  assert.equal(status.state, 'completed')
+  assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /gate red: ! grep -qs lint-error \{files\}/)
+  const gateLog = readFileSync(join(workspace, 'gate-m2-r1.log'), 'utf8')
+  assert.match(gateLog, /\$ ! grep -qs lint-error '\.\/two\.txt'\nexit 0/)
+  assert.doesNotMatch(gateLog, /elsewhere/)
+})
+
+test('a {files} gate gets odd file names intact and logs a skip when nothing changed', async () => {
+  const odd = ["-dash.txt", "café's.txt"]
+  const { status } = await run([
+    step('implementer', report('feat: odd', ['true']), () => odd.forEach(name => writeFileSync(join(root, name), 'x'))), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ], { gates: ['for f in {files}; do test -f "$f" || exit 1; done'] })
+  assert.equal(status.state, 'completed')
+  assert.match(readFileSync(join(workspace, 'gate-m1-r1.log'), 'utf8'), /for f in '\.\/-dash\.txt' '\.\/café'\\''s\.txt'; do .*\nexit 0/)
+  assert.match(readFileSync(join(workspace, 'gate-m1-baseline.log'), 'utf8'), /\(skipped: no changed files\)/)
+})
+
+test('a state file from an older runner still loads and resumes', async () => {
+  await run([build('one.txt', 'feat: one')], { cap: 1 })
+  const { knownRed, ...older } = stateOnDisk()
+  const { redBefore, ...olderWork } = older.inProgress
+  writeFileSync(join(workspace, 'run-state.json'), JSON.stringify({ ...older, inProgress: olderWork }))
+  const resumed = await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.equal(resumed.status.state, 'completed')
+})
+
+test('--human-gate with an id the plan does not have is refused', async () => {
+  const { status } = await run([], { humanGates: ['9'] })
+  assert.equal(status.reason, 'unknown-milestone')
+})
+
 test('rerunning the same command with --accept for a milestone already done is fine', async () => {
   await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
   const options = { humanGates: ['1'], accepted: ['1'], cap: 3 }
@@ -196,16 +246,34 @@ test('--accept commits a stopped milestone without review, and the next code rev
   assert.match(readFileSync(pathOf(second.calls[1].prompt, 'review-m2-r1\\.diff'), 'utf8'), /one\.txt/)
 })
 
-test('a red gate becomes a finding for the fixer', async () => {
+const LINT = '! grep -qs lint-error one.txt two.txt'
+
+test('a gate command this change turned red becomes a finding for the fixer', async () => {
   const { status, calls } = await run([
-    build('one.txt', 'feat: one'), critic(),
-    step('fixer', report('fix: gate', ['test -f one.txt']), write('ready.txt')), critic(),
+    step('implementer', report('feat: one', ['test -f one.txt']), write('one.txt', 'lint-error')), critic(),
+    step('fixer', report('fix: lint', ['test -f one.txt']), write('one.txt', 'clean')), critic(),
     build('two.txt', 'feat: two'), critic(),
     reviewer(),
-  ], { gates: ['test -f ready.txt'] })
+  ], { gates: [LINT] })
   assert.equal(status.state, 'completed')
   assert.ok(!roles(calls).includes('triage'))
-  assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /gate red: test -f ready\.txt/)
+  assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /gate red: ! grep -qs lint-error/)
+})
+
+test('a gate command that was red before the milestone is advisory and never blocks', async () => {
+  writeFileSync(join(root, 'two.txt'), 'lint-error')
+  git('add', 'two.txt')
+  git('commit', '--quiet', '-m', 'old lint debt')
+  const { status, calls } = await run([
+    build('one.txt', 'feat: one'), critic(),
+    step('implementer', report('feat: two', ['test -f two.txt']), write('two.txt', 'lint-error, still')), critic(),
+    reviewer(),
+  ], { gates: [LINT] })
+  assert.equal(status.state, 'completed')
+  assert.ok(!roles(calls).includes('fixer'))
+  const gateLog = readFileSync(pathOf(calls[1].prompt, 'gate-m1-r1\\.log'), 'utf8')
+  assert.match(gateLog, /\(advisory: red before this change\)\nexit 1/)
+  assert.match(calls[1].prompt, /advisory there was already red before this change/)
 })
 
 test('an implementer that names no test gets a finding for the fixer', async () => {

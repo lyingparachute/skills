@@ -14,7 +14,7 @@ Return a summary, the focused test commands that prove this milestone (runnable 
 
 export const criticPrompt = ({ brief, review, gate }) => `You are a fresh-context critic. Someone else wrote this change. Attack it: find what is wrong.
 Load the \`judo-review\` skill and apply it to the diff in ${review}.
-The requirements are in ${brief}. The gate ran ${gate.green ? 'green' : 'red'}; its output is in ${gate.file}.
+The requirements are in ${brief}. The gate ran ${gate.green ? 'green' : 'red'}; its output is in ${gate.file}. A command marked advisory there was already red before this change: report its failures in files this change touches, old ones included (Boy Scout rule), and ignore the rest.
 Report a defect even when the plan mandates it. Report two separate lists. standards: clean-code and enterprise quality. spec: compliance with the requirements - scope, non-goals, locked decisions, definition of done.
 Each finding gives the location as file:line, the issue, a severity, and a concrete code-judo move as the fix. Use empty lists when you find nothing.`
 
