@@ -64,13 +64,16 @@ mkdir -p .orchestrate && nohup node <skill>/scripts/run-plan.mjs --plan PLAN \
 
 A runner that died shows as `crashed`. If its worker outlived it, the status names the pid, and the runner refuses to start until that worker is killed.
 
+Keep the repo to the runner while it works: it stages the whole tree, so a file anyone changes during a run lands in that milestone's commit. Edits made while the run is stopped are fine if you leave them unstaged - the rerun lists every unstaged file in `run.log`, the ledger, and the next review package. Check that list before an `--accept`; those files join the commit.
+
 On a stop, act on the reason, then rerun the same command. The rerun skips completed milestones and picks up the one in progress where it stopped: a failed implementer's partial work goes to a new implementer, and a stop in review resumes the review on the current tree, so your manual fixes get reviewed too. An `--accept` for a milestone that is already done is ignored, so you can keep it in the command.
 
 | Reason | What you do |
 |---|---|
 | `human-gate` | Hand the user the exact check. Write their result into the plan's Surprises & Discoveries, then rerun with `--accept ID`. |
 | `open-findings` | Read the fixes file in the detail. Fix what survives your own `receiving-code-review` triage and rerun, or rerun with `--accept ID` (`--accept close-out` at close-out) when the user takes the rest as is. |
-| `blocked` | An agent could not do the brief, it needs another plan first, or a milestone has commits the runner did not make. Settle it with the user; discard partial work or rerun with `--accept ID` as the detail says. |
+| `blocked` | An agent could not do the brief, or it needs another plan first. Settle it with the user; discard partial work or rerun with `--accept ID` as the detail says. |
+| `committed-by-hand` | A milestone has commits the runner did not make. Check them with the user, then rerun with `--accept ID`. |
 | `gate-red` | Read the gate log in the detail, fix the cause, rerun. |
 | `dirty-tree` | Uncommitted work that no milestone owns. Discard it, rerun. |
 | `cap` | Report agents used against the cap; rerun with the cap the user approves. |

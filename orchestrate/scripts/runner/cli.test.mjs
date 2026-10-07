@@ -142,7 +142,7 @@ for (const [signal, code] of [['SIGTERM', 143], ['SIGINT', 130]]) test(`${signal
   assert.equal(status.state, 'stopped')
   assert.equal(status.reason, 'interrupted')
   assert.equal(status.orphanWorker, undefined)
-  assert.match(readFileSync(workspaceFile('live.html'), 'utf8'), /Stopped: interrupted/)
+  assert.match(readFileSync(workspaceFile('live.html'), 'utf8'), /Needs attention: interrupted/)
 })
 
 test('--follow started with the runner waits for the run instead of exiting at once', async () => {

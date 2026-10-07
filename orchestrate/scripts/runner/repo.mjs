@@ -72,11 +72,17 @@ export function createRepo(cwd, workspace, { signal } = {}) {
     stagedPaths: base => gitPaths(cwd, ['diff', '--cached', '--name-only', base]),
     changedFiles: base => gitPaths(cwd, ['diff', '--cached', '--name-only', '--diff-filter=d', base]),
     commit: message => git(cwd, ['commit', '--quiet', '-m', message]),
+    unstagedPaths: () => [...new Set([
+      ...gitPaths(cwd, ['diff', '--name-only']),
+      ...gitPaths(cwd, ['ls-files', '--others', '--exclude-standard']),
+    ])],
 
-    writePackage(base, label) {
+    writePackage(base, label, handChanged = []) {
       const file = join(workspace, `review-${label}.diff`)
+      const byHand = handChanged.length ? ['## Changed outside the runner\'s checks (by hand, or by a worker that was cut off) - check each belongs to this change', handChanged.join('\n')] : []
       writeFileSync(file, [
         `# Review package: ${base} to the staged tree`,
+        ...byHand,
         '## Commits', git(cwd, ['log', '--oneline', `${base}..HEAD`]),
         '## Files changed', git(cwd, ['diff', '--cached', '--stat', base]),
         '## Diff', git(cwd, ['diff', '--cached', '-U10', base]),

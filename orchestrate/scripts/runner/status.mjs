@@ -42,10 +42,16 @@ function activity(agent) {
   }
 }
 
+function stateWithLiveness(workspace) {
+  const first = storedState(workspace)
+  if (first.status.state !== 'running') return { ...first, running: false }
+  if (runnerAlive(first.status.pid)) return { ...first, running: true }
+  return { ...storedState(workspace), running: false }
+}
+
 export function readStatus(workspace) {
-  const { status, plan, agentsUsed, completed } = storedState(workspace)
+  const { status, plan, agentsUsed, completed, running } = stateWithLiveness(workspace)
   const view = project(readEvents(workspace))
-  const running = status.state === 'running' && runnerAlive(status.pid)
   const live = join(workspace, LIVE_FILE)
   const base = { plan, agentsUsed, cap: view.cap, completed, ...(existsSync(live) ? { live } : {}) }
   if (running) {

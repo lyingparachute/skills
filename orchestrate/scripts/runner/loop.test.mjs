@@ -63,6 +63,7 @@ async function run(steps, options = {}) {
     planReader: createPlanReader(options.plan ?? PLAN, scriptsDir, root),
     repo: createRepo(root, workspace),
     journal: createJournal(workspace, { print: line => printed.push(line) }),
+    runInfo: { command: 'node run-plan.mjs --plan plan.md', idleMs: 900000 },
     agent: scripted.agent,
     cap: 50,
     gates: ['true'],
@@ -220,7 +221,7 @@ test('a milestone committed by hand is recorded only through --accept', async ()
   git('add', '-A')
   git('commit', '--quiet', '-m', 'feat: one, by hand')
   const blocked = await run([], { humanGates: ['1'] })
-  assert.equal(blocked.status.reason, 'blocked')
+  assert.equal(blocked.status.reason, 'committed-by-hand')
   assert.match(blocked.status.detail, /commits the runner did not make.*--accept 1/)
   const accepted = await run([build('two.txt', 'feat: two'), critic(), reviewer()], { humanGates: ['1'], accepted: ['1'] })
   assert.equal(accepted.status.state, 'completed')
@@ -411,7 +412,7 @@ test('the run prints a readable timeline and records the same steps as events', 
     /m1-r1 triage: 1 reject, 2 fix-now$/m,
     /m1-r1 2 findings to fix, see \S+fixes-m1-r1\.json$/m,
     /m1-r2 critic found nothing$/m,
-    /commit \w{7} feat: one$/m,
+    /commit \w{7} feat: one \(1 file\)$/m,
     /milestone 1 complete \(review clean\)$/m,
     /close-out: whole-branch review$/m,
     /COMPLETED$/m,
@@ -440,7 +441,10 @@ test('a stop shows on the live page with links to the files it names', async () 
   const stuck = () => critic({ standards: [finding('still bad')], spec: [] })
   await run([build('one.txt', 'feat: one'), stuck(), verdict('fix-now'), step('fixer', report('fix: try', [])), stuck(), verdict('fix-now')])
   const page = livePage()
-  assert.match(page, /Stopped: open-findings/)
+  assert.match(page, /Needs attention: open-findings/)
+  assert.match(page, /Review findings were still open after two rounds/)
+  assert.match(page, /<code id="rerun">node run-plan\.mjs --plan plan\.md<\/code>/)
+  assert.match(page, /<span class="chip MAJOR">MAJOR<\/span><span class="chip fix-now">fix-now<\/span><div><p>still bad<\/p><code>one\.txt:1<\/code>/)
   assert.match(page, /<a href="fixes-m1-r2\.json">fixes-m1-r2\.json<\/a>/)
   assert.match(printed.at(-1), /STOPPED open-findings: plan\.md#1: 1 finding\(s\) left/)
 })
@@ -465,4 +469,75 @@ test('a rerun resumes the same timeline; the next plan starts a new one', async 
   const [first] = readEvents(workspace)
   assert.equal(first.plan, 'next.md')
   assert.equal(first.fresh, true)
+})
+
+test('files changed outside the runner while it was stopped are listed once, and --accept records them as unreviewed', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  writeFileSync(join(root, 'one.txt'), 'edited by hand')
+  writeFileSync(join(root, 'unrelated.txt'), 'other work')
+  const { status } = await run([build('two.txt', 'feat: two'), critic(), reviewer()], { humanGates: ['1'], accepted: ['1'] })
+  assert.equal(status.state, 'completed')
+  const log = printed.join('\n')
+  const [, list] = log.match(/changed outside the runner since its last check: 2 files, see (\S+hand-changes-\S+\.json)/)
+  assert.deepEqual(JSON.parse(readFileSync(list, 'utf8')).sort(), ['one.txt', 'unrelated.txt'])
+  assert.match(ledger(), /\| plan\.md#1 \| 2 file\(s\) changed outside the runner since its last check \| by hand, or by a worker that was cut off \| \S+hand-changes-\S+\.json \| joins the next commit \|/)
+  assert.match(ledger(), /\| plan\.md#1 \| --accept commits 2 file\(s\) changed outside the runner, with no critic \| a person checked the tree \| one\.txt unrelated\.txt \| committed unreviewed \|/)
+  assert.match(log, /commit \w{7} feat: one \(2 files\)/)
+})
+
+test('the next review package lists files changed outside the runner, until they are committed', async () => {
+  const stuck = () => critic({ standards: [finding('still bad')], spec: [] })
+  await run([build('one.txt', 'feat: one'), stuck(), verdict('fix-now'), step('fixer', report('fix: try', [])), stuck(), verdict('fix-now')])
+  writeFileSync(join(root, 'manual-fix.txt'), 'fixed by hand')
+  const { calls } = await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.match(readFileSync(pathOf(calls[0].prompt, 'review-m1-r1\\.diff'), 'utf8'), /## Changed outside the runner's checks \(by hand, or by a worker that was cut off\) - check each belongs to this change\n\nmanual-fix\.txt\n/)
+  assert.doesNotMatch(readFileSync(pathOf(calls[2].prompt, 'review-m2-r1\\.diff'), 'utf8'), /Changed outside the runner/)
+})
+
+test('a rerun after a cut-off implementer does not call its partial work a hand change', async () => {
+  await run([step('implementer', { failure: 'rate limited' }, write('one.txt', 'half'))])
+  await run([build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.doesNotMatch(printed.join('\n'), /changed outside the runner/)
+})
+
+test('a rerun with nothing touched reports no outside changes', async () => {
+  await run([build('one.txt', 'feat: one')], { cap: 1 })
+  await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.doesNotMatch(printed.join('\n'), /changed outside the runner/)
+  assert.doesNotMatch(ledger(), /changed outside the runner/)
+})
+
+test('a stop that repeats before any check lists the same outside changes only once', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  writeFileSync(join(root, 'manual.txt'), 'by hand')
+  await run([], { humanGates: ['1'] })
+  await run([], { humanGates: ['1'] })
+  assert.equal(ledger().match(/changed outside the runner since its last check/g).length, 1)
+})
+
+test('outside changes in a tree with no built milestone are left to the dirty-tree stop', async () => {
+  writeFileSync(join(root, 'stray.txt'), 'stray')
+  const { status } = await run([])
+  assert.equal(status.reason, 'dirty-tree')
+  assert.doesNotMatch(printed.join('\n'), /changed outside the runner/)
+})
+
+test('--accept close-out records hand-changed files as committed unreviewed', async () => {
+  const stuck = () => reviewer({ standards: [], spec: [finding('branch-wide smell')] })
+  await run([
+    build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(),
+    stuck(), verdict('fix-now'), step('fixer', report('fix: smell', []), write('three.txt')), stuck(), verdict('fix-now'),
+  ])
+  writeFileSync(join(root, 'by-hand.txt'), 'by hand')
+  const { status } = await run([], { accepted: ['close-out'] })
+  assert.equal(status.state, 'completed')
+  assert.match(ledger(), /\| plan\.md#close-out \| 1 file\(s\) changed outside the runner since its last check/)
+  assert.match(ledger(), /\| plan\.md#close-out \| --accept commits 1 file\(s\) changed outside the runner, with no critic .* by-hand\.txt \| committed unreviewed \|/)
+})
+
+test('a rerun of a finished plan reports no outside changes', async () => {
+  await run([build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  writeFileSync(join(root, 'later.txt'), 'later work')
+  await run([])
+  assert.doesNotMatch(ledger(), /changed outside the runner/)
 })

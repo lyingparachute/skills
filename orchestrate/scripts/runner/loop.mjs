@@ -23,6 +23,7 @@ const freshState = (plan, head) => ({
   testCommands: [],
   knownRed: [],
   pendingBase: '',
+  handChanged: [],
   inProgress: IDLE,
   closedOut: false,
   status: { state: 'running' },
@@ -55,10 +56,12 @@ async function guarded(ctx, state, isNew) {
   if (!milestones.ok) return stopped('plan-format', milestones.error)
   ctx.journal.emit({
     type: 'run-start', fresh: isNew, plan: state.plan, cap: ctx.cap, agentsUsed: state.agentsUsed, completed: state.completed, milestones: milestones.value,
+    command: ctx.runInfo.command, idleMs: ctx.runInfo.idleMs,
   })
+  const ids = milestones.value.map(m => m.id)
+  noteHandChanges(ctx, state, !state.closedOut && ids.every(id => state.completed.includes(id)))
   const unknown = ctx.accepted.filter(id => id !== state.inProgress.id && id !== CLOSE_OUT && !state.completed.includes(id))
   if (unknown.length) return stopped('bad-accept', `nothing in progress to accept for: ${unknown.join(', ')}`)
-  const ids = milestones.value.map(m => m.id)
   const strangers = ctx.humanGates.filter(id => !ids.includes(id))
   if (strangers.length) return stopped('unknown-milestone', `--human-gate names no milestone of the plan: ${strangers.join(', ')}; see task-brief --titles`)
   for (const [index, { id, title }] of milestones.value.entries()) {
@@ -68,6 +71,20 @@ async function guarded(ctx, state, isNew) {
     if (outcome.stop) return outcome
   }
   return state.closedOut ? {} : closeOut(ctx, state)
+}
+
+// Once a milestone is built (or at close-out) every runner check stages the whole tree, so unstaged work
+// changed after the last check. Before that, the tree is an implementer's partial work or a dirty-tree stop.
+function noteHandChanges(ctx, state, closing) {
+  if (!state.inProgress.message && !closing) return
+  const files = ctx.repo.unstagedPaths().filter(file => !state.handChanged.includes(file))
+  if (!files.length) return
+  const list = ctx.repo.writeJson(`hand-changes-${new Date().toISOString().replace(/[:.]/g, '-')}.json`, files)
+  const unit = `${ctx.planReader.plan}#${state.inProgress.id || CLOSE_OUT}`
+  ctx.journal.emit({ type: 'hand-changes', files, file: list })
+  ctx.repo.ledger(`| ${cell(unit)} | ${files.length} file(s) changed outside the runner since its last check | by hand, or by a worker that was cut off | ${list} | joins the next commit |`)
+  state.handChanged = unique([...state.handChanged, ...files])
+  ctx.repo.saveState(state)
 }
 
 async function advance(ctx, state, id) {
@@ -85,7 +102,7 @@ async function advance(ctx, state, id) {
 const landed = (repo, work) => repo.parent() === work.startHead && repo.subject() === subject(work.message)
 
 const dirtyTree = id => stopped('dirty-tree', `uncommitted changes that belong to no milestone in progress, before milestone ${id}: discard them`)
-const committedByHand = id => stopped('blocked', `milestone ${id} has commits the runner did not make: check them, then rerun with --accept ${id}`)
+const committedByHand = id => stopped('committed-by-hand', `milestone ${id} has commits the runner did not make: check them, then rerun with --accept ${id}`)
 const awaitHuman = id => stopped('human-gate', `milestone ${id} is built and reviewed; a person must check it, then rerun with --accept ${id}`)
 
 async function startMilestone(ctx, state, id) {
@@ -93,6 +110,7 @@ async function startMilestone(ctx, state, id) {
   const resuming = state.inProgress.id === id && !repo.isClean()
   if (!resuming) {
     const startHead = repo.head()
+    ctx.journal.emit({ type: 'gate-start', label: `m${id}-baseline` })
     const baseline = await repo.runGate(ctx.gates, `m${id}-baseline`)
     const redBefore = baseline.anyRed
     ctx.journal.emit({ type: 'baseline', label: `m${id}-baseline`, red: redBefore, file: baseline.file })
@@ -132,7 +150,13 @@ async function acceptMilestone(ctx, state, id) {
   if (checked.stop) return checked
   const review = state.inProgress.review === 'clean' ? 'human-checked' : 'accepted'
   state.inProgress = { ...state.inProgress, review }
+  noteUnreviewed(ctx, state, id)
   return finish(ctx, state, id)
+}
+
+function noteUnreviewed(ctx, state, id) {
+  if (!state.handChanged.length) return
+  ctx.repo.ledger(`| ${cell(`${ctx.planReader.plan}#${id}`)} | --accept commits ${state.handChanged.length} file(s) changed outside the runner, with no critic | a person checked the tree | ${cell(state.handChanged.join(' '))} | committed unreviewed |`)
 }
 
 async function gateOnly(ctx, label, tests, { advisory, base }) {
@@ -142,25 +166,28 @@ async function gateOnly(ctx, label, tests, { advisory, base }) {
 }
 
 async function gate(ctx, commands, label, options) {
+  ctx.journal.emit({ type: 'gate-start', label })
   const result = await ctx.repo.runGate(commands, label, options)
+  ctx.repo.stageAll()
   ctx.journal.emit({ type: 'gate', label, green: result.green, failed: result.failed, file: result.file })
   return result
 }
 
-function commit(ctx, message) {
+function commit(ctx, fileCount, message) {
   ctx.repo.commit(message)
-  ctx.journal.emit({ type: 'commit', sha: ctx.repo.short(ctx.repo.head()), subject: subject(message) })
+  ctx.journal.emit({ type: 'commit', sha: ctx.repo.short(ctx.repo.head()), subject: subject(message), fileCount })
 }
 
 function finish(ctx, state, id) {
   const { repo } = ctx
   repo.stageAll()
-  if (!repo.stagedPaths('HEAD').length) {
+  const staged = repo.stagedPaths('HEAD').length
+  if (!staged) {
     return repo.head() === state.inProgress.startHead ? stopped('blocked', `milestone ${id}: nothing to commit`) : record(ctx, state, id)
   }
   state.inProgress = { ...state.inProgress, committing: true }
   repo.saveState(state)
-  commit(ctx, state.inProgress.message)
+  commit(ctx, staged, state.inProgress.message)
   return record(ctx, state, id)
 }
 
@@ -174,6 +201,7 @@ function record(ctx, state, id) {
   state.pendingBase = reviewedByCritic ? '' : state.pendingBase || base
   state.completed.push(id)
   state.inProgress = IDLE
+  state.handChanged = []
   repo.saveState(state)
   ctx.journal.emit({ type: 'milestone-done', id, review })
   return {}
@@ -186,6 +214,7 @@ async function closeOut(ctx, state) {
   if (ctx.accepted.includes(CLOSE_OUT)) {
     const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands, { advisory: state.knownRed, base: state.base0 })
     if (checked.stop) return checked
+    noteUnreviewed(ctx, state, CLOSE_OUT)
   } else {
     const reviewed = await reviewRounds(ctx, state, {
       base: state.base0, role: 'reviewer', label: CLOSE_OUT, unit: `${ctx.planReader.plan}#${CLOSE_OUT}`,
@@ -195,7 +224,9 @@ async function closeOut(ctx, state) {
     message = reviewed.fixMessage || CLOSE_OUT_MESSAGE
   }
   repo.stageAll()
-  if (repo.stagedPaths('HEAD').length) commit(ctx, message)
+  const staged = repo.stagedPaths('HEAD').length
+  if (staged) commit(ctx, staged, message)
+  state.handChanged = []
   repo.ledger(`${ctx.planReader.plan} close-out: whole-branch review done (commits ${repo.short(state.base0)}..${repo.short(repo.head())}, agents used ${state.agentsUsed})`)
   state.closedOut = true
   repo.saveState(state)
@@ -209,7 +240,7 @@ async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief,
   for (let round = 1; round <= MAX_REVIEW_ROUNDS; round += 1) {
     const tag = `${label}-r${round}`
     repo.stageAll()
-    const review = repo.writePackage(base, tag)
+    const review = repo.writePackage(base, tag, state.handChanged)
     const gated = await gate(ctx, unique([...ctx.gates, ...named]), tag, { advisory, files: repo.changedFiles(base) })
     const critique = await dispatch(ctx, state, role, criticPrompt({ brief, review, gate: gated }), REVIEW, tag)
     if (critique.stop) return critique
@@ -227,7 +258,7 @@ async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief,
     ]
     if (!fixes.length) return { fixMessage }
     const fixFile = repo.writeJson(`fixes-${tag}.json`, fixes)
-    ctx.journal.emit({ type: 'fixes', step: tag, count: fixes.length, file: fixFile })
+    ctx.journal.emit({ type: 'fixes', step: tag, count: fixes.length, file: fixFile, items: fixes.map(({ severity, issue, location }) => ({ severity, issue, location })) })
     if (round === MAX_REVIEW_ROUNDS) return stopped('open-findings', `${unit}: ${fixes.length} finding(s) left after ${MAX_REVIEW_ROUNDS} review rounds, see ${fixFile}`)
     const fixed = await work(ctx, state, 'fixer', fixerPrompt({ brief, review, fixes: fixFile }), tag)
     if (fixed.stop) return fixed
@@ -258,7 +289,10 @@ async function triage(ctx, state, { brief, review, findings, tag, unit }) {
     return stopped('agent-failed', `triage must give exactly one verdict per finding in ${file}, got indexes ${indexes.join(', ') || 'none'}`)
   }
   const verdicts = new Map(judged.value.verdicts.map(v => [v.index, v]))
-  ctx.journal.emit({ type: 'triage', step: tag, verdicts: tally(judged.value.verdicts.map(v => v.verdict)) })
+  ctx.journal.emit({
+    type: 'triage', step: tag, verdicts: tally(judged.value.verdicts.map(v => v.verdict)),
+    items: findings.map((f, index) => ({ severity: f.severity, axis: f.axis, issue: f.issue, location: f.location, verdict: verdicts.get(index).verdict, reason: verdicts.get(index).reason })),
+  })
   findings.forEach((finding, index) => {
     const { verdict, reason } = verdicts.get(index)
     if (verdict === 'fix-now') return

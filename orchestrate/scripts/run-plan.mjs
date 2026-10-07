@@ -110,6 +110,8 @@ function positiveInteger(flag, value) {
 }
 
 const print = line => console.log(line)
+const SHELL_SAFE = /^[\w@%+=:,./-]+$/
+const shellWord = word => (SHELL_SAFE.test(word) ? word : `'${word.replaceAll("'", "'\\''")}'`)
 
 function notify(status) {
   if (!values.notify) return
@@ -168,7 +170,9 @@ const interrupt = new AbortController()
 const repo = createRepo(root, workspace, { signal: interrupt.signal })
 const journal = createJournal(workspace, { print })
 const releaseExitHandlers = killWorkerOnExit(repo, journal, interrupt)
+const idleMs = positiveInteger('--idle-timeout-min', values['idle-timeout-min']) * MS_PER_MINUTE
 const status = await runPlan({
+  runInfo: { command: [process.execPath, resolve(process.argv[1]), ...process.argv.slice(2)].map(shellWord).join(' '), idleMs },
   planReader: createPlanReader(relative(root, resolve(values.plan)), scriptsDir, root),
   repo,
   journal,
@@ -179,7 +183,7 @@ const status = await runPlan({
     cwd: root,
     workspace,
     timeoutMs: positiveInteger('--agent-timeout-min', values['agent-timeout-min']) * MS_PER_MINUTE,
-    idleMs: positiveInteger('--idle-timeout-min', values['idle-timeout-min']) * MS_PER_MINUTE,
+    idleMs,
     onEvent: event => journal.emit(event),
     signal: interrupt.signal,
   }),
