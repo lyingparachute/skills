@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # Resolve and ensure the working-tree directory orchestrate uses for its
-# short-lived artifacts: task briefs, implementer reports, review packages,
-# and the progress ledger. Print the directory's absolute path.
+# short-lived artifacts: task briefs, review packages, gate logs, agent logs,
+# run state, and the progress ledger. Print the directory's absolute path.
 #
 # The workspace lives in the working tree (not under .git/) because harnesses
-# treat .git/ as protected and deny agent writes there — which would block an
-# implementer subagent from writing its report file. A self-ignoring .gitignore
+# treat .git/ as protected and deny agent writes there. A self-ignoring .gitignore
 # keeps the workspace out of `git status` and out of accidental commits.
 #
 # Single source of truth for the workspace location, so task-brief and
-# review-package cannot drift to different directories.
+# run-plan.mjs cannot drift to different directories.
 #
 # Usage: workspace
 set -euo pipefail
