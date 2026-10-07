@@ -59,7 +59,7 @@ test('a stopped run marks its milestone as stopped and offers the exact accept c
 
 test('while the gate runs and no agent works, the page says so', () => {
   const gating = [...working, { at: at(3), type: 'agent-end', role: 'implementer', step: 'm1', ok: true, ms: 1 }, { at: at(3), type: 'gate-start', label: 'm1-r1' }]
-  assert.match(page(gating, 5), /Running the gate: m1-r1<\/h2><p class="facts"><span>lint, type check and focused tests, for 2m00s/)
+  assert.match(page(gating, 5), /Running the gate: m1-r1<\/h2><p class="facts"><span>lint, type check and focused tests, for <span class="since" data-at="[^"]+">2m00s<\/span>/)
   assert.doesNotMatch(page([...gating, { at: at(6), type: 'gate', label: 'm1-r1', green: true, failed: [], file: 'g' }], 6), /Running the gate/)
 })
 

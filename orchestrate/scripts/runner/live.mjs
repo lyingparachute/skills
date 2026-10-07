@@ -13,7 +13,7 @@ const STORE_KEY = 'orchestrate-live'
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
 const escape = text => String(text).replace(/[&<>"']/g, char => ESCAPES[char])
 const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const since = (now, at) => duration(now - new Date(at))
+const since = (now, at, ticking = true) => (ticking ? `<span class="since" data-at="${escape(at)}">${duration(now - new Date(at))}</span>` : duration(now - new Date(at)))
 
 function linker(workspace) {
   const workspacePath = new RegExp(`(${escapeRegExp(workspace)}/[^\\s,;:)]*[^\\s,;:).])`)
@@ -100,7 +100,7 @@ function stopPanel(view, link) {
 
 function donePanel(view, now) {
   if (view.state !== 'completed') return ''
-  return `<section class="panel done"><h2>Completed</h2><p>All ${view.milestones.length} milestones and the close-out review are done, in ${since(now, view.startedAt)} with ${view.agentsUsed} agents.</p></section>`
+  return `<section class="panel done"><h2>Completed</h2><p>All ${view.milestones.length} milestones and the close-out review are done, in ${since(new Date(view.updatedAt), view.startedAt, false)} with ${view.agentsUsed} agents.</p></section>`
 }
 
 const chip = (kind, text) => `<span class="chip ${escape(kind)}">${escape(text)}</span>`
@@ -251,7 +251,7 @@ a { color: var(--run); }
   </div>
   <div class="meta">
     ${step ? `<span>${escape(step)}</span>` : ''}
-    ${view.startedAt ? `<span>elapsed ${since(now, view.startedAt)}</span>` : ''}
+    ${view.startedAt ? `<span>elapsed ${since(running ? now : new Date(view.updatedAt), view.startedAt, running)}</span>` : ''}
     <span>last event <span class="age" data-at="${escape(view.updatedAt)}">${view.updatedAt ? clock(view.updatedAt) : 'none'}</span></span>
   </div>
   <div class="bars">
@@ -278,6 +278,7 @@ const ago = at => {
 }
 const tick = () => {
   document.querySelectorAll('.age[data-at]').forEach(el => { if (el.dataset.at) el.textContent = ago(el.dataset.at) + ' ago' })
+  document.querySelectorAll('.since[data-at]').forEach(el => { el.textContent = ago(el.dataset.at) })
   const clockEl = document.querySelector('.quiet-clock')
   const note = document.querySelector('.quiet-note')
   if (!clockEl || !note) return
