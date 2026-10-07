@@ -1,0 +1,135 @@
+import assert from 'node:assert/strict'
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, beforeEach, test } from 'node:test'
+import { schemaErrors, TRIAGE } from './contract.mjs'
+import { createAgent } from './harness.mjs'
+
+const ANSWER = { type: 'object', properties: { answer: { type: 'integer' } }, required: ['answer'], additionalProperties: false }
+const CLAUDE_REPLY = { type: 'result', subtype: 'success', is_error: false, result: '{"answer":5}', structured_output: { answer: 5 } }
+const GROK_REPLY = { text: '{"answer":5}', stopReason: 'end_turn', structuredOutput: { answer: 5 } }
+const opencodeEvents = text => [
+  { type: 'step_start', sessionID: 'ses_1', part: { type: 'step-start' } },
+  { type: 'text', sessionID: 'ses_1', part: { type: 'text', text } },
+  { type: 'step_finish', sessionID: 'ses_1', part: { type: 'step-finish', reason: 'stop' } },
+].map(event => JSON.stringify(event)).join('\n')
+
+const CALL_MARK = '--- call ---'
+let dir
+let savedPath
+let replies = 0
+
+function fakeCli(name, body) {
+  const file = join(dir, 'bin', name)
+  writeFileSync(file, `#!/bin/sh\nprintf '%s\\n%s\\n' "${CALL_MARK}" "$*" >> "${dir}/${name}.args"\n${body}\n`)
+  chmodSync(file, 0o755)
+}
+
+function printing(text) {
+  const file = join(dir, `reply-${replies++}.txt`)
+  writeFileSync(file, `${text}\n`)
+  return `cat '${file}'`
+}
+const ask = (harness, timeoutMs) => createAgent({ harness, models: { critic: 'model-x' }, cwd: dir, workspace: dir, timeoutMs })('critic', 'What is 2+3?', ANSWER)
+const failure = reply => ({ ...reply, error: reply.error.replace(/, log: \S+$/, '') })
+const callsTo = name => readFileSync(join(dir, `${name}.args`), 'utf8').split(`${CALL_MARK}\n`).slice(1)
+
+beforeEach(() => {
+  dir = mkdtempSync(join(tmpdir(), 'harness-test-'))
+  mkdirSync(join(dir, 'bin'))
+  savedPath = process.env.PATH
+  process.env.PATH = `${join(dir, 'bin')}:${savedPath}`
+})
+
+afterEach(() => {
+  process.env.PATH = savedPath
+  rmSync(dir, { recursive: true, force: true })
+})
+
+test('claude: structured_output is the reply, with the model and schema passed', async () => {
+  fakeCli('claude', printing(JSON.stringify(CLAUDE_REPLY)))
+  assert.deepEqual(await ask('claude'), { ok: true, value: { answer: 5 } })
+  assert.match(callsTo('claude')[0], /--json-schema .*"answer".* --model model-x --dangerously-skip-permissions/)
+})
+
+test('claude: an error result fails with its message', async () => {
+  fakeCli('claude', printing(JSON.stringify({ ...CLAUDE_REPLY, is_error: true, result: 'rate limited' })))
+  assert.deepEqual(failure(await ask('claude')), { ok: false, error: 'rate limited', kind: 'process' })
+})
+
+test('grok: structuredOutput is the reply', async () => {
+  fakeCli('grok', printing(JSON.stringify(GROK_REPLY)))
+  assert.deepEqual(await ask('grok'), { ok: true, value: { answer: 5 } })
+  assert.match(callsTo('grok')[0], /-m model-x --always-approve/)
+})
+
+test('codex: the -o file is the reply', async () => {
+  fakeCli('codex', `while [ "$1" != "-o" ]; do shift; done; echo '{"answer":5}' > "$2"`)
+  assert.deepEqual(await ask('codex'), { ok: true, value: { answer: 5 } })
+  assert.match(callsTo('codex')[0], /^exec --output-schema \S+\.schema\.json -o \S+ -m model-x --sandbox workspace-write/)
+})
+
+test('opencode: JSON inside a fenced reply is extracted', async () => {
+  fakeCli('opencode', printing(opencodeEvents('Here:\n```json\n{"answer": 5}\n```')))
+  assert.deepEqual(await ask('opencode'), { ok: true, value: { answer: 5 } })
+  assert.match(callsTo('opencode')[0], /^run --format json --auto -m model-x What is 2\+3\?/)
+})
+
+test('opencode: a reply that breaks the schema gets one repair turn in the same session', async () => {
+  fakeCli('opencode', `if [ -f "${dir}/tried" ]; then ${printing(opencodeEvents('{"answer": 5}'))}; else touch "${dir}/tried"; ${printing(opencodeEvents('{"answer": "five"}'))}; fi`)
+  assert.deepEqual(await ask('opencode'), { ok: true, value: { answer: 5 } })
+  const calls = callsTo('opencode')
+  assert.equal(calls.length, 2)
+  assert.match(calls[1], /-s ses_1 Your last reply was rejected: reply breaks the schema: \$\.answer: expected integer/)
+})
+
+test('opencode: a second bad reply fails instead of looping', async () => {
+  fakeCli('opencode', printing(opencodeEvents('no json here')))
+  assert.deepEqual(failure(await ask('opencode')), { ok: false, error: 'no JSON object in the reply', kind: 'reply' })
+  assert.equal(callsTo('opencode').length, 2)
+})
+
+test('opencode: a provider error fails with its message and gets no repair turn', async () => {
+  const rateLimited = JSON.stringify({ type: 'error', sessionID: 'ses_1', error: { name: 'APIError', data: { message: 'Rate limit exceeded.' } } })
+  fakeCli('opencode', `${printing(rateLimited)}; exit 1`)
+  assert.deepEqual(failure(await ask('opencode')), { ok: false, error: 'opencode exited 1: Rate limit exceeded.', kind: 'process' })
+  assert.equal(callsTo('opencode').length, 1)
+})
+
+test('opencode: a non-JSON line in the event stream is skipped', async () => {
+  fakeCli('opencode', printing(`warning: plugin slow\n${opencodeEvents('{"answer": 5}')}`))
+  assert.deepEqual(await ask('opencode'), { ok: true, value: { answer: 5 } })
+})
+
+test('codex: an exit without the -o file fails instead of throwing', async () => {
+  fakeCli('codex', 'true')
+  assert.deepEqual(failure(await ask('codex')), { ok: false, error: 'codex wrote no final message', kind: 'process' })
+})
+
+test('a hung worker and what it started are killed at the timeout', async () => {
+  fakeCli('grok', 'sleep 30 & sleep 30')
+  const started = Date.now()
+  assert.deepEqual(failure(await ask('grok', 200)), { ok: false, error: 'grok timed out after 200 ms', kind: 'process' })
+  assert.ok(Date.now() - started < 5000)
+})
+
+test('a non-zero exit fails and names the log file', async () => {
+  fakeCli('grok', 'echo boom >&2; exit 7')
+  const reply = await ask('grok')
+  assert.equal(reply.ok, false)
+  const log = reply.error.match(/log: (\S+)/)[1]
+  assert.match(readFileSync(log, 'utf8'), /boom/)
+})
+
+test('schemaErrors reports every broken field by path', () => {
+  const bad = { verdicts: [{ index: 1.5, verdict: 'maybe', extra: true }] }
+  assert.deepEqual(schemaErrors(TRIAGE, bad), [
+    '$.verdicts[0].reason: missing',
+    '$.verdicts[0].extra: not allowed',
+    '$.verdicts[0].index: expected integer',
+    '$.verdicts[0].verdict: "maybe" is not one of fix-now, followup, reject, owner-call',
+  ])
+  assert.deepEqual(schemaErrors(TRIAGE, { verdicts: [] }), [])
+  assert.throws(() => schemaErrors({ type: 'string', minLength: 1 }, 'x'), /cannot check minLength/)
+})

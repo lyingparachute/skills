@@ -1,0 +1,317 @@
+import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { afterEach, beforeEach, test } from 'node:test'
+import { fileURLToPath } from 'node:url'
+import { runPlan } from './loop.mjs'
+import { createPlanReader, createRepo } from './repo.mjs'
+
+const scriptsDir = join(dirname(fileURLToPath(import.meta.url)), '..')
+const PLAN = 'plan.md'
+const planText = title => `# ${title}
+
+## Scope and non-goals
+
+Greeting files only.
+
+## Milestones
+
+### Milestone 1 - First file
+
+Write one.txt.
+
+### Milestone 2 - Second file
+
+Write two.txt.
+`
+
+let root
+let workspace
+const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
+const write = (file, text = file) => () => writeFileSync(join(root, file), text)
+const report = (commitMessage, testCommands) => ({ status: 'done', summary: 'done', testCommands, concerns: [], commitMessage })
+const finding = issue => ({ location: 'one.txt:1', issue, severity: 'MAJOR', fix: 'rewrite it' })
+const clean = { standards: [], spec: [] }
+
+const step = (role, value, effect = () => {}) => ({ role, value, effect })
+const build = (file, message, tests = [`test -f ${file}`]) => step('implementer', report(message, tests), write(file))
+const critic = (value = clean) => step('critic', value)
+const reviewer = (value = clean) => step('reviewer', value)
+const verdict = (verdict, index = 0) => step('triage', { verdicts: [{ index, verdict, reason: `${verdict} because one.txt:1 says so` }] })
+
+function scriptedAgent(steps) {
+  const calls = []
+  const agent = async (role, prompt) => {
+    const next = steps.shift()
+    assert.ok(next, `unexpected ${role} call`)
+    assert.equal(role, next.role, `call ${calls.length + 1}`)
+    calls.push({ role, prompt })
+    next.effect(prompt)
+    if (next.value instanceof Error) throw next.value
+    return next.value.failure ? { ok: false, error: next.value.failure } : { ok: true, value: next.value }
+  }
+  return { agent, calls, left: steps }
+}
+
+async function run(steps, options = {}) {
+  const scripted = scriptedAgent(steps)
+  const status = await runPlan({
+    planReader: createPlanReader(options.plan ?? PLAN, scriptsDir, root),
+    repo: createRepo(root, workspace),
+    agent: scripted.agent,
+    cap: 50,
+    gates: ['true'],
+    humanGates: [],
+    accepted: [],
+    reviewDocs: false,
+    ...options,
+  })
+  return { status, ...scripted }
+}
+
+const ledger = () => readFileSync(join(workspace, 'progress.md'), 'utf8')
+const subjects = () => git('log', '--format=%s').split('\n')
+const pathOf = (prompt, pattern) => prompt.match(new RegExp(`\\S+${pattern}`))[0]
+const roles = calls => calls.map(call => call.role)
+const stateOnDisk = () => JSON.parse(readFileSync(join(workspace, 'run-state.json'), 'utf8'))
+
+beforeEach(() => {
+  root = mkdtempSync(join(tmpdir(), 'run-plan-test-'))
+  git('init', '--quiet')
+  git('config', 'user.email', 'test@example.com')
+  git('config', 'user.name', 'Test')
+  writeFileSync(join(root, PLAN), planText('Plan'))
+  git('add', PLAN)
+  git('commit', '--quiet', '-m', 'plan')
+  workspace = execFileSync(join(scriptsDir, 'workspace'), { cwd: root, encoding: 'utf8' }).trim()
+})
+
+afterEach(() => rmSync(root, { recursive: true, force: true }))
+
+test('clean milestones commit once each, then the close-out review runs', async () => {
+  const { status, left } = await run([
+    build('one.txt', 'feat: one'), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.deepEqual(status, { state: 'completed' })
+  assert.equal(left.length, 0)
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one', 'plan'])
+  assert.match(ledger(), /plan\.md Milestone 1: complete \(commits \w{7}\.\.\w{7}, review clean, gate green, agents used 2\)/)
+  assert.match(ledger(), /plan\.md close-out: whole-branch review done/)
+})
+
+test('a fix-now finding goes to one fixer, then a second review round passes', async () => {
+  const { status, calls } = await run([
+    build('one.txt', 'feat: one'),
+    critic({ standards: [finding('bad name')], spec: [] }), verdict('fix-now'),
+    step('fixer', report('fix: name', ['test -f fixed.txt']), write('fixed.txt')),
+    critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.equal(status.state, 'completed')
+  assert.match(calls[3].prompt, /fixes-m1-r1\.json/)
+  assert.deepEqual(git('show', '--name-only', '--format=', 'HEAD~1').split('\n').sort(), ['fixed.txt', 'one.txt'])
+  assert.match(readFileSync(join(workspace, 'gate-m1-r2.log'), 'utf8'), /\$ test -f fixed\.txt\nexit 0/)
+})
+
+test('a rejected finding is logged as a decision row and not fixed', async () => {
+  const { status } = await run([
+    build('one.txt', 'feat: one'),
+    critic({ standards: [], spec: [finding('wrong | thing')] }), verdict('reject'),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.equal(status.state, 'completed')
+  assert.match(ledger(), /\| plan\.md#1 \| reject spec finding: wrong \\\| thing \| reject because .* \| \S+findings-m1-r1\.json#0 \| dropped \|/)
+})
+
+test('an owner-call finding is logged for the plan owner and the run goes on unfixed', async () => {
+  const { status, calls } = await run([
+    build('one.txt', 'feat: one'), critic({ standards: [], spec: [finding('plan demands a global')] }), verdict('owner-call'),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.equal(status.state, 'completed')
+  assert.ok(!roles(calls).includes('fixer'))
+  assert.match(ledger(), /owner-call spec finding: plan demands a global .* \| owner-call \|/)
+})
+
+test('a triage reply that skips a finding stops the run', async () => {
+  const { status } = await run([build('one.txt', 'feat: one'), critic({ standards: [finding('a'), finding('b')], spec: [] }), verdict('reject', 1)])
+  assert.equal(status.reason, 'agent-failed')
+  assert.match(status.detail, /exactly one verdict per finding .* got indexes 1/)
+})
+
+test('a rerun after a failed implementer resumes its partial work', async () => {
+  const first = await run([step('implementer', { failure: 'rate limited' }, write('one.txt', 'half'))])
+  assert.deepEqual(first.status, { state: 'stopped', reason: 'agent-failed', detail: 'implementer: rate limited' })
+  const second = await run([build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.equal(second.status.state, 'completed')
+  assert.match(second.calls[0].prompt, /An earlier implementer stopped partway/)
+})
+
+test('rerunning the same command with --accept for a milestone already done is fine', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  const options = { humanGates: ['1'], accepted: ['1'], cap: 3 }
+  assert.equal((await run([build('two.txt', 'feat: two')], options)).status.reason, 'cap')
+  assert.equal((await run([critic(), reviewer()], { ...options, cap: 6 })).status.state, 'completed')
+})
+
+test('a milestone committed by hand is recorded only through --accept', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  git('add', '-A')
+  git('commit', '--quiet', '-m', 'feat: one, by hand')
+  const blocked = await run([], { humanGates: ['1'] })
+  assert.equal(blocked.status.reason, 'blocked')
+  assert.match(blocked.status.detail, /commits the runner did not make.*--accept 1/)
+  const accepted = await run([build('two.txt', 'feat: two'), critic(), reviewer()], { humanGates: ['1'], accepted: ['1'] })
+  assert.equal(accepted.status.state, 'completed')
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one, by hand', 'plan'])
+})
+
+test('findings left after two rounds stop the run; a rerun resumes the review on the same tree', async () => {
+  const stuck = () => critic({ standards: [finding('still bad')], spec: [] })
+  const first = await run([build('one.txt', 'feat: one'), stuck(), verdict('fix-now'), step('fixer', report('fix: try', [])), stuck(), verdict('fix-now')])
+  assert.equal(first.status.reason, 'open-findings')
+  assert.match(first.status.detail, /fixes-m1-r2\.json/)
+  assert.deepEqual(subjects(), ['plan'])
+
+  const resumed = await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.equal(resumed.status.state, 'completed')
+  assert.deepEqual(roles(resumed.calls), ['critic', 'implementer', 'critic', 'reviewer'])
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one', 'plan'])
+})
+
+test('--accept commits a stopped milestone without review, and the next code review covers it', async () => {
+  const first = await run([build('one.txt', 'feat: one')], { cap: 1 })
+  assert.equal(first.status.reason, 'cap')
+  const second = await run([build('two.txt', 'feat: two'), critic(), reviewer()], { accepted: ['1'] })
+  assert.equal(second.status.state, 'completed')
+  assert.match(ledger(), /Milestone 1: complete .*review accepted/)
+  assert.match(ledger(), /Milestone 2: its review covered the unreviewed milestones since \w{7}/)
+  assert.match(readFileSync(pathOf(second.calls[1].prompt, 'review-m2-r1\\.diff'), 'utf8'), /one\.txt/)
+})
+
+test('a red gate becomes a finding for the fixer', async () => {
+  const { status, calls } = await run([
+    build('one.txt', 'feat: one'), critic(),
+    step('fixer', report('fix: gate', ['test -f one.txt']), write('ready.txt')), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ], { gates: ['test -f ready.txt'] })
+  assert.equal(status.state, 'completed')
+  assert.ok(!roles(calls).includes('triage'))
+  assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /gate red: test -f ready\.txt/)
+})
+
+test('an implementer that names no test gets a finding for the fixer', async () => {
+  const { calls } = await run([
+    build('one.txt', 'feat: one', []), critic(),
+    step('fixer', report('test: one', ['test -f one.txt'])), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /no focused test command proves this change/)
+})
+
+test('files the gate writes are committed with the milestone', async () => {
+  const { status } = await run([
+    build('one.txt', 'feat: one'), critic(),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ], { gates: ['date > gate-output.txt'] })
+  assert.equal(status.state, 'completed')
+  assert.equal(git('status', '--porcelain'), '')
+})
+
+test('the run stops before a dispatch that would pass the cap, and a rerun goes on from there', async () => {
+  const first = await run([build('one.txt', 'feat: one')], { cap: 1 })
+  assert.deepEqual(first.status, { state: 'stopped', reason: 'cap', detail: 'the next critic would exceed the agent cap of 1' })
+  assert.equal(stateOnDisk().agentsUsed, 1)
+  const second = await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()], { cap: 5 })
+  assert.equal(second.status.state, 'completed')
+  assert.deepEqual(roles(second.calls), ['critic', 'implementer', 'critic', 'reviewer'])
+})
+
+test('a docs-only milestone skips the critic and joins the next review package', async () => {
+  const { status, calls } = await run([
+    build('notes.md', 'docs: notes'),
+    build('two.txt', 'feat: two'), critic(),
+    reviewer(),
+  ])
+  assert.equal(status.state, 'completed')
+  const review = readFileSync(pathOf(calls[2].prompt, 'review-m2-r1\\.diff'), 'utf8')
+  assert.match(review, /notes\.md/)
+  assert.match(review, /two\.txt/)
+})
+
+test('--review-docs sends a docs-only milestone to the critic', async () => {
+  const { calls } = await run([build('notes.md', 'docs: notes'), critic(), build('two.txt', 'feat: two'), critic(), reviewer()], { reviewDocs: true })
+  assert.deepEqual(roles(calls), ['implementer', 'critic', 'implementer', 'critic', 'reviewer'])
+})
+
+test('a human-gated milestone stops after review and commits on --accept', async () => {
+  const first = await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  assert.equal(first.status.reason, 'human-gate')
+  assert.equal((await run([], { humanGates: ['1'] })).status.reason, 'human-gate')
+  const second = await run([build('two.txt', 'feat: two'), critic(), reviewer()], { humanGates: ['1'], accepted: ['1'] })
+  assert.equal(second.status.state, 'completed')
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one', 'plan'])
+  assert.match(ledger(), /Milestone 1: complete .*review human-checked/)
+})
+
+test('a commit that landed before the state was saved is recorded, not rebuilt', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  const state = stateOnDisk()
+  writeFileSync(join(workspace, 'run-state.json'), JSON.stringify({ ...state, inProgress: { ...state.inProgress, committing: true } }))
+  git('add', '-A')
+  git('commit', '--quiet', '-m', 'feat: one')
+  const { status, calls } = await run([build('two.txt', 'feat: two'), critic(), reviewer()])
+  assert.equal(status.state, 'completed')
+  assert.deepEqual(roles(calls), ['implementer', 'critic', 'reviewer'])
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one', 'plan'])
+})
+
+test('close-out findings left after two rounds resolve with --accept close-out', async () => {
+  const stuck = () => reviewer({ standards: [], spec: [finding('branch-wide smell')] })
+  const first = await run([
+    build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(),
+    stuck(), verdict('fix-now'), step('fixer', report('fix: smell', []), write('three.txt')), stuck(), verdict('fix-now'),
+  ])
+  assert.equal(first.status.reason, 'open-findings')
+  const second = await run([], { accepted: ['close-out'] })
+  assert.equal(second.status.state, 'completed')
+  assert.equal(subjects()[0], 'fix: close-out review findings')
+})
+
+test('a blocked implementer stops the run with its reason', async () => {
+  const blocked = { ...report('unused', []), status: 'blocked', summary: 'needs the auth plan first' }
+  const { status } = await run([step('implementer', blocked)])
+  assert.deepEqual(status, { state: 'stopped', reason: 'blocked', detail: 'implementer: needs the auth plan first' })
+})
+
+test('an unexpected error is saved as a stop instead of leaving the run marked running', async () => {
+  const { status } = await run([step('implementer', new Error('disk full'))])
+  assert.deepEqual(status, { state: 'stopped', reason: 'runner-error', detail: 'disk full' })
+  assert.equal(stateOnDisk().status.reason, 'runner-error')
+})
+
+test('--accept for a milestone that is not in progress is refused', async () => {
+  const { status } = await run([], { accepted: ['2'] })
+  assert.deepEqual(status, { state: 'stopped', reason: 'bad-accept', detail: 'nothing in progress to accept for: 2' })
+})
+
+test('a finished plan gives way to the next one; an unfinished one does not', async () => {
+  writeFileSync(join(root, 'next.md'), planText('Next'))
+  git('add', 'next.md')
+  git('commit', '--quiet', '-m', 'next plan')
+  await run([build('one.txt', 'feat: one')], { cap: 1 })
+  assert.equal((await run([], { plan: 'next.md' })).status.reason, 'plan-mismatch')
+  await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
+  const next = await run([build('a.txt', 'feat: a'), critic(), build('b.txt', 'feat: b'), critic(), reviewer()], { plan: 'next.md' })
+  assert.equal(next.status.state, 'completed')
+})
