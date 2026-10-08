@@ -1,146 +1,110 @@
 ---
 name: pr
-description: Use when writing or editing a PR description or pull request body, on any host (GitHub, GitLab, Bitbucket).
+description: Use when writing or editing a PR description, on any host (GitHub, GitLab, Bitbucket).
 ---
 
-This skill owns the **structure** of a PR body. `no-ai-slop` owns the **voice**: call the Skill tool with `no-ai-slop` before you write. Use the domain terms from `GLOSSARY.md`.
+This skill owns the **structure** of a PR body. `no-ai-slop` owns the **voice**: call the Skill tool with `no-ai-slop` before you write.
 
-Read the governing spec, plan, or ticket as well as the diff, to tell whether the change is a one-way door.
+The reader did not see the work and has not seen the ticket. Write for that **cold** reader. Read the spec, plan, or ticket as well as the diff, so you know what a revert does not undo.
 
-The repo's own PR template wins (`.github/pull_request_template.md`, `.gitlab/merge_request_templates/`, `docs/pull_request_template.md`, `PULL_REQUEST_TEMPLATE.md`). Fill every section and checkbox it has. Put the Summary visual, the Evidence, and the Merge Danger below into its closest sections, and add a section only for what it has no place for.
+The repo's own PR template wins (`.github/pull_request_template.md`, `.gitlab/merge_request_templates/`, `docs/pull_request_template.md`, `PULL_REQUEST_TEMPLATE.md`). Fill every section and checkbox it has. Put Why, What changed, and Risk below into its closest sections, and add a section only for what it has no place for.
 
 ## Template
 
 ```markdown
-## Summary
+## Why
 
-<ticket or plan link>
+<ticket or plan link, or "No ticket">
 
-<diagram, diff sketch, or tree>
+<what went wrong or what was missing, as the user or caller saw it>
 
-## Evidence
+<the fix, in one sentence>
 
-- **Before:** <screenshot / output / failing test run>
-  **After:** <screenshot / output / passing test run>
+## What changed
 
-## Merge danger
+### Behavior
 
-**Door:** <one-way or two-way>
+<optional visual>
 
-<optional: why>
+- <what a user or caller now sees>
 
-**Blast radius:** <short phrase>
+### Code
 
-<optional: what could break on merge>
+- <where the change lives, for the reviewer who opens it>
+
+### Not changed
+
+- <what you left alone on purpose>
+
+## Risk
+
+- Undo: <"revert is enough", or what a revert does not undo>
+- If this is wrong: <who notices, and what they see>
+- Look closely at: <the one place a reviewer should read slowly, or "nothing special">
 ```
 
-Start the body at the Summary heading.
+Start the body at the Why heading.
 
-## Summary
+## Why
 
-Pick the smallest view that makes the key point clear.
+Open on what the user or caller saw: an error text, a status code, a screen. Use the words they would use, and terms from the repo's `GLOSSARY.md` where it has one. Code names wait for the Code sub-heading.
 
-- Logic or an algorithm as pseudocode:
+## What changed
 
-```text
-on(save)
-  if content is unchanged
-    return cached result
-  write new content
-  return fresh result
+Three sub-headings. Drop any that would be empty.
+
+- Behavior: what now happens, in words a user of the system knows: "an outage now returns 503". When a picture shows it faster than bullets, read [`VISUALS.md`](VISUALS.md) and put one visual above the bullets. A table of cases with Before and After columns fits most behavior changes.
+- Code: where the change lives. This is the only place for class and method names, and only for code the reviewer must open.
+- Not changed: a choice to leave something alone, only when a reviewer would otherwise ask.
+
+## Risk
+
+- Undo: most changes are undone by a revert. A revert does not undo dropped data, sent emails or events, or a deleted resource. It does not undo a published API, package version, or data format that others already use. Name the one that applies.
+- If this is wrong: on one line, name each group whose behavior changes and what they would see. Examples: one button, one endpoint, every caller of a library, layout on mobile.
+- Look closely at: the one file or decision where a mistake would hide.
+
+## Example
+
+```markdown
+## Why
+
+https://tracker.example.com/browse/PROJ-123
+
+Order imports failed with `400 Currency EUR is unknown`, but EUR is valid. The currency service was down, and we reported every failure from it as "unknown currency". Callers saw a client error and did not retry.
+
+Now an outage returns 503 so callers retry, and an unknown currency still returns 400.
+
+## What changed
+
+### Behavior
+
+| Currency service answers | Before | After |
+|---|---|---|
+| 404 | 400 "Currency X is unknown" | same |
+| 5xx or timeout | 400 "Currency X is unknown" | 503 "Could not check currency X", plus a WARN log |
+
+- A caller without channel access now gets 403 before any currency check.
+
+### Code
+
+- `CurrencyClient` maps 5xx and timeouts to 503 and logs a WARN.
+- Control characters are removed from the currency code before it is logged.
+
+### Not changed
+
+- Background jobs. They run after the import is accepted.
+
+## Risk
+
+- Undo: revert is enough.
+- If this is wrong: callers without channel access get 403 instead of a currency error. During a currency outage, import callers get 503 instead of 400.
+- Look closely at: the order of the access and currency checks in `ImportService`.
 ```
 
-- Runtime control flow as a call tree:
+Done when each check holds:
 
-```text
-submitForm
-  createSession
-    persistPrompt
-    launchAgent
-  navigateToSession
-```
-
-- UI structure as a component tree, with the state and module boundaries that matter:
-
-```text
-<SessionPage> (apps/example/src/routes/session.tsx)
-  useSessionEvents()
-  <SessionToolbar>
-    <RunSkillButton> (packages/ui)
-```
-
-- File responsibility or a broad refactor as a shallow file tree:
-
-```text
-src/
-├── commands/       # parses user actions
-├── sessions/       # owns session state
-└── transport/      # sends API requests
-```
-
-- Interaction or data flow between components as Mermaid, on GitHub and GitLab only. Bitbucket shows Mermaid as a raw code block, so there use a call tree or an arrow list (`UI -> Daemon: send prompt`).
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant UI
-    participant Daemon
-    User->>UI: choose command
-    UI->>Daemon: send expanded prompt
-    Daemon-->>UI: stream result
-```
-
-- `diff` when the point is what changes and the surrounding shape already exists. Match the diff to the topic:
-
-```diff
- <SessionPage>
-   useSessionEvents()
-   <SessionToolbar>
-+    <RunSkillButton />
-   <SessionTimeline>
-+    <SkillResultCard />
-```
-
-```diff
- src/
- ├── commands/
-+│   └── show-me.ts       # expands the slash command
- ├── sessions/
--└── transport.ts
-+└── transport/
-+    ├── client.ts
-+    └── stream.ts
-```
-
-```diff
- submitForm
-   createSession
-     persistPrompt
-+    expandSkillMention
-     launchAgent
--  navigateToSession
-+  navigateToSession
-+    subscribeToEvents
-```
-
-- The new code in full, when most of it is new, when cut context would hide ownership or order, or when the reviewer needs the target shape to copy.
-
-Put each visual next to the short text it supports. Keep only the calls, files, props, states, and boundaries the reviewer needs. One visual is usual, two is fine, more is rare.
-
-## Evidence
-
-Show a before and an after from runs you can point to. They come from this session or from output already in the plan, ticket, or PR. Code you read is not evidence.
-
-- Screenshots are best for a visual change, when the environment can take them.
-- Execution next: the exact test that failed and now passes, named or sketched in pseudocode, or the command and its output.
-
-If no run is possible, say what you did not run and why. A change with nothing to run (docs, config text) states that in place of Before and After.
-
-## Merge danger
-
-- **Door.** A two-way door can be walked back: revert the commit and you are where you started. A one-way door is what a revert does not undo, in the repo or outside it: a migration that drops data, sent emails or events, a published API or package version, a contract or data format others start to depend on, a deleted resource.
-- **Blast radius.** What breaks, and for whom, if this is wrong. One button, one service, every consumer of a library, layout on mobile. Name the widest one that is real.
-
-Two-way and small: the reviewer can skim. One-way: say what to read slowly.
-
-Done when every section is filled from this change, Evidence shows real before and after output or a stated reason there is nothing to run, and you ran the `no-ai-slop` pre-send checklist on the body.
+- The body is under 300 words, not counting a visual.
+- After the ticket link, Why opens on what the user or caller saw, names no class or method, and stays under 80 words.
+- What changed has at most 5 bullets across its sub-headings, at most one visual, and class or method names only under Code.
+- Risk has its three lines, and "Look closely at" names one place or says "nothing special".
+- You ran the `no-ai-slop` pre-send checklist on the body.

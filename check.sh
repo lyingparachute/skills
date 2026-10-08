@@ -12,7 +12,7 @@ harness_commands="clear compact check verify help init config fast skills plugin
 
 # Path and url segments that read like an invocation but are not. Add to this
 # list when a new false positive shows up, so the check can stay a hard failure.
-not_skills="tmp api users read source sources exit-codes headroom"
+not_skills="tmp api users read source sources exit-codes headroom orders"
 
 # Backticked labels in routing docs that are not skill references. Filenames,
 # paths, and flags do not match the bare-name pattern below.
