@@ -12,7 +12,7 @@ import { createPlanReader, createRepo } from './runner/repo.mjs'
 import { follow, readStatus, statusLine, storedState } from './runner/status.mjs'
 
 const MS_PER_MINUTE = 60 * 1000
-const OPENCODE_FREE_MODEL = 'opencode/muse-spark-1.3-contributor-free'
+const OPENCODE_FREE_MODEL = 'opencode/deepseek-v4.1-flash-free'
 const OPENCODE_FREE_PROVIDER = 'opencode/'
 const USAGE = `usage: run-plan.mjs --plan PLAN --harness ${HARNESSES.join('|')} --cap N [options]
        run-plan.mjs --status [--json] | --follow
