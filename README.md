@@ -2,7 +2,7 @@
 
 My agent skills + global rules. **Single source of truth** for every coding harness. Each harness's skill dir holds only symlinks back here.
 
-> **Edit here, never in a harness.** Every harness (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode) sees these skills through symlinks into this repo. Change, rename, or delete a skill *in this repo*. Editing it inside a harness's own skill dir writes through the symlink and desyncs the rest, or leaves a dangling link. When writing or editing any skill, follow the `writing-great-skills` skill.
+> **Edit here, never in a harness.** Every harness (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode, Antigravity / Gemini) sees these skills through symlinks into this repo. Change, rename, or delete a skill *in this repo*. Editing it inside a harness's own skill dir writes through the symlink and desyncs the rest, or leaves a dangling link. When writing or editing any skill, follow the `writing-great-skills` skill.
 
 ## Install
 
@@ -10,11 +10,11 @@ My agent skills + global rules. **Single source of truth** for every coding harn
 ./install.sh
 ```
 
-Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode) and `AGENTS.md` into each harness's global-rules path. It is idempotent. Re-run it on a new machine and after **adding, renaming, or removing** a skill. It relinks and prunes stale symlinks so all harnesses stay valid.
+Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode, Antigravity / Gemini) and `AGENTS.md` into each harness's global-rules path. It is idempotent. Re-run it on a new machine and after **adding, renaming, or removing** a skill. It relinks and prunes stale symlinks so all harnesses stay valid.
 
 ## Rules
 
-`AGENTS.md` contains the global agent rules. `install.sh` links it into `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.config/opencode/AGENTS.md`, `~/.grok/AGENTS.md`.
+`AGENTS.md` contains the global agent rules. `install.sh` links it into `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.config/opencode/AGENTS.md`, `~/.grok/AGENTS.md`, `~/.gemini/GEMINI.md`, `~/.gemini/AGENTS.md`.
 
 ## Skills
 

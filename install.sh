@@ -15,6 +15,10 @@ SKILL_DIRS=(
   "$HOME/.cursor/skills"
   "$HOME/.grok/skills"
   "$HOME/.config/opencode/skills"
+  "$HOME/.gemini/antigravity-cli/skills"
+  "$HOME/.gemini/config/skills"
+  "$HOME/.gemini/skills"
+  "$HOME/.gemini/antigravity/skills"
 )
 
 RULES_DESTS=(
@@ -23,6 +27,8 @@ RULES_DESTS=(
   "$HOME/.claude/CLAUDE.md"
   "$HOME/.config/opencode/AGENTS.md"
   "$HOME/.grok/AGENTS.md"
+  "$HOME/.gemini/GEMINI.md"
+  "$HOME/.gemini/AGENTS.md"
 )
 
 pruned=0
@@ -30,6 +36,9 @@ for dir in "${SKILL_DIRS[@]}"; do
   mkdir -p "$dir"
   for skill in "$REPO"/*/; do
     name="$(basename "$skill")"
+    if [ -d "$dir/$name" ] && [ ! -L "$dir/$name" ]; then
+      rm -rf "$dir/$name"
+    fi
     ln -sfn "${skill%/}" "$dir/$name"
   done
   # Validate: drop symlinks whose target no longer exists — a skill that was
