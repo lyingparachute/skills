@@ -1,4 +1,3 @@
-
 # Web Interface Guidelines
 
 Review files for compliance with Web Interface Guidelines.

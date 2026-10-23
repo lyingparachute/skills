@@ -38,12 +38,27 @@ Vendored whole. Upstream is what I could not verify from the files, so fill it i
 
 | Skill | Version declared | Upstream |
 |---|---|---|
-| `impeccable` | 3.9.1 | unknown |
+| `impeccable` | 4.7.0 | <https://github.com/pbakaus/impeccable>, Apache-2.0. The `.agents/skills/impeccable` build at tag `skill-v4.7.0` (commit `aeeb3d8`), taken 2026-10-23. Our additions, which an upgrade must carry over: `reference/details/` (whole folder), `reference/web-interface-guidelines.md`, and one pointer line each in `animate.md`, `craft-floor.md`, `harden.md`, `adapt.md`, `optimize.md`, `polish.md`, and `typeset.md`, two in `audit.md`, and one under `harden.md`'s Assess Hardening Needs heading. `details/surfaces.md` and `details/typography.md` came from our 3.9.1 copy, not upstream (hit-area line aligned to 44px). The 3.9.1 `details/animations.md`, `details/performance.md`, and `details/README.md` were merged into the new `details/` files below; 3.9.1's `interaction-design.md`, `brand.md`, `product.md`, `codex.md`, and the Node `.mjs` scripts were dropped by upstream v4. `web-interface-guidelines.md` fetches <https://github.com/vercel-labs/web-interface-guidelines> `main` at run time, on purpose, to stay current. |
 | `nlm-skill` | 0.5.5 | unknown, wraps <https://github.com/jacob-bd/notebooklm-cli> |
 | `sentry-cli` | 0.31.0 | unknown |
 | `graphify` | see `.graphify_version` | unknown |
 | `stripe-best-practices` | none | unknown |
 | `stripe-projects` | none | unknown |
+
+## Folded into impeccable from emilkowalski/skills
+
+Upstream: <https://github.com/emilkowalski/skills>, MIT, Copyright (c) 2026 Emil Kowalski. Compared 2026-10-23 at commit `2d22863`.
+
+Rewritten, not copied whole, into `impeccable/reference/details/`:
+
+| Upstream skill | Lands in | Notes |
+|---|---|---|
+| `emil-design-eng`, `animate` (+ `RECIPES.md`), `review-animations` (+ `STANDARDS.md`) | `motion.md` | One gate, easing, duration, physical rules, recipes, and review table. Merged with our earlier `details/animations.md`. Exits use ease-out per Emil, not ease-in. The 0.25 icon-swap scale stays as a scoped exception. Stagger is Emil's 30-80ms per item, replacing the old 100ms between content groups. Review keeps the fix order and Block/Approve decision. |
+| `animation-performance` | `motion-performance.md` | Merged with our earlier `details/performance.md`. |
+| `break-ui` (+ `CATALOG.md`) | `worst-case.md`, `worst-case-catalog.md` | Catalog kept close to upstream. |
+| `mobile-native` | `mobile-web.md` | Only what `adapt.md` lacks; safe areas and touch targets stay in `adapt.md`. |
+
+Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`.
 
 ## Ideas borrowed without the file
 
