@@ -17,7 +17,6 @@ SKILL_DIRS=(
   "$HOME/.config/opencode/skills"
   "$HOME/.gemini/antigravity-cli/skills"
   "$HOME/.gemini/config/skills"
-  "$HOME/.gemini/skills"
   "$HOME/.gemini/antigravity/skills"
 )
 
