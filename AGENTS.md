@@ -131,6 +131,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 # Subagents
 
+- **Subagent model = user default.** Never set `model` on Agent, Workflow `agent()`, or delegated tasks unless the user names a model for that work. Subagents never run on Opus: a PreToolUse hook denies an Opus model on Agent, Workflow and T3 tools, and denies `fork` (it inherits the Opus main model).
 - **Subagent = leaf.** A subagent never spawns agents. Need more → return to top with what is missing and what to spawn next.
 
 ## When Top Agent Spawn
