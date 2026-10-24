@@ -23,7 +23,7 @@ Symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Co
 - **Align & plan:** `zoom-out`, `grill-with-docs`, `grilling`, `exec-plan`, `plan-feature`
 - **Build:** `implement` (light), `orchestrate` (heavy, subagent-per-milestone), `tdd`, `diagnosing-bugs`
 - **Design quality:** `codebase-design`, `domain-modeling`, `type-system-discipline`, `improve-codebase`, `impeccable` (owns FE detail refs: motion, motion performance, surfaces, typography, worst-case data, mobile web; plus Web Interface Guidelines)
-- **Verify:** `judo-review`, `receiving-code-review`
+- **Verify:** `judo-review`, `receiving-code-review`, `security-audit`
 - **Knowledge:** `research`, `graphify`, `nlm-skill`
 - **Integrations:** `sentry-cli`, `stripe-best-practices`, `stripe-projects`
 - **Output & comms:** `caveman`, `caveman-commit`, `no-ai-slop`, `pr`, `wait-what`, `handoff`

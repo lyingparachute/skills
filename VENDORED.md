@@ -44,6 +44,7 @@ Vendored whole. Upstream is what I could not verify from the files, so fill it i
 | `graphify` | see `.graphify_version` | unknown |
 | `stripe-best-practices` | none | unknown |
 | `stripe-projects` | none | unknown |
+| `security-audit` | none | <https://github.com/cloudflare/security-audit-skill>, MIT (`LICENSE` copied in). `skills/security-audit` at commit `c1c8a8c`, taken 2026-10-24. Everything but `SKILL.md` is upstream as-is. Our `SKILL.md` changes, which an upgrade must carry over: user-invoked with a human-facing description; pre-merge PR and uncommitted-change review routed to `judo-review` (a diff between refs stays an audit scope); delegated agents use the default model and are leaves; a delegated-prompt block appended to every prompt (launch no agents, which overrides the agent split in `ATTACK-CLASSES.md`; redact secrets and personal data, covering `observed_result`); a Redact evidence principle pointing at that block; the user accepts the full-audit profile, scope, and agent budget before any agent launches, and again when the wave-1 estimate exceeds it; `no-ai-slop` loaded before Phase 6 prose; confirmed findings handed to `exec-plan`. |
 
 ## Folded into impeccable from emilkowalski/skills
 

@@ -22,6 +22,9 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]
 
+**Audit security**
+`security-audit` [user] - hunt vulnerabilities in a repo or named scope. Confirmed findings → `exec-plan`.
+
 **Design / build frontend**
 `impeccable` [model] (owns the detail refs + Web Interface Guidelines audit)
 
@@ -48,6 +51,6 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 
 Model-invoked skills fire from their descriptions. User-invoked skills, including `wait-what`, run only when typed. This file is the map.
 
-- One orchestrator (`implement`, `orchestrate`, `plan-feature`, `improve-codebase`) never runs inside another, with two exceptions: `plan-feature` and `improve-codebase` call each other, and their bodies stop the loop; any skill may run `improve-codebase` once the user agrees.
+- One orchestrator (`implement`, `orchestrate`, `plan-feature`, `improve-codebase`, `security-audit`) never runs inside another, with two exceptions: `plan-feature` and `improve-codebase` call each other, and their bodies stop the loop; any skill may run `improve-codebase` once the user agrees.
 
 - Frontend detail work lives inside `impeccable` (see `impeccable/reference/details/`), not a separate skill.
