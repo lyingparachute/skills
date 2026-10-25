@@ -2,24 +2,24 @@
 
 ### Phase 1: Map the source and plan coverage
 
-The parent initializes `run-metadata.json`, applies the strict pre-reconnaissance budget gate in `SKILL.md`, then creates agent scratch roots and the shared ledger before hunting. If the gate fails, record the incomplete status in metadata and launch no reconnaissance agent. Reconnaissance reads the target and locally available build/configuration state only. It does not contact deployed endpoints, external identity providers, registries, brokers, cloud APIs, or other shared services.
+The parent initializes `run-metadata.json`, applies the strict pre-reconnaissance budget gate in `SKILL.md`, then creates agent scratch roots and the shared ledger before hunting. If the gate fails, record the incomplete status in metadata and launch no reconnaissance agent. Reconnaissance reads source and local configuration; public documentation and advisory lookups are allowed. It does not probe deployments or call external provider control planes. Include the Local execution policy from `SKILL.md` in each assignment.
 
-Launch several `research` agents in parallel. They return structured facts to the parent and do not write files.
+The lead covers the four discovery areas below directly. They are questions to answer, not four required agent calls. Delegate bounded exploration only when repository size or distinct subsystems justify it; combine related areas. Workers return source facts without writing shared files.
 
-**Agent 1a: Product, stack, and local operation**
+**Discovery area 1: Product, stack, and local operation**
 
 ```text
-Read the target at <target>. Do not use network access. Return:
+Read the target at <target>. Return:
 1. Product type, users, operators, and ordinary trust-sensitive actions.
 2. Languages, frameworks, build system, runtimes, and locally visible deployment models.
 3. Repository-relative entry points and subsystem boundaries.
-4. Exact build and test commands that could run offline with local dependencies, their expected write locations, and the target-controlled inputs they process. Do not run them during reconnaissance.
+4. Exact build and test commands that could run on the local development stack, their expected write locations, and the target-controlled inputs they process. Do not run them during reconnaissance.
 5. Comparable software or protocol visible from local documentation and dependencies. If no useful comparison is source-grounded, say so.
 6. Missing local toolchains or runtime facts that limit bounded execution.
 Return only source facts with repository-relative file:line references.
 ```
 
-**Agent 1b: Principals, authority, and controls**
+**Discovery area 2: Principals, authority, and controls**
 
 ```text
 Read all source that establishes identity, authorization, isolation, and privilege. Map:
@@ -32,7 +32,7 @@ Read all source that establishes identity, authorization, isolation, and privile
 Return trust boundaries and control locations with repository-relative file:line references. Do not infer live reachability.
 ```
 
-**Agent 1c: Entry surfaces, copies, and sinks**
+**Discovery area 3: Entry surfaces, copies, and sinks**
 
 ```text
 Inventory every source-visible place external or lower-trust input enters:
@@ -41,20 +41,24 @@ For each surface, follow major transformations, stored or derived copies, and se
 Return repository-relative paths and line numbers. Be complete, but do not execute or send inputs.
 ```
 
-**Agent 1d: Local execution and deployment visibility**
+**Discovery area 4: Local execution and deployment visibility**
 
 ```text
 Read tests, build definitions, manifests, packaging, and maintained environment overlays. Return:
-1. Small offline tests or existing fixtures that could validate trust boundaries with dummy data inside the required OS-enforced sandbox.
-2. Processes that could use an isolated loopback network namespace without external or shared dependencies.
-3. Commands that would fetch dependencies, publish artifacts, contact paid/provider APIs, or affect shared state; mark them prohibited for this run.
+1. Small existing tests or fixtures that validate trust boundaries with test-owned data on the local development stack.
+2. Existing or startable local services, their runtime ownership, and evidence that their databases/storage contain test-owned data only.
+3. Repository-prescribed dependency setup and public advisory/doc reads, separated from publishing, paid/provider calls or shared-state mutations that remain outside local execution authority.
 4. Deployed controls and attachments that source cannot establish and therefore require needs_validation if decisive.
 5. The final active source path for each deployment mode only where the repository selects it deterministically.
-6. Whether the local platform can enforce an empty allowlisted environment, no external network, read-only target/toolchain mounts, scratch-only writes, and explicit CPU, memory, process, file-size, disk, and wall-clock limits. Missing controls block target-controlled execution.
-7. Whether trusted parent-side code can promote predeclared scratch files with path-confined no-follow descriptor traversal, nonblocking regular-file checks, no-follow traversal of every destination parent, exclusive regular-file destination creation, and explicit per-file and cumulative size bounds. Missing promotion controls block use of scratch files as evidence.
+6. Effective runtime integration destinations and whether email, payments, identity,
+   storage, webhooks and analytics use local substitutes or disabled test adapters.
+   Report only variable names and redacted facts, never secret values.
+7. Shared ports, fixture resets, caches and build outputs requiring serialized tests;
+   parent-owned startup/cleanup and ordinary scratch-to-artifact evidence retention.
+   Missing OS sandbox or descriptor-promotion tools do not block local tests.
 ```
 
-Add focused reconnaissance agents for materially distinct deployment modes or subsystems that these four do not map. Do not silently omit them: if the budget gate in `SKILL.md` blocks a focused agent, launch nothing for it, seed the unmapped area as a `deferred` ledger unit with reason `budget_cannot_reserve_critics_and_validation`, and disclose the gap in the report.
+Cover materially distinct deployment modes and subsystems beyond these discovery areas directly or through bounded exploration. If resources prevent that work, seed the unmapped area as a deferred ledger unit with the exact reason and disclose the gap. The absence of a reconnaissance agent is not itself a coverage gap.
 
 ## Prior-run input
 
@@ -75,8 +79,8 @@ State paths and source refs used in `run-metadata.json`. Summarize only the cove
 The parent synthesizes `<output-dir>/architecture.md`, with a hard cap of about 1,000 words. Include:
 
 1. Product, principals, normal authority, and protected resources.
-2. The comparable-software baseline from Agent 1a, when one is source-grounded: what security trade-offs the comparable accepts. Use it to calibrate effort and severity, never to dismiss a demonstrated finding; if the comparable shares a defect pattern that has mattered in practice, that strengthens the finding. Omit this line when no meaningful comparable exists.
-3. Tech stack, source-visible deployment paths, and offline build/test limits.
+2. The comparable-software baseline from discovery area 1, when one is source-grounded: what security trade-offs the comparable accepts. Use it to calibrate effort and severity, never to dismiss a demonstrated finding; if the comparable shares a defect pattern that has mattered in practice, that strengthens the finding. Omit this line when no meaningful comparable exists.
+3. Tech stack, source-visible deployment paths, and local build/test prerequisites and verified runtime configuration.
 4. Entry surfaces and the important source-to-sink or lifecycle paths.
 5. Trust boundaries and the strongest source-visible control on each.
 6. Repository-relative starting paths.
@@ -91,7 +95,7 @@ Do not select a companion file merely because the language or dependency name ap
 
 The parent writes `<output-dir>/coverage-ledger.json` as a top-level JSON array. Derive one unit for every material combination of entry surface, trust boundary, subsystem, and applicable ordinary or companion attack class at the granularity the run profile sets (`quick` uses one all-in-scope subsystem identity; `deep` adds lifecycle modes). For a scoped run, seed in-scope surfaces for assignment and retain discovered excluded surfaces as `out_of_scope` units so later full runs can turn them into current work.
 
-Each dimension has a human label and a stable source-derived value in `canonical_refs`. Use the same canonical reference for the same source object across runs even if its display label changes. Suitable references include a repository-relative entry path plus exported scope, a route or message identity defined in source, the source control that defines a boundary, a repository package path, and the exact attack-class block reference. A block reference is `FILE.md#` plus the exact class name as written in bold or as a heading in that file — a stable identifier matched against the file text, not a rendered HTML anchor. For companion section blocks, use the heading text before any parenthetical qualifier (for example `Core discipline`). Do not derive references by lowercasing or slugging display labels.
+Each dimension has a human label and a stable source-derived value in `canonical_refs`. Use the same canonical reference for the same source object across runs even if its display label changes. Suitable references include a repository-relative entry path plus exported scope, a route or message identity defined in source, the source control that defines a boundary, a repository package path, and the exact attack-class block reference. A block reference is `FILE.md#` plus the exact class name as written in bold or as a heading in that file - a stable identifier matched against the file text, not a rendered HTML anchor. For companion section blocks, use the heading text before any parenthetical qualifier (for example `Core discipline`). Do not derive references by lowercasing or slugging display labels.
 
 Derive `coverage_id` without lossy slugs:
 
@@ -149,8 +153,12 @@ Enforce this state table exactly:
 | `covered` | canonical owner | both nonempty | empty | empty |
 | `candidate` | canonical owner | both nonempty | nonempty | optional |
 
-Canonical agent IDs match `^[a-z0-9][a-z0-9_-]{0,63}$` and are not Windows device names. Lowercase is mandatory, so one ledger cannot contain case-fold aliases. The unit `agent_id` records the assignment owner. Every check records its own `agent_id` and nonempty `reviewed_paths`; the unit-level `reviewed_paths` is exactly their union. A source-only check uses `artifact: null`. A local check requires a regular file promoted only by trusted parent-side code under exactly `agents/<check.agent_id>/artifacts/`. This lets hunter and verifier checks coexist in one unit. Scratch paths, output-root files, symlinks, special files, and another check owner's artifacts are not evidence.
+Canonical agent IDs match `^[a-z0-9][a-z0-9_-]{0,63}$` and are not Windows device names. Lowercase is mandatory, so one ledger cannot contain case-fold aliases. The unit `agent_id` records the assignment owner. Every check records its own `agent_id` and nonempty `reviewed_paths`; the unit-level `reviewed_paths` is exactly their union. A source-only check uses `artifact: null`. A local check requires a reviewed, redacted regular file retained by the parent under exactly `agents/<check.agent_id>/artifacts/`. This lets hunter and verifier checks coexist in one unit. Scratch paths, output-root files, symlinks, special files, and another check owner's artifacts are not evidence.
 
 The ledger is the coverage claim. An architecture summary, agent count, or generic "auth reviewed" sentence is not coverage evidence. Phase 2 closes units only from the paths and checks in a hunter's structured result.
 
 Run `node <skill-dir>/validate-coverage-ledger.cjs <output-dir>/coverage-ledger.json` after seeding, after every parent update, and before Phase 6. The validator rejects input beyond 5 MiB, 64 nesting levels, 10,000 units, 1,000 entries in a nested collection, or 500,000 traversed values, and caps reported validation errors at 100. In practice the 5 MiB byte limit holds roughly 2,000-5,000 realistic units, so it binds before the 10,000-unit cap. Fix every error before assigning work or making a coverage claim.
+
+## Source revisions during repairs
+
+The parent maps every unit, check, and archived attempt to an immutable source manifest in `source-index.json`, including units without findings. Record repaired batches and source changes using the Requested remediation contract in `SKILL.md`. Historical attempts keep their original source associations. Reopened live units contain only new-source evidence; unaffected coverage retains its old association until explicit source/configuration/condition equivalence supports carrying its claim forward.

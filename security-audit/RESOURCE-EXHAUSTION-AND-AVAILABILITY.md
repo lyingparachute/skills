@@ -11,7 +11,7 @@ Use `MEMORY-SAFETY-AND-BINARY.md` for memory-integrity defects and `PROTOCOLS-RP
 ```
 - Require an input-to-cost path, a missing effective bound, and impact on another user, shared service, safety function, or operator-owned spend. Self-limiting work in the requester's own process is not a service vulnerability.
 - A missing rate limit is not enough. Check body/message/file caps, concurrency, queues, deadlines, database constraints, upstream gateways, and per-tenant quotas before calling a path unbounded.
-- Do not run stress, saturation, or production tests. Use asymptotic analysis, small boundary fixtures, mocked paid calls, strict local resource limits, and deterministic cancellation tests.
+- Do not run stress, saturation, or production tests. Use asymptotic analysis, small boundary fixtures, mocked paid calls, bounded inputs/request counts/concurrency, timeouts, and deterministic cancellation tests. Use a dedicated disposable local process; OS isolation and resource-control tools are not required.
 - State attacker cost, service work, persistence, scope, and recovery. One bounded input with superlinear or persistent shared effect is materially different from sustained volume.
 - Use `confirmed` for source-visible bounds failures demonstrated safely. Use `needs_validation` when upstream caps, deployed topology, autoscaling, paid quota, or recovery behavior is outside the repository.
 ```
@@ -67,7 +67,7 @@ A restart, restore, fallback, or cleanup path rebuilds unbounded state, ignores 
 
 - Build an input-to-resource table: earliest accepted size/cardinality, work before auth, downstream fan-out, persistence, shared pool, limit and cleanup owner, recovery.
 - Compare aggregate limits with per-object limits. Ten thousand valid one-byte items may evade a per-message cap while exhausting tenant-wide or process-wide state.
-- Validate only in an isolated fixture with strict CPU/memory/time limits and small growth points. Mock external and paid calls and stop once the missing bound or cancellation is observable.
+- Validate in a dedicated disposable local process using small growth points, bounded input sizes/request counts/concurrency, and a timeout. Follow the Local execution policy in `SKILL.md`; OS isolation and resource-control tools are not prerequisites. Mock external and paid calls and stop once the missing bound or cancellation is observable.
 
 ## Validation rules (apply before reporting ANY finding here)
 

@@ -78,7 +78,7 @@ Notification, widget, shortcut, share sheet, biometric prompt, or deferred opera
 
 - Enumerate every process, app component, local endpoint, URI scheme, file association, webview origin, and helper. Record OS identity, runtime privilege, caller, and callable operation.
 - Read final packaging inputs: merged manifest, entitlements, installer rules, native-messaging registration, protocol handlers, and ACL creation. Source declarations can be overwritten downstream.
-- Validate with dummy profiles and non-sensitive local fixtures on an isolated machine/emulator. Do not interact with other users' apps, credentials, or production services.
+- Validate with disposable test profiles and non-sensitive local fixtures or an emulator, following the Local execution policy in `SKILL.md`. A separate machine is not required. Do not interact with other users' apps, credentials, or production services.
 
 ## Validation rules (apply before reporting ANY finding here)
 
