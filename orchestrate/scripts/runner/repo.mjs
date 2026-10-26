@@ -90,18 +90,18 @@ export function createRepo(cwd, workspace, { signal } = {}) {
       return file
     },
 
-    async runGate(commands, label, { advisory = [], files = [] } = {}) {
+    async runGate(commands, label, files = []) {
       const file = join(workspace, `gate-${label}.log`)
       const runs = []
       for (const command of commands) {
         const skipped = isScoped(command) && !files.length
         const run = skipped ? { code: 0, output: '(skipped: no changed files)' } : await sh(scopedTo(command, files), cwd, signal)
-        runs.push({ command, advisory: advisory.includes(command), ...run })
+        runs.push({ command, ...run })
       }
-      const heading = r => `$ ${scopedTo(r.command, files)}${r.advisory ? '  (advisory: red before this change)' : ''}\nexit ${r.code}`
+      const heading = r => `$ ${scopedTo(r.command, files)}\nexit ${r.code}`
       writeFileSync(file, runs.map(r => `${heading(r)}\n${r.output}`).join('\n'))
-      const failed = runs.filter(r => r.code !== 0 && !r.advisory).map(r => r.command)
-      return { green: failed.length === 0, file, failed, anyRed: runs.filter(r => r.code !== 0).map(r => r.command) }
+      const failed = runs.filter(r => r.code !== 0).map(r => r.command)
+      return { green: failed.length === 0, file, failed }
     },
 
     writeJson(name, value) {

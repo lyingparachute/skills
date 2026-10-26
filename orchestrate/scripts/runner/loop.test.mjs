@@ -197,11 +197,25 @@ test('a {files} gate gets odd file names intact and logs a skip when nothing cha
 
 test('a state file from an older runner still loads and resumes', async () => {
   await run([build('one.txt', 'feat: one')], { cap: 1 })
-  const { knownRed, ...older } = stateOnDisk()
-  const { redBefore, ...olderWork } = older.inProgress
-  writeFileSync(join(workspace, 'run-state.json'), JSON.stringify({ ...older, inProgress: olderWork }))
+  const current = stateOnDisk()
+  const older = { ...current, knownRed: [], inProgress: { ...current.inProgress, redBefore: [] } }
+  writeFileSync(join(workspace, 'run-state.json'), JSON.stringify(older))
   const resumed = await run([critic(), build('two.txt', 'feat: two'), critic(), reviewer()])
   assert.equal(resumed.status.state, 'completed')
+  assert.ok(!('knownRed' in stateOnDisk()))
+  assert.ok(!('redBefore' in stateOnDisk().inProgress))
+})
+
+test('a review an older runner passed with an advisory red gate is redone before the commit', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  const current = stateOnDisk()
+  assert.equal(current.inProgress.review, 'clean')
+  writeFileSync(join(workspace, 'run-state.json'), JSON.stringify({ ...current, knownRed: [LINT], inProgress: { ...current.inProgress, redBefore: [LINT] } }))
+  writeFileSync(join(root, 'one.txt'), 'lint-error')
+  const resumed = await run([critic(), step('fixer', report('fix: lint', ['test -f one.txt']), write('one.txt', 'clean')), critic(), build('two.txt', 'feat: two'), critic(), reviewer()], { gates: [LINT] })
+  assert.equal(resumed.status.state, 'completed')
+  assert.deepEqual(roles(resumed.calls).slice(0, 3), ['critic', 'fixer', 'critic'])
+  assert.doesNotMatch(git('show', 'HEAD~1:one.txt'), /lint-error/)
 })
 
 test('--human-gate with an id the plan does not have is refused', async () => {
@@ -265,20 +279,32 @@ test('a gate command this change turned red becomes a finding for the fixer', as
   assert.match(readFileSync(pathOf(calls[2].prompt, 'fixes-m1-r1\\.json'), 'utf8'), /gate red: ! grep -qs lint-error/)
 })
 
-test('a gate command that was red before the milestone is advisory and never blocks', async () => {
+test('a gate command red before a milestone stops the run until it is fixed in its own commit', async () => {
   writeFileSync(join(root, 'two.txt'), 'lint-error')
   git('add', 'two.txt')
   git('commit', '--quiet', '-m', 'old lint debt')
-  const { status, calls } = await run([
-    build('one.txt', 'feat: one'), critic(),
-    step('implementer', report('feat: two', ['test -f two.txt']), write('two.txt', 'lint-error, still')), critic(),
-    reviewer(),
-  ], { gates: [LINT] })
-  assert.equal(status.state, 'completed')
-  assert.ok(!roles(calls).includes('fixer'))
-  const gateLog = readFileSync(pathOf(calls[1].prompt, 'gate-m1-r1\\.log'), 'utf8')
-  assert.match(gateLog, /\(advisory: red before this change\)\nexit 1/)
-  assert.match(calls[1].prompt, /advisory there was already red before this change/)
+  const blocked = await run([], { gates: [LINT] })
+  assert.equal(blocked.status.reason, 'baseline-red')
+  assert.match(blocked.status.detail, /before milestone 1: ! grep -qs lint-error .* already red, see \S+gate-m1-baseline\.log; fix it in its own commit/)
+  assert.deepEqual(subjects(), ['old lint debt', 'plan'])
+
+  writeFileSync(join(root, 'two.txt'), 'clean')
+  git('commit', '--quiet', '-am', 'Remove lint error from two.txt')
+  const resumed = await run([build('one.txt', 'feat: one'), critic(), build('two.txt', 'feat: two'), critic(), reviewer()], { gates: [LINT] })
+  assert.equal(resumed.status.state, 'completed')
+  assert.deepEqual(subjects(), ['feat: two', 'feat: one', 'Remove lint error from two.txt', 'old lint debt', 'plan'])
+})
+
+test('a gate that turns red after a committed milestone stops the next one before any agent runs', async () => {
+  await run([build('one.txt', 'feat: one'), critic()], { humanGates: ['1'] })
+  await run([], { humanGates: ['1'], accepted: ['1'] })
+  writeFileSync(join(root, 'two.txt'), 'lint-error')
+  git('add', 'two.txt')
+  git('commit', '--quiet', '-m', 'lint debt from elsewhere')
+  const blocked = await run([], { gates: [LINT] })
+  assert.equal(blocked.status.reason, 'baseline-red')
+  assert.match(blocked.status.detail, /^before milestone 2: /)
+  assert.deepEqual(blocked.calls, [])
 })
 
 test('an implementer that names no test gets a finding for the fixer', async () => {

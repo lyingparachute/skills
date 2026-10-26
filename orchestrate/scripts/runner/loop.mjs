@@ -6,7 +6,7 @@ export const ROLES = ['implementer', 'critic', 'triage', 'fixer', 'reviewer']
 export const CLOSE_OUT = 'close-out'
 const CLOSE_OUT_MESSAGE = 'fix: close-out review findings'
 const DOC_FILE = /\.md$/
-const IDLE = { id: '', base: '', startHead: '', brief: '', message: '', tests: [], redBefore: [], review: '', committing: false }
+const IDLE = { id: '', base: '', startHead: '', brief: '', message: '', tests: [], review: '', committing: false }
 
 const stopped = (reason, detail) => ({ stop: { reason, detail } })
 const unique = list => [...new Set(list)]
@@ -21,7 +21,6 @@ const freshState = (plan, head) => ({
   agentsUsed: 0,
   completed: [],
   testCommands: [],
-  knownRed: [],
   pendingBase: '',
   handChanged: [],
   inProgress: IDLE,
@@ -33,7 +32,7 @@ export async function runPlan(ctx) {
   const { repo, planReader } = ctx
   const fresh = freshState(planReader.plan, repo.head())
   const stored = repo.loadState(fresh)
-  const loaded = { ...fresh, ...stored, inProgress: { ...IDLE, ...stored.inProgress } }
+  const loaded = withoutAdvisoryGate({ ...fresh, ...stored, inProgress: { ...IDLE, ...stored.inProgress } })
   const state = loaded.plan === planReader.plan || loaded.status.state !== 'completed' ? loaded : fresh
   const isNew = stored === fresh || state === fresh
   let outcome
@@ -46,6 +45,13 @@ export async function runPlan(ctx) {
   ctx.journal.emit({ type: 'end', ...state.status })
   repo.saveState(state)
   return state.status
+}
+
+// Older runners let a gate red before the milestone pass as advisory. A review that passed under that waiver
+// is redone, so the gate that now blocks runs again before anything is committed.
+function withoutAdvisoryGate({ knownRed, ...state }) {
+  const { redBefore = [], ...inProgress } = state.inProgress
+  return { ...state, inProgress: redBefore.length ? { ...inProgress, review: '' } : inProgress }
 }
 
 async function guarded(ctx, state, isNew) {
@@ -101,8 +107,9 @@ async function advance(ctx, state, id) {
 
 const landed = (repo, work) => repo.parent() === work.startHead && repo.subject() === subject(work.message)
 
-const dirtyTree = id => stopped('dirty-tree', `uncommitted changes that belong to no milestone in progress, before milestone ${id}: discard them`)
+const dirtyTree = id => stopped('dirty-tree', `uncommitted changes that belong to no milestone in progress, before milestone ${id}: commit them in their own commit, or discard them`)
 const committedByHand = id => stopped('committed-by-hand', `milestone ${id} has commits the runner did not make: check them, then rerun with --accept ${id}`)
+const baselineRed = (id, baseline) => stopped('baseline-red', `before milestone ${id}: ${baseline.failed.join(', ')} already red, see ${baseline.file}; fix it in its own commit (Boy Scout rule), then rerun`)
 const awaitHuman = id => stopped('human-gate', `milestone ${id} is built and reviewed; a person must check it, then rerun with --accept ${id}`)
 
 async function startMilestone(ctx, state, id) {
@@ -112,10 +119,9 @@ async function startMilestone(ctx, state, id) {
     const startHead = repo.head()
     ctx.journal.emit({ type: 'gate-start', label: `m${id}-baseline` })
     const baseline = await repo.runGate(ctx.gates, `m${id}-baseline`)
-    const redBefore = baseline.anyRed
-    ctx.journal.emit({ type: 'baseline', label: `m${id}-baseline`, red: redBefore, file: baseline.file })
-    state.knownRed = redBefore
-    state.inProgress = { ...IDLE, id, base: state.pendingBase || startHead, startHead, brief: ctx.planReader.brief(id), redBefore }
+    ctx.journal.emit({ type: 'baseline', label: `m${id}-baseline`, red: baseline.failed, file: baseline.file })
+    if (!baseline.green) return baselineRed(id, baseline)
+    state.inProgress = { ...IDLE, id, base: state.pendingBase || startHead, startHead, brief: ctx.planReader.brief(id) }
     repo.saveState(state)
   }
   const prompt = implementerPrompt({ plan: ctx.planReader.plan, id, brief: state.inProgress.brief, resuming })
@@ -136,8 +142,8 @@ async function reviewMilestone(ctx, state, id) {
   const changed = repo.stagedPaths(base)
   const light = !ctx.reviewDocs && changed.every(path => DOC_FILE.test(path))
   const checked = light
-    ? await gateOnly(ctx, `m${id}-light`, tests, { advisory: state.inProgress.redBefore, base })
-    : await reviewRounds(ctx, state, { base, role: 'critic', label: `m${id}`, unit: `${ctx.planReader.plan}#${id}`, tests, brief, advisory: state.inProgress.redBefore })
+    ? await gateOnly(ctx, `m${id}-light`, tests, base)
+    : await reviewRounds(ctx, state, { base, role: 'critic', label: `m${id}`, unit: `${ctx.planReader.plan}#${id}`, tests, brief })
   if (checked.stop) return checked
   state.inProgress = { ...state.inProgress, review: light ? 'light' : 'clean' }
   repo.saveState(state)
@@ -145,8 +151,7 @@ async function reviewMilestone(ctx, state, id) {
 }
 
 async function acceptMilestone(ctx, state, id) {
-  const { redBefore: advisory, base } = state.inProgress
-  const checked = await gateOnly(ctx, `m${id}-accepted`, unique([...state.testCommands, ...state.inProgress.tests]), { advisory, base })
+  const checked = await gateOnly(ctx, `m${id}-accepted`, unique([...state.testCommands, ...state.inProgress.tests]), state.inProgress.base)
   if (checked.stop) return checked
   const review = state.inProgress.review === 'clean' ? 'human-checked' : 'accepted'
   state.inProgress = { ...state.inProgress, review }
@@ -159,15 +164,15 @@ function noteUnreviewed(ctx, state, id) {
   ctx.repo.ledger(`| ${cell(`${ctx.planReader.plan}#${id}`)} | --accept commits ${state.handChanged.length} file(s) changed outside the runner, with no critic | a person checked the tree | ${cell(state.handChanged.join(' '))} | committed unreviewed |`)
 }
 
-async function gateOnly(ctx, label, tests, { advisory, base }) {
+async function gateOnly(ctx, label, tests, base) {
   ctx.repo.stageAll()
-  const result = await gate(ctx, unique([...ctx.gates, ...tests]), label, { advisory, files: ctx.repo.changedFiles(base) })
+  const result = await gate(ctx, unique([...ctx.gates, ...tests]), label, ctx.repo.changedFiles(base))
   return result.green ? {} : stopped('gate-red', `${label}: ${result.failed.join(', ')} failed, see ${result.file}`)
 }
 
-async function gate(ctx, commands, label, options) {
+async function gate(ctx, commands, label, files) {
   ctx.journal.emit({ type: 'gate-start', label })
-  const result = await ctx.repo.runGate(commands, label, options)
+  const result = await ctx.repo.runGate(commands, label, files)
   ctx.repo.stageAll()
   ctx.journal.emit({ type: 'gate', label, green: result.green, failed: result.failed, file: result.file })
   return result
@@ -212,13 +217,13 @@ async function closeOut(ctx, state) {
   ctx.journal.emit({ type: 'close-out-start' })
   let message = CLOSE_OUT_MESSAGE
   if (ctx.accepted.includes(CLOSE_OUT)) {
-    const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands, { advisory: state.knownRed, base: state.base0 })
+    const checked = await gateOnly(ctx, `${CLOSE_OUT}-accepted`, state.testCommands, state.base0)
     if (checked.stop) return checked
     noteUnreviewed(ctx, state, CLOSE_OUT)
   } else {
     const reviewed = await reviewRounds(ctx, state, {
       base: state.base0, role: 'reviewer', label: CLOSE_OUT, unit: `${ctx.planReader.plan}#${CLOSE_OUT}`,
-      tests: state.testCommands, brief: ctx.planReader.plan, closing: true, advisory: state.knownRed,
+      tests: state.testCommands, brief: ctx.planReader.plan, closing: true,
     })
     if (reviewed.stop) return reviewed
     message = reviewed.fixMessage || CLOSE_OUT_MESSAGE
@@ -233,7 +238,7 @@ async function closeOut(ctx, state) {
   return {}
 }
 
-async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief, advisory, closing = false }) {
+async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief, closing = false }) {
   const { repo } = ctx
   let named = tests
   let fixMessage = ''
@@ -241,7 +246,7 @@ async function reviewRounds(ctx, state, { base, role, label, unit, tests, brief,
     const tag = `${label}-r${round}`
     repo.stageAll()
     const review = repo.writePackage(base, tag, state.handChanged)
-    const gated = await gate(ctx, unique([...ctx.gates, ...named]), tag, { advisory, files: repo.changedFiles(base) })
+    const gated = await gate(ctx, unique([...ctx.gates, ...named]), tag, repo.changedFiles(base))
     const critique = await dispatch(ctx, state, role, criticPrompt({ brief, review, gate: gated }), REVIEW, tag)
     if (critique.stop) return critique
     const findings = [
