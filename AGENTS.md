@@ -40,7 +40,7 @@
 - **No null returns.** Use typed absence - empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union - instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
 - **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → recommend one and state the trade-off. Ask only when the choice is the user's to make: product behavior, public API shape, scope, or cost. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt.
-- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" - later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it. Done = plan met, tested, reviewed; "80% working" = 0% shipped.
+- **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" - later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it.
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
@@ -76,12 +76,11 @@
 
 ## Planning
 
-- **Plan before code.** Every non-trivial task starts with a written plan from the `exec-plan` skill. It owns what a plan contains, its template and format check, and its critic gate. Explore requirements and constraints before committing to a plan.
-- **Bite-sized tasks.** One task = one concern = one verifiable outcome. No monolithic prompts.
+- **Plan before code.** Every non-trivial task starts with a written plan from the `exec-plan` skill. It owns what a plan contains, its template and format check, and its critic gate, which passes before any execution, no exception. Explore requirements and constraints before committing to a plan. One task = one concern = one verifiable outcome.
 
 ## Testing & Delivery
 
-- **Done = verified output, not assertion.** Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, in its own commit, even outside the files you touched.
+- **Done = plan met, reviewed, and verified output, not assertion.** "80% working" = 0% shipped. Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, in its own commit, even outside the files you touched.
 - **Commit message = one line**, per `caveman-commit`. Details go in the PR description.
 - **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
@@ -118,7 +117,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## "Review the plan" / "critique the plan"
 
-- Use /exec-plan (On-demand critique): a skeptical senior-engineer verdict in three sections (should this be done, what we get, what to improve), with every claim verified against code.
+- Use `exec-plan` (On-demand critique).
 
 # Context Boundaries
 
@@ -133,13 +132,13 @@ User phrases below activate specific workflows. Follow the protocol literally.
 ## When Top Agent Spawn
 
 - **Broad exploration or large tool output → spawn.** Searches across many modules, long research, big logs. Top reads the summary, not the raw dump. A few targeted reads or greps stay in the top agent.
-- **Large work = slices, one per subagent.** One slice = one concern, one verifiable outcome. A medium feature that fits one context stays in one agent. Splitting it too fine loses shared context and breaks the seams.
+- **Large work = slices, one per subagent.** One slice = one concern, one verifiable outcome. No monolithic prompts. A medium feature that fits one context stays in one agent. Splitting it too fine loses shared context and breaks the seams.
 - **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. No serial when no dependency.
-- **Plan exists → critic subagent review plan before execute.** No exception for non-trivial plan.
 - **Non-trivial slice done → critic subagent review code before next slice.**
 
 ## Critic Subagent Rules
 
-- **Critic = fresh context, never the writer.** Same agent self-approve = theatre.
-- **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief, the rounds, and the output format.
-- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed, or dismissed in writing with a reason. A `followup-execplan` finding becomes a tracked plan, never "later".
+- **Critic = fresh context, never the writer.** Same agent self-approve = theatre. Brief = attack, not validate; a close call gets called out.
+- **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief and the output format.
+- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed, or dismissed in writing with a reason. A `followup-execplan` finding becomes a tracked plan, never "later". Quality bar: no code smell, no debt created, no debt left behind.
+- **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 → report to user, never a third loop.

@@ -13,7 +13,7 @@ Call the Skill tool with `tdd` and use it where possible, at pre-agreed seams.
 
 Run typechecking and single test files regularly. The full suite is CI's job.
 
-Once done, call the Skill tool with `judo-review` to review the work: it hunts the code-judo moves that leave the codebase more enterprise-level than before. Handle its findings by calling the Skill tool with `receiving-code-review`, which sets what you fix now and what becomes a followup plan. Accept no weak code.
+Once done, dispatch a fresh critic subagent that loads `judo-review` to review the work; you never review your own code: it hunts the code-judo moves that leave the codebase more enterprise-level than before. Handle its findings by calling the Skill tool with `receiving-code-review`, which sets what you fix now and what becomes a followup plan. Accept no weak code.
 
 Commit to the current branch once per milestone: exactly one commit after the milestone is complete and verified, holding its slices, tests, docs and review fixes; amend it until work on the next milestone begins. When the last milestone is committed, set the plan's `Status` to landed with the commit sha and tick its DoD boxes.
 

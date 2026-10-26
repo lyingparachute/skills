@@ -1,6 +1,6 @@
 ---
 name: improve-codebase
-description: Use when the user asks to audit a whole codebase or path for smells and friction, or when plan-feature needs a prep sweep of a feature's path. Many subagents.
+description: "Use when the user asks to audit a whole codebase or path for smells and friction, or when plan-feature needs a prep sweep of a feature's path."
 ---
 
 # Improve Codebase

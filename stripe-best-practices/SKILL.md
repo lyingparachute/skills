@@ -1,16 +1,6 @@
 ---
 name: stripe-best-practices
-description: >-
-  Guides Stripe integration decisions - API selection (Checkout Sessions vs
-  PaymentIntents), Connect platform setup (Accounts v2, controller properties),
-  billing/subscriptions, Treasury financial accounts, integration surfaces
-  (Checkout, Payment Element), migrating from deprecated Stripe APIs, and
-  security best practices (API key management, restricted keys, webhooks,
-  OAuth). Use when building, modifying, or reviewing any Stripe integration -
-  including accepting payments, building marketplaces, integrating Stripe,
-  processing payments, setting up subscriptions, creating connected accounts, or
-  implementing secure key handling.
-
+description: "Use when building, changing, or reviewing a Stripe integration: accepting payments, Checkout Sessions vs PaymentIntents, Connect and connected accounts, billing and subscriptions, Treasury, Payment Element, moving off deprecated Stripe APIs, or API keys, webhooks, and OAuth security."
 ---
 
 Latest Stripe API version: **2026-06-24.dahlia**. Always use the latest API version and SDK unless the user specifies otherwise.

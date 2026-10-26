@@ -1,9 +1,6 @@
 ---
 name: caveman-commit
-description: >
-  Ultra-compressed commit message generator. One-line commit messages, no body. Use when user says
-  "write a commit", "commit message", "generate commit", "/commit", or invokes /caveman-commit.
-  Auto-triggers when staging changes.
+description: "Use when writing a commit message, when staging changes to commit, or when the user says \"commit\" or \"/commit\"."
 ---
 
 A commit message is one line: one plain sentence that says what the code does now. No body, no trailers. Details belong in the PR description.

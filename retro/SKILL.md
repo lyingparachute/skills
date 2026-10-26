@@ -1,6 +1,6 @@
 ---
 name: retro
-description: Retrospective on a coding session - suggest changes to the agent's environment, not the code.
+description: "Use at the end of a session to find what in the agent's setup (rules, skills, hooks) should change, not the code."
 disable-model-invocation: true
 ---
 

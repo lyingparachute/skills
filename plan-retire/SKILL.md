@@ -1,6 +1,6 @@
 ---
 name: plan-retire
-description: Use when a plan is done with - every milestone implemented and approved by a critic subagent, merged, abandoned, superseded, or invalidated - or when the plans dir accumulates stale entries, to preserve durable decisions and delete the plan per retention policy.
+description: "Use when a plan is done with - every milestone implemented and approved by a critic subagent, merged, abandoned, superseded, or invalidated - or when the plans dir collects stale entries."
 ---
 
 # Plan Retire

@@ -36,6 +36,8 @@ Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-ques
 
 Vendored whole. Upstream is what I could not verify from the files, so fill it in when you next touch one.
 
+Every `description` below was rewritten to say when to use the skill, not what it does. An upgrade keeps our description.
+
 | Skill | Version declared | Upstream |
 |---|---|---|
 | `impeccable` | 4.7.0 | <https://github.com/pbakaus/impeccable>, Apache-2.0. The `.agents/skills/impeccable` build at tag `skill-v4.7.0` (commit `aeeb3d8`), taken 2026-10-23. Our additions, which an upgrade must carry over: `reference/details/` (whole folder), `reference/web-interface-guidelines.md`, and one pointer line each in `animate.md`, `craft-floor.md`, `harden.md`, `adapt.md`, `optimize.md`, `polish.md`, and `typeset.md`, two in `audit.md`, and one under `harden.md`'s Assess Hardening Needs heading. `details/surfaces.md` and `details/typography.md` came from our 3.9.1 copy, not upstream (hit-area line aligned to 44px). The 3.9.1 `details/animations.md`, `details/performance.md`, and `details/README.md` were merged into the new `details/` files below; 3.9.1's `interaction-design.md`, `brand.md`, `product.md`, `codex.md`, and the Node `.mjs` scripts were dropped by upstream v4. `web-interface-guidelines.md` fetches <https://github.com/vercel-labs/web-interface-guidelines> `main` at run time, on purpose, to stay current. |

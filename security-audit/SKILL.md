@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Audit a repository or named scope for security issues using local tests, and fix verified findings in batches when requested.
+description: "Use when you want a repository or named scope audited for security issues with local tests, and verified findings fixed in batches."
 disable-model-invocation: true
 ---
 

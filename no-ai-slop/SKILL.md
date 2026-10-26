@@ -1,6 +1,6 @@
 ---
 name: no-ai-slop
-description: Always applies to prose a person will read - replies to the user, tickets, design/sign-off docs, PR descriptions, review comments, in-repo docs. Strips AI slop, keeps it plain and human, pitches detail at the reader's altitude. Load before writing more than a line of prose, or on "clean up this ticket", "draft the PR description", "make this sound less like AI". Not for code, code comments, or commit messages (use caveman-commit).
+description: "Use before writing more than a line of prose a person will read: replies, tickets, design docs, PR descriptions, review comments, in-repo docs. Also use when the user asks to clean up text or make it sound less like AI. Not for code, code comments, or commit messages (use caveman-commit)."
 ---
 
 # No AI Slop

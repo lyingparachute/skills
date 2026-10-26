@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Execute an accepted ExecPlan, or a feature folder of them, to enterprise level through a deterministic runner that works in any harness - a fresh implementer agent per milestone, a code-judo critic per code milestone, a green gate before every commit, and a whole-branch review at the end. Use for hard/high-token plans where single-agent implement isn't enough.
+description: "Use when an accepted plan, or a feature folder of plans, is too big or risky for one agent, and you want a fresh agent and a critic per milestone."
 disable-model-invocation: true
 ---
 

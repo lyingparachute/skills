@@ -1,6 +1,6 @@
 ---
 name: exec-plan
-description: Use when authoring, folding into, or revising an execution plan, or deciding whether a plan is ready to execute - including writing acceptance criteria, scoping milestones, and running plan-critic review rounds.
+description: "Use when writing, folding into, or revising an execution plan, writing its acceptance criteria or milestones, running plan-critic rounds, deciding whether a plan is ready, or when the user asks to review or critique a plan."
 ---
 
 # Exec Plan

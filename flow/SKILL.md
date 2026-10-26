@@ -1,6 +1,6 @@
 ---
 name: flow
-description: Router over my skill set - pick the right skill and the chain it belongs to.
+description: "Use when you are not sure which skill fits a task, or which chain of skills to run."
 disable-model-invocation: true
 ---
 

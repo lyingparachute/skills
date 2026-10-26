@@ -1,6 +1,6 @@
 ---
 name: wait-what
-description: Re-explain the last message in plain language and the project's own vocabulary, when it did not land.
+description: "Use when the last message did not land and you want it re-explained in plain language and the project's own vocabulary."
 disable-model-invocation: true
 ---
 
