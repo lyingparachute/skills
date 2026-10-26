@@ -138,10 +138,13 @@ test('a reviewing role retries with its prompt unchanged', async () => {
   assert.doesNotMatch(callsTo('opencode')[1], /cut off by a provider error/)
 })
 
+// Wide enough that a slow first exec of the fake CLI (antivirus scanning a new script) is not read as a stall.
+const STALL_IDLE_MS = 10000
+
 const stallOnce = (harness, reply) => {
   fakeCli(harness, `if [ -f "${dir}/stalled" ]; then ${printing(reply)}; else sleep 30; fi`)
   const marked = async ms => { waits.push(ms); writeFileSync(join(dir, 'stalled'), '') }
-  return agentFor(harness, { idleMs: 3000, sleep: marked })('critic', 'go', ANSWER)
+  return agentFor(harness, { idleMs: STALL_IDLE_MS, sleep: marked })('critic', 'go', ANSWER)
 }
 
 test('claude: a silent worker is killed as a stall and retried', async () => {
