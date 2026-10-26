@@ -10,7 +10,7 @@ Reference for the Standards axis. Three rules govern every entry below:
 
 Twelve shapes from Fowler's catalogue, each with the move that resolves it. Where a move here overlaps Preferred Remedies in `SKILL.md`, that section is authoritative on the remedy; this list is what you scan the diff for. Scan the whole list against the touched flow, past the first hit.
 
-- **Mysterious or misleading name** - a name that needs the body read to be understood, or that predicts the wrong result. Check every new or renamed name against the `Name = what it returns or changes` rule in `AGENTS.md`. Rename until the call site reads on its own.
+- **Mysterious or misleading name** - a name that needs the body read to be understood, or that predicts the wrong result. Check every new or renamed name against the `Method name = what it returns or changes` rule in `AGENTS.md`. Rename until the call site reads on its own.
 - **Duplicated code** - the same logic in two places. Extract it, or move it to the layer that owns the concept.
 - **Feature envy** - a function reaching repeatedly into another object's data. Move it next to the data it uses.
 - **Data clumps** - the same group of parameters or fields travelling together. Give the group a type.
