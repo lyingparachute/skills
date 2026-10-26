@@ -95,14 +95,16 @@ A green test run is not approval, and neither is behavior that seems correct. Tr
 - Tests are missing, circular, over-mocked, or fail to cover the behavior being changed.
 - The review found named smells but no judo move, on a diff where a better shape is visible.
 
-Where the best fix is real but too large for this change, the finding becomes a `followup-execplan`, never a waiver.
+A large fix is still a fix in this change, never a waiver. [Disposition](#disposition) decides when it may wait.
 
 ## Disposition
 
-Every finding gets one disposition:
+Every finding gets one disposition. Fix now is the default; a follow-up plan is the last resort.
 
-- `merge-blocking`: local enough to fix in this change; blocks approval.
-- `followup-execplan`: real structural issue, but too large for this change. Describe the move, why, and rough blast radius. Reported every time, and does not block approval by itself.
+- `merge-blocking`: the fix belongs in this change. This is every finding's starting disposition, including fixes that span several files or reshape a module the diff touches. Blocks approval.
+- `followup-execplan`: the user chose to defer it. Describe the move, why, and rough blast radius. Reported every time, and does not block approval by itself.
+
+Size alone never makes a finding `followup-execplan`. When a fix looks large, keep it `merge-blocking`, state its blast radius, and ask the user: fix it now in this change, or track it as a follow-up plan? Only their answer moves it to `followup-execplan`. As a reviewer subagent, leave it `merge-blocking` with the blast radius stated; the top agent asks.
 
 ## Preferred Remedies
 
@@ -123,7 +125,7 @@ Push for remedies that reduce the number of concepts a reader must hold. Reach f
 
 When the real problem is structural, a rename or a tidier version of the same messy idea is not a remedy; name the structural move instead.
 
-When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - the remedy is not a review comment. Raise it as a `followup-execplan` and offer to run the `improve-codebase` skill on the affected path, with the move as a suspect, and run it only after the user agrees.
+When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - name the move and ask the user to fix it now. Offer to run the `improve-codebase` skill on the affected path, with the move as a suspect, and run it only after the user agrees. It becomes a `followup-execplan` only when the user defers it.
 
 ## Output
 
