@@ -67,7 +67,7 @@ One plan, no feature folder → `<plans-dir>/<date>-<topic>.md`.
 ## Critic Gate (mandatory: min 1, max 2 rounds)
 
 1. Dispatch a skeptical fresh-context plan-critic (never the writer). Brief: **attack, don't validate**, across two passes.
-   - **Rigor pass:** verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps.
+   - **Rigor pass:** verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps, missing edge cases, hidden coupling, untested assumptions, and steps that over-constrain the implementer.
    - **Architecture pass:** first call the Skill tool with `zoom-out` to map the planned change against existing modules, callers, and domain concepts, then call it with `judo-review` and apply the code-judo lens to the plan's Locked decisions and boundaries. Hunt the design-judo move to make before code exists: a layer or abstraction the plan invents that could be deleted, a concern the plan puts in the wrong module, bespoke logic duplicating a canonical domain concept, or a state model that will spawn conditionals. Prefer the design that feels inevitable in hindsight and holds the fewest concepts (deep-module vocabulary: /codebase-design).
 
    Typed findings only: `{location, issue, severity, suggested fix}`.
@@ -93,7 +93,7 @@ Once `Status: ready`, the baton passes out of this skill (a fold sends it back t
 
 ## Red Flags
 
-- "The plan is simple, one critic pass is enough" - two rounds, no exception.
+- "The plan is simple, it needs no critic" - one fresh round minimum, no exception.
 - Writing implementation code/pseudo-code into milestones - that's the implementer's job.
 - A DoD bullet with no command - untestable = not done-able.
 - "This is new work, it needs its own plan" - search for a fold target first.

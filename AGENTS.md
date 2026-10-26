@@ -22,8 +22,8 @@
 **Always drop.** Filler (sure/certainly/happy to/basically/just/really/actually), hedging, pleasantries. Active voice, short synonyms.
 **Off.** "stop caveman" / "normal mode".
 
-**Plain English, always. Non-native reader test.** Every user-facing sentence - caveman or prose, chat reply or artifact - is understood on one pass by a competent engineer whose first language is not English. Short common words, one idea per sentence, active voice: "use" not "utilize", "help" not "facilitate", "about" not "regarding", "to" not "in order to". Cut on sight: fancy synonyms, abstract metaphor nouns (substrate, wedge, vector, nexus, surface, flywheel, north star), fancy ways to say "is" ("serves as", "boasts", "not just X but Y"), sycophancy ("great question", "you're absolutely right"), em-dash (use `-`). Precise technical terms stay, ornament goes. Plain does not mean vague.
-**`no-ai-slop` = voice rule for all user-facing text**, not only shared-system artifacts. Load it before writing more than a line of prose. It holds at every caveman intensity: compression changes how much you say, never whether the tells are allowed.
+**Plain English, always.** Every user-facing sentence - caveman or prose, reply or artifact - passes the non-native reader test: understood on one pass, short common words, one idea per sentence, active voice. Precise technical terms stay, ornament goes. No em-dash (use `-`), no praise, no filler.
+**`no-ai-slop` owns the full list of tells.** Load it before writing more than a line of prose. It holds at every caveman intensity: compression changes how much you say, never whether the tells are allowed.
 
 # Global Engineering Rules
 
@@ -53,7 +53,7 @@
 
 ## Architecture
 
-- **Small, composable units.** Functions/methods do one thing. Modules own one concern. No god objects, no god services.
+- **Deep modules, one concern.** Small interface, much behavior behind it. Functions do one thing. No god objects, no god services. Vocabulary and the deletion test: `codebase-design`.
 - **Explicit over implicit.** Constructor injection / explicit parameters over hidden globals, inline singletons, magic framework injection that obscures data flow.
 - **Boundaries are contracts.** Module/service boundary = public API. One validation layer at the boundary, no scattered guards inside business logic.
 - **Dependencies point inward.** Infra and interface layers depend on domain core. Domain depends on nothing outside itself. Domain never imports infrastructure types.
@@ -67,14 +67,12 @@
 - **Refactor in small, safe steps.** Each step leaves code working. Rewrite and refactor never in the same commit.
 - **Evolutionary design.** Design for next concrete requirement, not every hypothetical future. Extend when needed.
 - **Screaming architecture.** Package/module = business purpose, not technical layer. Top-level: `Ordering`, `Billing`, `Inventory` - never `Controllers`, `Services`, `Repositories`.
-- **Value objects over primitives.** Wrap domain concepts in typed value objects, not raw strings/ints. Kills primitive obsession; validity enforced at construction.
 - **Ubiquitous language.** Same terms in code, tests, domain conversations. Code says X, business says Y → code is wrong.
 
 ## API & Error Handling
 
 - **Backward compatibility by default.** Additions safe; removals/renames break. Version or deprecate before removing.
 - **Typed error models, not exceptions for control flow.** Exceptions = unexpected system failure. Business outcomes never live as exceptions.
-- **Exhaustive error surfaces.** Every error state representable in the type system, handled explicitly by caller.
 
 ## Planning
 
@@ -84,7 +82,7 @@
 ## Testing & Delivery
 
 - **Done = verified output, not assertion.** Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, in its own commit, even outside the files you touched.
-- **Commit message = one line.** Subject only: no body, no bullet list, no trailers. Details go in the PR description. Format per `caveman-commit`.
+- **Commit message = one line**, per `caveman-commit`. Details go in the PR description.
 - **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
 - **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
@@ -94,7 +92,7 @@
 
 ## Types & Frontend
 
-- **Strict types everywhere.** No `any`, no type assertions without a comment explaining why. Discriminated unions over boolean flags for state.
+- **Strict types everywhere.** No `any`, no cast without a comment saying why. Discriminated unions over boolean flags. Domain concepts as value objects or branded types, validated at construction. Every error state in the type system, matched exhaustively. Details: `type-system-discipline`.
 
 # Workflow Triggers
 
@@ -102,15 +100,12 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## "Implement the plan" / "execute the plan"
 
-- Use `/implement` (one agent, the light path) or `/orchestrate` (fresh subagent per milestone, critic, gate; for big or risky plans). The skill owns the protocol.
+- Use the `implement` skill (one agent, the light path) or `/orchestrate` (fresh subagent per milestone, critic, gate; for big or risky plans). The skill owns the protocol.
 
 ## "Review the implementation" / "verify the implementation"
 
-- Do NOT trust implementer's summary. Verify against the plan directly.
-- For each Scope item + DoD bullet: locate the change, run the specified verify command (include actual output), flag missing/partial/deviation with `file:line`.
-- Also check: out-of-scope respected, no new compile errors or test regressions.
+- Do NOT trust implementer's summary. Run `judo-review` with the plan as its Spec source: every Scope item and DoD bullet gets `PASS|FAIL|UNCLEAR` with its verify command's actual output.
 - Findings → correction workflow: IMPLEMENT (one subagent per task) → VALIDATE (separate subagent per task) → REPORT.
-- Output: `PASS|FAIL|UNCLEAR: <bullet> - <evidence>`. Final verdict: `APPROVE | CHANGES REQUESTED | BLOCKED`.
 
 ## "Check your work" / "verify changes" / "self-verify"
 
@@ -145,11 +140,6 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## Critic Subagent Rules
 
-- **Critic = fresh context, never the writer.** Agent that wrote plan no review plan. Agent that wrote code no review code. Same agent self-approve = theatre.
-- **Critic brief = attack, not validate.** Prompt frames as "find what's wrong", not "is this right?". Bias toward call out, not approve.
-- **Critic for plan look for:** missing edge cases, hidden coupling, untested assumption, scope creep, premature abstraction, violated boundary, vague acceptance criteria, step-by-step over-constrain.
-- **Critic for code look for:** all `## Code Quality` violations, all `## Architecture` violations, missing tests, mock abuse, framework fight, type weakness (`any`, unexplained assertion), boundary leak.
-- **Critic output = typed findings.** List of `{location, issue, severity, suggested fix}`. No prose verdict. No "looks good overall". Concrete or nothing.
-- **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → one round 2 to verify fixes. Leftovers after round 2 → report to user, never third loop.
-- **Findings block progress.** Plan no execute until findings resolved or top write explicit dismissal with reason. Slice no merge until findings fixed. Quality bar = no code smell, no debt created, no debt left behind.
-- **Critic discipline:** fresh-context critic reviews findings; implementer addresses with evidence, not performative agreement.
+- **Critic = fresh context, never the writer.** Same agent self-approve = theatre.
+- **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief, the rounds, and the output format.
+- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed, or dismissed in writing with a reason. A `followup-execplan` finding becomes a tracked plan, never "later".
