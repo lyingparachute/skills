@@ -1,6 +1,6 @@
 ---
 name: diagnosing-bugs
-description: "Use when the user says \"diagnose\" or \"debug this\", or reports something broken, throwing, failing, or slow."
+description: "Use when the user says \"diagnose\" or \"debug this\", reports something broken, throwing, failing, or slow, or points at a ticket, screenshot, or log that shows wrong behavior."
 ---
 
 # Diagnosing Bugs
@@ -14,6 +14,16 @@ When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear me
 Diagnosis pastes raw output, and raw output carries secrets. The global redaction rule applies to every log, trace, and payload you surface here. On top of it: build the repro command against environment variables, never literal credentials, so the loop stays shareable.
 
 ## Phase 1 - Build a feedback loop
+
+### Start from the real failure
+
+Before you read code for a cause, collect the evidence of the failure the user saw:
+
+- **Logs of the failing run** - the run, request, or job id, then its logs and traces (Loki, Grafana, Sentry, CI), around the time it failed.
+- **The exact input** - the file, payload, or account the user used. Ask for it when you cannot reach it; a sample from the repo is not that input.
+- **The code that ran** - the repo and service that serve the failing path, and the version deployed where it failed (`main`, a tag, a release), not only your branch.
+
+Every claim about the cause cites one of these. A cause you cannot tie to them is a hypothesis: say so, and say what evidence would confirm it.
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug - one that goes red on _this_ bug - you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
