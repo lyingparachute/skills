@@ -13,7 +13,7 @@ Before milestone 1, run the repo's lint, type check, and the tests of the area t
 
 Call the Skill tool with `tdd` and use it where possible, at pre-agreed seams.
 
-Run typechecking and single test files regularly. The full suite is CI's job.
+Run typechecking and single test files regularly. If the repo defines a full local CI mirror and a moment for it, follow the repo; otherwise the full suite is CI's job.
 
 Hand independent slices to parallel subagents, all dispatched in one message; you keep the seams between them.
 

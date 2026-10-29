@@ -87,7 +87,7 @@
 - **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
 - **Test coverage is non-negotiable.** Every feature ships with tests. Untested code = unfinished code.
 - **Integration tests at boundaries over unit tests with mocks.** Test service in isolation against real/stubbed ports. Over-mocked unit tests = false confidence, break on refactors.
-- **Single focused tests over full-suite runs.** Narrowest test that covers the change. Full suite = CI's job.
+- **Single focused tests over full-suite runs.** Narrowest test that covers the change. Run focused checks while working. If the repo defines a full local CI mirror and a moment for it, follow the repo; otherwise the full suite is CI's job.
 
 ## Types & Frontend
 
