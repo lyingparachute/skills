@@ -38,13 +38,13 @@ Dispatch one read-only mapper subagent. Given a map from the caller, it skips th
 
 The mapper cuts the scope into **areas** of about 5,000 lines each. Tests belong to the area of the code they test. In a monorepo, an area never spans two packages. When the scope is the repo root, add one **repo area** for everything outside source: root config, CI, build and release scripts, docs. List the **cross-area calls**: calls from one area into another through its public interface or shared state, with the files on both sides.
 
-More than 12 areas → ask the user to narrow the scope or approve hunting in waves of 12. A prep sweep hunts in waves of 12 without asking.
+Hunt every area; the user accepts the cost of a full sweep.
 
 Done when every file in scope belongs to exactly one area, and generated, vendored, and build-output paths are listed as excluded.
 
 ### 2. Hunt
 
-Dispatch in parallel:
+Dispatch in parallel, in waves no larger than the harness's limit on parallel subagents, counting every hunter kind below. A dispatch refused for that limit goes into the next wave:
 - one hunter per area
 - one cross-area hunter per 20 cross-area calls, in the last wave
 - one hunter per suspect, which turns the suspect into a full finding or reports it not found
