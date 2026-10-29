@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Use when pinning down domain terms or a ubiquitous language, before adding to or editing a durable doc (ADR, GLOSSARY.md, README, AGENTS.md or CLAUDE.md, docs/ pages, runbooks), or when another skill needs the domain model.
+description: Use when pinning down domain terms or a ubiquitous language, before adding to or editing a durable doc (ADR, GLOSSARY.md, README, AGENTS.md or CLAUDE.md, docs/ pages, runbooks), when asked where a decision record or a term belongs, or when another skill needs the domain model.
 ---
 
 # Domain Modeling
@@ -83,4 +83,4 @@ When a term is resolved and survives the contest, update `GLOSSARY.md` right the
 
 ### Write ADRs sparingly
 
-A new ADR passes the test in [ADR-FORMAT.md](./ADR-FORMAT.md) and the contest.
+An ADR is 1-3 sentences: the constraint, the decision, and why. It stays true while the code moves, so it names no class, file, test, route, or plan, and carries no history or status story. A new ADR also passes the test in [ADR-FORMAT.md](./ADR-FORMAT.md) and the contest; read that file before you write or edit one.
