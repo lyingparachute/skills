@@ -77,7 +77,7 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 5. **Canonical ownership**: prefer existing utilities, helpers, packages, services, and domain concepts over bespoke near-duplicates or logic in the wrong layer.
 6. **Over-engineering**: hunt thin wrappers, identity abstractions, pass-through helpers, speculative flexibility, generic magic, unnecessary dependencies, and hand-rolled standard-library/native behavior.
 7. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious.
-8. **File size and decomposition**: if a change pushes a file from below 400 lines to above 400 lines, or from below 400 lines toward an 800-line sprawl, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
+8. **File size and decomposition**: the limit is the repo's own file-size check when it has one (a lint `max-lines` rule, a file-size check script, a rule in its agent rules), else 400 lines. If a change pushes a file from below the limit to above it, or toward twice the limit, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
 
 ## Approval Bar
 
@@ -86,7 +86,7 @@ A green test run is not approval, and neither is behavior that seems correct. Tr
 - A plausible simplification would delete a meaningful category of complexity.
 - A task in the batch misses its stated requirement, misunderstands it, or ships behavior beyond it.
 - The diff preserves incidental complexity while only moving it around.
-- A file crosses from below 400 lines to above 400 lines due to the change.
+- A file crosses the file-size limit of pass 8, or moves toward twice it, due to the change.
 - New branching makes an existing flow more tangled.
 - Feature checks leak across shared/general-purpose code.
 - A wrapper, abstraction, dependency, generic mechanism, cast, or optional contract adds indirection without making the model clearer.
