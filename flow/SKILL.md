@@ -14,10 +14,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 `grill-with-docs` [user] → `exec-plan` [model] → `implement` [model] (drives `tdd`, `judo-review`) → `caveman-commit` [model] → `pr` [model] (when it goes up as a PR) → `plan-retire` [model]
 
 **Plan a feature, model decides**
-`plan-feature` [model] (drives `zoom-out`, `improve-codebase` as prep sweep, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement` or `orchestrate`
-
-**Execute a hard plan (heavy / high-token)**
-`orchestrate` [user] - a runner that works in any harness: fresh implementer per milestone + a code-judo critic per code milestone, a green gate before each commit, whole-branch review, then `plan-retire`; walks a feature folder in build order. The multi-agent alternative to `implement` for plans too big or risky for one agent.
+`plan-feature` [model] (drives `zoom-out`, `improve-codebase` as prep sweep, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement`
 
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test) → `judo-review` [model]
@@ -29,7 +26,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 `impeccable` [model] (owns the detail refs + Web Interface Guidelines audit)
 
 **Clean up a codebase**
-`improve-codebase` [model] (drives `graphify` output or `zoom-out`, `judo-review`, `exec-plan`, `plan-feature` for user-facing picks), then hand its plans to `implement` or `orchestrate`
+`improve-codebase` [model] (drives `graphify` output or `zoom-out`, `judo-review`, `exec-plan`, `plan-feature` for user-facing picks), then hand its plans to `implement`
 
 **Research a question**
 `research` [model] (web primary sources) · `nlm-skill` [model] (NotebookLM) · `graphify` [model] (this codebase)
@@ -51,6 +48,6 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 
 Model-invoked skills fire from their descriptions. User-invoked skills, including `wait-what`, run only when typed. This file is the map.
 
-- One orchestrator (`implement`, `orchestrate`, `plan-feature`, `improve-codebase`, `security-audit`) never runs inside another, with two exceptions: `plan-feature` and `improve-codebase` call each other, and their bodies stop the loop; any skill may run `improve-codebase` once the user agrees.
+- One orchestrator (`implement`, `plan-feature`, `improve-codebase`, `security-audit`) never runs inside another, with two exceptions: `plan-feature` and `improve-codebase` call each other, and their bodies stop the loop; any skill may run `improve-codebase` once the user agrees.
 
 - Frontend detail work lives inside `impeccable` (see `impeccable/reference/details/`), not a separate skill.

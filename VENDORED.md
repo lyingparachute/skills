@@ -30,7 +30,7 @@ These started as his and have since diverged, some heavily. Diff against that co
 | `flow` | His `ask-matt`, renamed and rebuilt around our chains. |
 | `exec-plan` | Ours, replacing his `to-spec` and `to-tickets`. Its rules and `TEMPLATE.md` absorb what was kept from OpenAI's ExecPlan spec (`PLANS.md`, removed). |
 
-Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`orchestrate` covers it), `chief-of-staff`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
+Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`implement` covers it), `chief-of-staff`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
 
 ## Third-party skills
 
@@ -69,4 +69,3 @@ Compared Cursor's `pstack` (<https://github.com/cursor/plugins>, `pstack/skills`
 
 We borrowed the slop-tell catalogue for `no-ai-slop`.
 The Fowler smell baseline and comment rules informed `judo-review/STANDARDS.md`.
-The decision-trail discipline informed `orchestrate`. No skill was copied.

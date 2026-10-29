@@ -56,7 +56,7 @@ A branch is a **batch**: it usually carries several unrelated small tasks the au
 
 A diff can be clean code that builds the wrong thing, or the right feature built badly. Merging the two lists, or re-ranking one against the other, hides exactly that. Each axis keeps its own findings.
 
-Three ways this runs. As the top agent reviewing directly, dispatch one subagent per axis in parallel, each with its own scope and sources. As the top agent handing the whole review to one critic, that critic becomes the reviewer subagent and splits the axes itself, which is how `orchestrate` uses it. Already a reviewer subagent: run both axes yourself, in sequence, outputs still separate. A subagent never spawns.
+Three ways this runs. As the top agent reviewing directly, dispatch one subagent per axis in parallel, each with its own scope and sources. As the top agent handing the whole review to one critic, that critic becomes the reviewer subagent and splits the axes itself. Already a reviewer subagent: run both axes yourself, in sequence, outputs still separate. A subagent never spawns.
 
 ## Baseline
 

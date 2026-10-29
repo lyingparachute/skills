@@ -85,7 +85,7 @@ Done when every story maps to a plan in the story-to-plan table, every taken pre
 
 Render every index section as one self-contained HTML page for a person: one card per decision, the stories with their walkthroughs, the build order as an inline SVG or HTML diagram, and Questions for you at the end. Inline CSS with a `prefers-color-scheme` block, and no external requests. Write it to `${TMPDIR:-/tmp}/plan-feature-<feature>-<YYYYMMDD-HHMM>.html` and open it (`open` on macOS, `xdg-open` on Linux, `start ""` in a Windows shell).
 
-Done when the page shows the same decision ids, assumption ids, stories, roadmap rows, prep candidates, and questions as the index. Show the user the page path, the index path, and the question count. Then name `implement` or `orchestrate` as the next command, after the user confirms the assumptions the first plan rests on.
+Done when the page shows the same decision ids, assumption ids, stories, roadmap rows, prep candidates, and questions as the index. Show the user the page path, the index path, and the question count. Then name `implement` as the next command, after the user confirms the assumptions the first plan rests on.
 
 ## Update run
 

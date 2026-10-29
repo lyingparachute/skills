@@ -99,7 +99,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 ## "Implement the plan" / "execute the plan"
 
-- Use the `implement` skill (one agent, the light path) or `/orchestrate` (fresh subagent per milestone, critic, gate; for big or risky plans). The skill owns the protocol.
+- Use the `implement` skill. It owns the protocol.
 
 ## "Review the implementation" / "verify the implementation"
 
