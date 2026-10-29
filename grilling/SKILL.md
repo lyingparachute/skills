@@ -1,6 +1,6 @@
 ---
 name: grilling
-description: "Use when the user wants a plan, decision, or idea stress-tested before building, or says \"grill me\" or similar."
+description: "Use when the user wants a plan, decision, or idea stress-tested before building, or says \"grill me\", \"ask me questions\", or \"take conscious decisions\"."
 ---
 
 Interview the user relentlessly about every aspect of it until you reach a shared understanding. Map it as a **design tree**: every decision branches into the decisions that hang off it. Walk the whole tree - surface every decision that needs their input; leave nothing silently assumed.
