@@ -44,7 +44,7 @@
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
-- **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values.
+- **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values. Need a secret from the user? Call `request_secret` when T3 Code offers it; without it, ask the user to set an environment variable, never to paste the value in chat.
 - **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable - naked `.skip` = debt.
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
@@ -93,6 +93,15 @@
 
 - **Strict types everywhere.** No `any`, no cast without a comment saying why. Discriminated unions over boolean flags. Domain concepts as value objects or branded types, validated at construction. Every error state in the type system, matched exhaustively. Details: `type-system-discipline`.
 
+# T3 Code Tools
+
+When T3 Code's tools are loaded, they replace your own for the same job:
+
+- **Browser and app checks** → `preview_*` (open, navigate, resize, appearance, act, snapshot, recording); native apps → `device_*`. Details: `implement/UI.md`.
+- **Secrets** → `request_secret`.
+- **Waiting on background work** → `t3_background_wait`, never `sleep` or polling loops.
+- **Charts and visuals in chat** → `html_preview`, then `html_render`.
+
 # Workflow Triggers
 
 User phrases below activate specific workflows. Follow the protocol literally.
@@ -140,5 +149,5 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 - **Critic = fresh context, never the writer.** Same agent self-approve = theatre. Brief = attack, not validate; a close call gets called out.
 - **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief and the output format.
-- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed, or dismissed in writing with a reason. A `followup-execplan` finding becomes a tracked plan, never "later". Quality bar: no code smell, no debt created, no debt left behind.
+- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed. Dismissal is only for a finding that fails confirmation against the source, or one the user dismisses, each written with its reason; a confirmed finding is fixed, or deferred to a tracked plan when the user chooses. Quality bar: no code smell, no debt created, no debt left behind.
 - **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 → report to user, never a third loop.
