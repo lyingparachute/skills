@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Use when writing or editing a PR description, on any host (GitHub, GitLab, Bitbucket).
+description: Use when writing or editing a PR description, opening a PR, or updating a PR branch (rebase, force push), on any host (GitHub, GitLab, Bitbucket).
 ---
 
 This skill owns the **structure** of a PR body. `no-ai-slop` owns the **voice**: call the Skill tool with `no-ai-slop` before you write.
@@ -85,3 +85,18 @@ Done when each check holds:
 - Each Risk bullet says what goes wrong, who notices, and what they see. A reader cannot get that bullet from the table.
 - A revert bullet appears only when a revert leaves damage behind.
 - You ran the `no-ai-slop` pre-send checklist on the body.
+
+## Opening the PR
+
+Run the gate the repo's PR template or rules name (a `ci:local` script, a checklist command) before you open the PR, and tick only the boxes whose command you saw pass. A gate that is red or cannot finish here: fix it, or tell the user and leave the PR unopened.
+
+## Updating the branch
+
+"Rebase and force push" means onto the PR's own base branch, which is often not `main`. Read the base from the host (`gh pr view --json baseRefName`, or the PR's destination branch on GitLab or Bitbucket), then:
+
+1. `git fetch`, then rebase onto `origin/<base>` and resolve conflicts.
+2. Run lint, type check, and the tests of the modules the rebase touched.
+3. Push with `git push --force-with-lease=<branch>:<sha>`, where `<sha>` is `origin/<branch>` as it was before your rebase.
+4. Check the branch is 0 commits behind `origin/<base>`. The base moved while you worked → repeat from step 1.
+
+Done when the push landed and the branch is 0 behind its base.
