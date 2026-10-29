@@ -8,7 +8,10 @@
 #   4. Every milestone heading sits under the "## Milestones" section.
 #   5. No other milestone form is left: no other milestone-like heading
 #      anywhere, and inside "## Milestones" no paragraph or list item that
-#      opens like a milestone ("Milestone 2:", "**M2.**", "M2,", "1. ...").
+#      opens like a milestone ("Milestone 2:", "**Milestone 2 Title**",
+#      "**M2.**", "M2,", "1. ..."). A bare "Milestone 2 Title" line counts
+#      before the first heading, and after it only for a number no heading has
+#      opened yet; "Milestone 1 needs X." under a later heading is prose.
 #   6. With --since REF: at most 3% of the words in the file at REF are gone,
 #      so a format conversion cannot silently drop content.
 # Fenced code blocks are ignored.
@@ -22,13 +25,24 @@ from collections import Counter
 
 MILESTONE_HEADING = re.compile(r"^### Milestone (\d+) - \S.*$")
 OLD_FORM = re.compile(
-    r"^(\*\*)?(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])([ \t]*[-.:,)–—]|\*\*|[ \t]+\w)"
+    r"^(\*\*)?(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])([ \t]*[-.:,)–—]|\*\*)"
+    r"|^\*\*(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])[ \t]+\w"
     r"|^(\*\*)?M\d+[a-z]?(\*\*)?[.:,)]"
     r"|^#{1,6} +(Milestone|M|Task|Step|Phase) ?\d"
 )
+BARE_FORM = re.compile(r"^(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])[ \t]+\w")
 FENCE = re.compile(r"^[ \t]*(```|~~~)")
 WORD = re.compile(r"[A-Za-z0-9_]+")
 MAX_REMOVED_SHARE = 0.03
+
+
+def is_unopened_bare_milestone(bare, nums):
+    if not bare:
+        return False
+    if not nums:
+        return True
+    number = re.match(r"M?(\d+)", bare.group(2))
+    return bare.group(1) == "Milestone" and number is not None and int(number.group(1)) > max(nums)
 
 
 def words(text):
@@ -60,6 +74,8 @@ def format_errors(text):
                 errs.append(f"{i}: milestone heading outside '## Milestones'")
             continue
         if OLD_FORM.match(line) and (in_milestones or line.startswith("#")):
+            errs.append(f"{i}: other milestone form: {line[:70]}")
+        if in_milestones and is_unopened_bare_milestone(BARE_FORM.match(line), nums):
             errs.append(f"{i}: other milestone form: {line[:70]}")
         if in_milestones and not nums and re.match(r"^\d+\.\s", line):
             errs.append(f"{i}: numbered list item where milestone headings belong: {line[:60]}")
