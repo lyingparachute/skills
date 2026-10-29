@@ -15,13 +15,13 @@ Call the Skill tool with `tdd` and use it where possible, at pre-agreed seams.
 
 Run typechecking and single test files regularly. If the repo defines a full local CI mirror and a moment for it, follow the repo; otherwise the full suite is CI's job.
 
-Hand independent slices to parallel subagents, all dispatched in one message; you keep the seams between them.
+Hand independent slices to parallel subagents, all dispatched in one message; you keep the seams between them. When the repo requires it, each parallel writer works in its own worktree; read-only helpers share the checkout.
 
 A milestone that changes UI follows [UI.md](UI.md); read it before the first UI edit.
 
 After each milestone, dispatch a fresh critic subagent that loads `judo-review` to review it; you never review your own code: it hunts the code-judo moves that leave the codebase more enterprise-level than before. Handle its findings by calling the Skill tool with `receiving-code-review`, which sets what you fix now and what becomes a followup plan. Accept no weak code.
 
-Commit to the current branch, with no worktree unless the user asks, once per milestone, writing the message with `caveman-commit`: exactly one commit after the milestone is complete and verified, holding its slices, tests, docs and review fixes; amend it until work on the next milestone begins. In the last milestone's commit, also tick the plan's DoD boxes.
+Commit to the current branch once per milestone; worktrees only for parallel writers when the repo requires them, or when the user asks. Write the message with `caveman-commit`: exactly one commit after the milestone is complete and verified, holding its slices, tests, docs and review fixes; amend it until work on the next milestone begins. In the last milestone's commit, also tick the plan's DoD boxes.
 
 After the last milestone, a fresh critic subagent runs `judo-review` on the whole branch diff, from the parent of milestone 1's commit; its fixes amend the last milestone's commit. When it returns `APPROVE`, call the Skill tool with `plan-retire` to close out the plan - extract durable decisions, delete the rest. Merge is not required.
 

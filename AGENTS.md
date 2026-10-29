@@ -142,7 +142,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 
 - **Broad exploration or large tool output → spawn.** Searches across many modules, long research, big logs. Top reads the summary, not the raw dump. A few targeted reads or greps stay in the top agent.
 - **Large work = slices, one per subagent.** One slice = one concern, one verifiable outcome. No monolithic prompts. A medium feature that fits one context stays in one agent. Splitting it too fine loses shared context and breaks the seams.
-- **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. No serial when no dependency.
+- **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. Parallelize independent work; parallel writers follow the repo's worktree rule.
 - **Non-trivial slice done → critic subagent review code before next slice.**
 
 ## Critic Subagent Rules
