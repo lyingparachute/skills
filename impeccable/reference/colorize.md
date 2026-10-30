@@ -84,3 +84,5 @@ When invoked from live mode, every variant declares a `color-amount` parameter. 
 ```
 
 Add at most two variant-specific parameters, such as palette, temperature, or tint behavior. Follow [live.md](live.md)'s parameter contract.
+
+Exact surface steps, text levels, state colors, semantic colors, dark-mode values, and text-over-image rules live in [details/color-values.md](details/color-values.md).

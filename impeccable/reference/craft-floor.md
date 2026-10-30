@@ -48,3 +48,5 @@ Surface habits:
 - Claims and configuration come from supplied truth; label illustrative values honestly. Naming a concept and then ironizing it is not a claim.
 
 The floor holds the mechanics; it never picks the direction. With every check green, spend the page on the committed world, and when torn between refined and committed, commit.
+
+Exact patterns and values by surface and topic (landing pages, app UI, charts, interaction timing, gestures, color, surfaces, type, mobile, macOS, AI interfaces) are indexed in [details/README.md](details/README.md); load the matching file before building that surface.

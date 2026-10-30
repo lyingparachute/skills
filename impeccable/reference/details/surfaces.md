@@ -116,7 +116,7 @@ Some icons have uneven visual weight. The best fix is adjusting the SVG directly
 
 ## Shadows Instead of Borders
 
-For **buttons, cards, and containers** that use a border for depth or elevation, prefer replacing it with a subtle `box-shadow`. Shadows adapt to any background since they use transparency; solid borders don't. This also helps when using images or multiple colors as backgrounds - solid border colors don't work well on backgrounds other than the ones they were designed for.
+For **buttons, cards, and containers** that use a border to show depth or elevation, prefer a `box-shadow` token instead, unless the card is flat and static (see Declared Elevation and Shadows). Shadows adapt to any background since they use transparency; solid borders don't. This also helps when using images or multiple colors as backgrounds - solid border colors don't work well on backgrounds other than the ones they were designed for.
 
 **Do not apply this to dividers** (`border-b`, `border-t`, side borders) or any border whose purpose is layout separation rather than element depth. Those should stay as borders.
 
@@ -221,6 +221,7 @@ Use `outline-black/10` and `outline-white/10` specifically - not `outline-slate-
 ## Minimum Hit Area
 
 Interactive elements need a hit area of at least 44×44px, the same floor adapt.md and audit.md use (WCAG 2.5.5 AAA; the AA floor in 2.5.8 is 24×24px). If the visible element is smaller (e.g., a 20×20 checkbox), extend the hit area with a pseudo-element.
+Delete tiny decorative pagination dots that take no input, rather than extend their hit area.
 
 ### CSS Example
 
@@ -254,3 +255,46 @@ Interactive elements need a hit area of at least 44×44px, the same floor adapt.
 ### Collision Rule
 
 If the extended hit area overlaps another interactive element, shrink the pseudo-element - but make it as large as possible without colliding. Two interactive elements should never have overlapping hit areas.
+
+## Declared Elevation and Shadows
+
+- Declare one elevation per card: a border for a flat, static card, or one shadow token for a raised or interactive card. A shadow token may start with a 1px ring, which has zero offset and counts as the card's border. A flat card may skip both and separate from the canvas by fill tone alone. Never pair a CSS border with a separate wide shadow (the ghost card in craft-floor.md).
+- Replace harsh default shadows: lower opacity and a larger blur, so the shadow is never the first thing seen. Floating popovers get a stronger shadow token than cards. In quieter mode, reduce or remove extra shadows (quieter.md).
+- Shadow color: tinted toward the surface hue, or transparent black at low alpha, around 4-10%. Never an opaque gray (starting value).
+- A light-mode card border is never pure black: use transparent black at about 15% alpha (starting value).
+- Tactile raised buttons: one inner shadow and one outer shadow.
+- A focused or selected card gets a heavy accent stroke, clearly heavier than the card's 1px border, not a blurred duplicate glow (craft-floor.md).
+
+## Radius Flavors
+
+- A committed world sets the flavor: warm worlds use large radii, and modern worlds use sharp radii.
+- Small controls: start at 10px, below the card radius (starting value).
+- Match corner styles across a pair: a sharp image beside a rounded button looks disconnected.
+- Inner radius follows Concentric Border Radius. If the padding exceeds the outer radius, pick a smaller inner radius by eye. A pill-shaped element needs no adjustment.
+- Smooth iOS-style corners: add `corner-shape: squircle` beside `border-radius` inside `@supports (corner-shape: squircle)`. Browsers without it keep the plain radius.
+
+## Padding and Icon Size
+
+- Label-only buttons: horizontal padding about 1.5-2x the vertical height (starting value; one source gives about 1.6x).
+- Chips are vertically thinner than buttons. Vertical padding is 1/2 or 1/4 of horizontal: 20px horizontal gives 10px or 5px (starting value).
+- Icon size: match the line height of the adjacent text, such as a 24px icon beside 24px line height (starting value). Some systems anchor to cap height instead.
+- Stacked list with a taller icon: add a subline so the bottom edge aligns.
+- No decorative arrow inside a button. Keep an arrow only when it shows direction.
+- Cards carry no decorative icon. An icon stays only when it names the item.
+- Persuade pages: feature icons may take the brand accent.
+- Icon background tints slightly off-white on hover (starting value).
+- Put a solid circle behind overlay icons on bright photos, so a save icon stays visible on a white listing photo.
+
+## Glass Panels
+
+- Use glass only when the committed world is glass. Test contrast over the worst background, and honor prefers-reduced-transparency.
+- A glass panel uses a semi-transparent dark fill. Background blur below 20px. A soft inner shadow is optional.
+- A tab bar may use a translucent, blurred dark background under the same conditions.
+- Never use hover-triggered blur reveals; they are decorative blur.
+
+## Structural Frame Lines
+
+- Frame lines sit on real column or section edges, because they divide content. Two-axis decorative grids: see the background rule in craft-floor.md.
+- Use visible 1px border lines to frame sections and multi-column blocks.
+- Square junctions by default. Round them only when the committed world is soft.
+- Replace card wrappers with one vertical column divider. Rows and sections group by spacing.
