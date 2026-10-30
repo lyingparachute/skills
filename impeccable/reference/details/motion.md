@@ -2,6 +2,8 @@
 
 Concrete values for building and reviewing web motion. [animate.md](../animate.md) decides what earns motion; this file decides how it is built. Its values are narrower than animate.md's ranges and replace its example curve; when both apply, use these. They are still defaults: the project's DESIGN.md, its motion tokens, and a pinned brief win over them. A product register limited to opacity and transform stays limited, even where a recipe below uses clip-path or blur.
 
+Gesture mechanics (swipe, drag, sheets, long-press, carousels) live in [gestures.md](gestures.md).
+
 ## The gate
 
 Decide in this order. Stop at the first step that says no, and give the non-motion alternative (an instant state change, a static affordance) instead.
@@ -39,7 +41,7 @@ Decide in this order. Stop at the first step that says no, and give the non-moti
 | Constant motion (marquee, progress fill) | linear |
 | Anything else | ease-out |
 
-UI motion uses ease-out at the start: the first frames are the ones the user watches, and ease-in spends them standing still. A 200ms ease-out feels faster than a 200ms ease-in. This holds for exits too.
+UI motion uses ease-out at the start: the first frames are the ones the user watches, and ease-in spends them standing still. A 200ms ease-out feels faster than a 200ms ease-in. This holds for exits too. Persuade may tune the curve for tone: snappy, springy, or smooth. Operate and Read keep the tokens below.
 
 The built-in keywords are weak. With no project tokens, use these:
 
@@ -158,6 +160,72 @@ if (Math.abs(swipeAmount) >= SWIPE_THRESHOLD || velocity > FLICK_VELOCITY) dismi
 A flick dismisses (velocity around 0.11 px/ms), not only distance. Capture the pointer once the drag starts, ignore extra touch points mid-drag, damp the movement past the natural edge instead of stopping hard, set `transform` on the dragged element directly, and settle with a spring.
 
 **A crossfade that will not settle.** When two states visibly overlap whatever the easing, blur the seam: `filter: blur(2px)` plus `opacity: 0.7` during the swap, under 20px always.
+
+## Micro-interaction recipes
+
+Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Read (docs), or all surfaces. Values marked "start at" are starting points to tune. Values with a source name it. A Persuade page carries one authored moment; pick it from these.
+
+### Text and labels
+
+- **Masked text slide (all modes).** Put two copies of the label in an `overflow: hidden` box. On hover, move the stack up by one line, behind the pointer query. On Persuade, the same mask swaps two messages in one slot on hover or on scroll.
+- **Copy confirmation.** Swap the copy icon for a check with the contextual icon swap below. Slide up a "Copied" chip. Announce it in a status region (WCAG 4.1.3). Remove the chip on the next interaction or after a short timeout (start at 2 s).
+- **Checkmark reveal.** Mask the check inside its rounded square. Slide it in with ease-out. Start at a 300 ms delay, then tune.
+- **Headline words (Persuade).** Animate a headline word only when the motion shows its meaning. A small character can cross the copy on scroll and swap a word, animated with transform only.
+- **Per-letter display type (Persuade).** Stretch or animate letters on load or scroll.
+- **Number swap (Persuade).** When a number changes in marketing copy, slide the old value out and the new value in, in place. Data the user reads or acts on stays still (gate, step 2).
+
+### Feedback and state
+
+- **Menu content swap (Operate, Persuade).** Keep a menu container open between items. Swap its content with a short ease-in-out slide, not a close and reopen.
+- **State change feedback.** Give each state change a short feedback motion: a toggle, an opened panel, a sent form. Hover on a button alone is not enough.
+- **Page-load entrance (Persuade).** One staggered group on a landing page, using the stagger rules above.
+- **Keyboard shortcut caps.** Animate a key cap press only on a surface that teaches shortcuts, such as onboarding or docs. Keys pressed all day get no animation (see [interaction.md](interaction.md#clicks-and-presses)).
+- **Masked progress fill (Operate, Persuade).** Mask a fill rectangle to the track. On step completion, slide it across with ease-out over the dropdown duration in [Duration](#duration) (150-250 ms). The track then reads as drawing itself.
+- **Direction signals meaning.** Slide a temporary or contextual layer up from the bottom. Use it for sheets and contextual actions.
+- **Horizontal slide for progress.** Slide a step forward through a flow horizontally. Use it for onboarding steps, not for temporary layers.
+- **Shared element zoom (Persuade).** A tapped card image zooms into the next page's hero. Use the View Transitions API, with a fade where it is missing.
+- **Timer pill.** On an auto-advancing carousel, the active dot stretches into a pill that fills as the timer runs. The pause rules in [gestures.md](gestures.md#carousels) apply.
+- **Search expansion (Operate, Persuade).** A collapsed search control shows a magnifier icon. On activation, the handle retracts and the icon morphs into the expanding search input. Opening search is an occasional action, so the morph is allowed.
+- **Multi-stage toast.** Show a spinner, then a success state in the same toast, then auto-dismiss. Set the dismiss timing by the toast rule in [interaction.md](interaction.md#choosing-a-surface).
+- **Entrance chain.** Step entrances 300 ms apart with a spring: start at stiffness 550, damping 40, mass 1, then tune. That spring overshoots under 1%, so it reads as no bounce.
+- **Particle burst (Persuade).** Only for rare, earned milestones. Never for routine actions.
+
+### Loading and waiting
+
+- Loading indicators (skeleton or spinner) follow [product-patterns.md](product-patterns.md).
+- **Stepped spinner.** Start with five frames, each a 180-degree turn, then tune. Use it only when a continuous spin is too heavy for the surface.
+- **Skeleton shimmer.** A skeleton may shimmer, slowly and continuously. Stop the shimmer under reduced motion and keep the boxes. Shimmer on borders or strokes is a scattered effect, so skip it.
+
+### Hover and reveal
+
+- **Hover preview.** Position the preview absolutely so no text below moves. It follows the hover rules in [interaction.md](interaction.md#menus-and-tooltips): the pointer can move onto it, and Escape dismisses it.
+- **Hover-linked diagram nodes.** On hover, dim the non-active nodes. Do not blur them: decorative blur is banned (craft-floor.md). Gate the hover behind the pointer query.
+- **Cursor-reactive backgrounds (Persuade).** Track the pointer through a spring. Decoration only. A functional visual follows the pointer exactly or not at all.
+- **Hover zoom (Persuade).** Zoom a hovered image in slightly. Start at scale 1.02, then tune. Gate it behind the pointer query, so touch does not leave it stuck.
+- **Hover tag spring (decorative only).** Start with a spring at bounce 0 and about 500 ms, then tune. Use it only on a decorative Persuade hover, as an override of the exponential ease-out default in craft-floor.md. The spring never overshoots, so it stays within the bounce 0 rule for product UI (see Interruption above).
+
+### Marquee and loops
+
+- **Logo marquee.** Use a marquee only in place of a static logo row. Move it left to right at a constant speed (linear). Give it a pause control ([gestures.md](gestures.md#carousels)).
+- **Marquee edges.** Mask the edges with a linear gradient. Add progressive blur on an edge only when the mask leaves a hard cut, and keep blur under 20 px.
+- **Idle loop (Persuade).** A floating asset may bob or rotate in place, only as the page's one authored moment. Stop it offscreen, turn it off under reduced motion, and give it a pause control (WCAG 2.2.2).
+- **Scroll parallax (Persuade).** Parallax applies to margin assets only, and only as the page's one authored moment. Stop it offscreen and turn it off under reduced motion. Never on Operate or Read.
+
+### Scroll transitions
+
+- **Floating margin assets enter on a spring or ease-out (Persuade).** Stagger their entrances, and never ease them linearly.
+- **Hero to section (Persuade).** Slide the hero's floating assets off, fade the hero text (no blur), and slide the next section over the hero. Reverse the transition for the bottom CTA.
+- **Soft edge (Persuade).** Fade the hero bottom into the next section with a gradient mask, not a hard edge.
+- **Product reveal (Persuade).** Never delay the product reveal with a scroll effect. As the user scrolls, fade the hero text and slide the product UI into view.
+- **No scrolljacking.** Scroll-linked motion never takes control of scroll speed or locks the page (NN/g).
+- **Media morph (Persuade).** Morph a media container's shape on load, or into oversized type on scroll. Keep the scale moderate, because large resizes drop frames.
+
+### Authored moments
+
+- **Signature motion.** Pick one signature motion for the page. Repeat it only at meaningful moments, such as a section change. Identical entrances on every section stay banned (craft-floor.md).
+- **Centerpiece.** Pair a 3D centerpiece with a quiet surround. The centerpiece carries the motion, so no other loop runs beside it.
+- **Build in code.** Build the moment in CSS, SVG, or code. Video and Lottie exports render blurry on retina screens.
+- **404 page.** A 404 may hold a small interactive, such as a mini-game that redirects when it ends, and a real character illustration. It names the way back.
 
 ## Review
 
