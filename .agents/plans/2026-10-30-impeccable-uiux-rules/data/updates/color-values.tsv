@@ -1,0 +1,120 @@
+140-340:179	landed	details/color-values.md#Ramps	Lighter steps for backgrounds
+140-340:180#1	landed	details/color-values.md#Semantic and destructive colors	Reserve semantic hues for meaning
+140-340:180#2	landed	details/color-values.md#Semantic and destructive colors D3#18	warning is amber
+140-340:183	landed	details/color-values.md#Surface steps	a higher surface is lighter
+140-340:184#1	landed	details/color-values.md#Chips and badges	desaturate and dim the bright fill
+140-340:184#2	landed	details/color-values.md#Chips and badges	a brighter tint of the chip hue
+140-340:185#1	landed	details/surfaces.md#Declared Elevation and Shadows	lower opacity and a larger blur
+140-340:185#2	landed	details/surfaces.md#Declared Elevation and Shadows	Standard cards get a subtle shadow
+140-340:185#3	landed	details/surfaces.md#Declared Elevation and Shadows	one inner shadow and one outer shadow
+140-340:187	landed	details/surfaces.md#Padding and Icon Size	about 1-1.25em of the adjacent text
+140-340:189	landed	details/surfaces.md#Padding and Icon Size	about 2x the vertical height
+140-340:194#1	landed	details/color-values.md#Text over images	Never set raw text on a busy photo
+140-340:194#2	rejected	C16: flat overlay is valid when it passes 4.5:1	
+140-340:194#3	landed	details/color-values.md#Text over images	a bottom gradient scrim
+140-340:194#4	landed	details/color-values.md#Text over images D3#20	Progressive blur is an option only
+140-340:201#1	landed	details/color-values.md#Color hierarchy	Swap clashing bright or harsh fills
+140-340:201#2	landed	details/surfaces.md#Padding and Icon Size	carry no decorative icon
+140-340:211#1	merged	craft-floor.md#Refuse	Same-size cards of icon plus heading
+140-340:215#2	landed	details/color-values.md#Color hierarchy	about 90% neutral, 8% contrast, and 2% accent
+140-340:215#3	landed	details/color-values.md#Color hierarchy	Build color in four layers
+140-340:218	landed	details/color-values.md#Color hierarchy	four background layers, one or two stroke colors
+140-340:219#1	landed	details/color-values.md#Surface steps	Light mode canvas: near-white
+140-340:219#2	landed	details/color-values.md#Surface steps	white cards on a slightly darker canvas
+140-340:220#2	landed	details/color-values.md#Surface steps	Tint the outer app frame
+140-340:221	merged	details/surfaces.md#Shadow as Border (Light Mode) D3#27	0px 0px 0px 1px rgba(0, 0, 0, 0.06)
+140-340:222#1	landed	details/color-values.md#Interaction states	the more important the action
+140-340:222#2	landed	details/color-values.md#Interaction states	Utility buttons use a fill at 90-95% white
+140-340:224	landed	details/color-values.md#Text levels	about 11% white
+140-340:225	landed	details/color-values.md#Text levels	Body: 15-20% white
+140-340:226	landed	details/color-values.md#Text levels	Muted labels: 30-40% white
+140-340:228	landed	details/color-values.md#Ramps	500 or 600 for the primary fill
+140-340:229	landed	details/color-values.md#Surface steps	differ by about 4-6% lightness
+140-340:230	landed	details/color-values.md#Dark mode	primary at 300 or 400
+140-340:231	landed	details/color-values.md#Surface steps	give it a border instead
+140-340:233#1	landed	details/color-values.md#Semantic and destructive colors	Destructive actions use the danger role
+140-340:233#2	landed	details/color-values.md#Semantic and destructive colors	each have their own color
+140-340:236	landed	details/color-values.md#Ramps	lower its L by 0.03
+140-340:251#2	landed	details/color-values.md#Surface steps	Light mode uses about 2%
+140-340:271#2	landed	details/color-values.md#Interaction states	Every link has a hover state
+140-340:317	landed	details/color-values.md#Color hierarchy	Sibling cards share one fill
+140-340:318#1	landed	details/color-values.md#Color hierarchy D3#19	as a hierarchy guide, not a pie chart
+140-340:318#2	landed	details/color-values.md#Color hierarchy	fill those cards with a soft tint
+140-340:319#1	landed	details/color-values.md#Semantic and destructive colors	Operate UI: icons stay neutral
+140-340:321#1	landed	details/color-values.md#Surface steps	a neutral gray canvas
+140-340:321#2	landed	details/color-values.md#Surface steps	a white canvas with light-gray containers
+140-340:323	landed	details/surfaces.md#Declared Elevation and Shadows D3#27	Declare one elevation per card
+140-340:325#1	landed	details/color-values.md#Ramps	rotate slightly on the color wheel
+140-340:325#2	landed	details/color-values.md#Ramps	pair with its complement across the wheel
+140-340:326	landed	details/color-values.md#Ramps	fails 4.5:1 on the brand color
+140-340:328#1	merged	details/color-values.md#Text levels	Never 0% (pure black)
+140-340:328#2	landed	details/color-values.md#Text levels	dark gray on neutral surfaces
+140-340:328#3	landed	details/color-values.md#Text levels	Lighten borders around well-grouped elements
+140-340:329#1	landed	details/color-values.md#Dark mode	Lower its brightness to reduce eye strain
+140-340:329#2	landed	details/color-values.md#Dark mode	Reserve pure white for the most important titles
+140-340:332#1	landed	details/color-values.md#Dark mode	Widen the lightness gap between cards and borders
+140-340:332#2	landed	details/color-values.md#Dark mode	body text: a neutral light gray
+140-340:332#3	merged	details/color-values.md#Dark mode	pure white for the most important titles
+140-340:332#4	landed	details/color-values.md#Dark mode	Desaturate bright brand logos and accents
+140-340:334#1	landed	details/color-values.md#Semantic and destructive colors	Never give a destructive action the brand primary color
+140-340:334#2	landed	details/color-values.md#Semantic and destructive colors	Keep red (danger) and green (success)
+140-340:334#3	landed	details/color-values.md#Semantic and destructive colors	may use red or the brand color
+140-340:337	landed	details/color-values.md#Interaction states	a slightly lighter base color
+140-340:338	landed	details/color-values.md#Interaction states	a slightly darker base color
+140-340:339	landed	details/color-values.md#Interaction states	a desaturated light-gray fill
+001-139:29	landed	details/surfaces.md#Padding and Icon Size	add a subline so the bottom edge aligns
+001-139:33#2	merged	craft-floor.md#Refuse	Declare elevation once, border or shadow.
+001-139:33#3	landed	details/surfaces.md#Structural Frame Lines	one vertical column divider
+001-139:44	landed	details/surfaces.md#Padding and Icon Size	feature icons may take the brand accent
+001-139:82#3	landed	details/surfaces.md#Radius Flavors D3#8	warm worlds use large radii
+001-139:83#1	landed	details/surfaces.md#Radius Flavors D3#8	modern worlds use sharp radii
+001-139:116#2	landed	details/surfaces.md#Radius Flavors	Match corner styles across a pair
+341-575:368#3	landed	details/surfaces.md#Declared Elevation and Shadows D3#27	by fill tone alone
+341-575:399#1	landed	details/surfaces.md#Glass Panels D3#21	semi-transparent dark fill
+341-575:399#2	rejected	craft-floor.md:34 and quieter.md:66: decorative gradient fill. D3#21	
+341-575:399#3	landed	details/surfaces.md#Glass Panels D3#21	blur below 20px
+341-575:399#5	landed	details/surfaces.md#Glass Panels	A soft inner shadow
+341-575:453#3	landed	details/surfaces.md#Padding and Icon Size	a solid circle behind overlay icons
+341-575:470#1	landed	details/color-values.md#Gradients	Gradients use one hue only
+341-575:470#2	merged	details/color-values.md#Gradients	Gradients use one hue only
+341-575:471#1	landed	details/surfaces.md#Declared Elevation and Shadows	Replace harsh default shadows
+341-575:471#2	rejected	C7 and D3#27: shadow is tinted or transparent black, not light gray	
+341-575:471#4	merged	details/surfaces.md#Declared Elevation and Shadows	a border for flat, static cards
+341-575:476#1	landed	details/surfaces.md#Radius Flavors D3#8	Small controls: start at 10px
+341-575:482#2	landed	details/surfaces.md#Padding and Icon Size	No decorative arrow inside a button
+341-575:505#1	landed	details/color-values.md#Color hierarchy	Pull an overly saturated hue
+341-575:505#2	landed	details/color-values.md#Color hierarchy	Darken a bluish background toward a deep tint
+341-575:506#1	landed	details/color-values.md#Color hierarchy	take the color of their legend key
+341-575:533#1	merged	details/surfaces.md#Shadow as Border (Light Mode) D3#27	The first acts as a 1px border ring
+341-575:533#2	rejected	C7 and D3#27: shadow is tinted or transparent black, never light gray	
+341-575:537#2	landed	details/surfaces.md#Padding and Icon Size	Icon background tints slightly off-white
+341-575:538#1	landed	details/surfaces.md#Declared Elevation and Shadows	a 2px accent stroke
+341-575:554#2	landed	details/surfaces.md#Radius Flavors	outer radius minus padding
+341-575:554#3	landed	details/surfaces.md#Radius Flavors	needs no concentric adjustment
+341-575:569	merged	colorize.md#Apply at system scale D3#33	Tint neutrals only when the brand hue
+341-575:571	landed	details/color-values.md#Surface steps	canvas from the 50 step
+341-575:572	landed	details/color-values.md#Surface steps	canvas from the 950 step
+341-575:574#2	rejected	C20 and D3#34: build ramps in OKLCH, not HSB steps	
+341-575:574#3	landed	details/color-values.md#Surface steps	steps one level lighter
+576-818:599	landed	details/color-values.md#Text over images	against the brightest pixel behind the text
+576-818:612d	rejected	craft-floor.md:49: backgrounds are surfaces, textured only from the subject's world	
+576-818:615	merged	craft-floor.md#Verify	every brief requirement present and findable
+576-818:620b	rejected	craft-floor.md:13: one authored moment, not scattered effects	
+576-818:622	landed	details/surfaces.md#Structural Frame Lines D3#5	sit on real column or section edges
+576-818:689	landed	details/surfaces.md#Structural Frame Lines	frame sections and multi-column blocks
+576-818:690	landed	details/surfaces.md#Structural Frame Lines	Square junctions by default
+576-818:742c	landed	details/color-values.md#Text over images	one oversized, low-opacity logo
+576-818:745b	merged	details/surfaces.md#Minimum Hit Area	Interactive elements need a hit area of at least 44×44px
+576-818:746c	rejected	D3#18 and C4: red means error or danger, not a primary action	
+576-818:758f	landed	details/surfaces.md#Glass Panels	translucent, blurred dark background
+576-818:764b	merged	details/color-values.md#Text over images	Use a bottom gradient scrim
+576-818:764c	merged	details/color-values.md#Text over images	Layer the text on top of it
+576-818:769	landed	details/color-values.md#Surface steps	a tinted fill, not a divider
+576-818:776c	landed	details/color-values.md#Text levels D3#30	Input borders use a solid token
+576-818:781a	landed	details/color-values.md#Chips and badges	Chips never use the primary CTA fill color
+576-818:781b	landed	details/surfaces.md#Padding and Icon Size	vertically thinner than buttons
+576-818:782b	landed	details/surfaces.md#Padding and Icon Size	1/2 or 1/4 of horizontal
+576-818:784a	landed	details/color-values.md#Text over images	sit in a dark pill
+576-818:801b	landed	details/color-values.md#Text levels	Primary text is solid at 100% opacity
+576-818:801c	landed	details/color-values.md#Text levels D3#30	Secondary text uses a solid token
+576-818:582	merged	craft-floor.md#Refuse	Geometric masks standing in for organic contours

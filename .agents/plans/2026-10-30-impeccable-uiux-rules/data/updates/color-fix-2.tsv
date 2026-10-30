@@ -1,0 +1,8 @@
+341-575:538#1	landed	details/surfaces.md#Declared Elevation and Shadows	clearly heavier than the card's 1px border
+140-340:187	landed	details/surfaces.md#Padding and Icon Size	match the line height of the adjacent text
+341-575:554#2	landed	details/surfaces.md#Radius Flavors	pick a smaller inner radius by eye
+341-575:554#3	landed	details/surfaces.md#Radius Flavors	needs no adjustment
+576-818:745b	landed	details/surfaces.md#Minimum Hit Area	Delete tiny decorative pagination dots
+140-340:317	landed	details/color-values.md#Color hierarchy	Never use five different bright accent fills
+341-575:506#1	landed	details/charts.md#Comparison series	take the color of their legend key
+576-818:758e	rejected	Icon-only controls need an accessible name and a tooltip; visible labels are required per D3#11 and I7.	

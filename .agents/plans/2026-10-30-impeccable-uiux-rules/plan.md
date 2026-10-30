@@ -1,6 +1,6 @@
 # Land the video UI/UX rules in impeccable
 
-Status: ready - critic gate ran 2 rounds; round 2 findings fixed in revision 3, not re-reviewed (cap reached)
+Status: landed
 
 This ExecPlan is a living document. Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective are kept current as work proceeds. Repo plan rules: none. Starts after: nothing. The vendored `impeccable` skill was already upgraded to upstream 4.8.0 in commit `4280335` on branch `impeccable-uiux-rules`. That commit is the baseline every diff below compares against.
 
@@ -13,11 +13,11 @@ This ExecPlan is a living document. Progress, Surprises & Discoveries, Decision 
 - [x] (2026-10-30) Critic round 2: 1 BLOCKER, 10 MAJOR, 12 MINOR. All fixed in revision 3 (see Decision Log).
 - [x] (2026-10-30) Milestone 1 - ledger tooling. `build-ledger` prints `parsed 894 rows, 781 non-covered, wrote ledger.md`; a rerun exits 1 with `ledger.md exists`; a tampered ledger reports the duplicate and missing ids.
 - [x] (2026-10-30) Milestone 2 - ledger assignment. `check-ledger --assignment` prints `assignment ok: 781 rows, 0 unassigned, 0 conflicts without D3`. Pending rows by file: product-patterns 171, landing 100, color-values 76, motion 58, surfaces 48, charts 46, typography 37, gestures 28, ai-interface 25, mobile 24, interaction 19, macos 12; 24 rejected; 114 out-of-scope.
-- [ ] Milestone 3 - color and surface values.
-- [ ] Milestone 4 - interaction, gestures, and motion.
-- [ ] Milestone 5 - product patterns, charts, and typography.
-- [ ] Milestone 6 - landing, mobile, macOS, and AI-interface patterns.
-- [ ] Milestone 7 - provenance and final checks.
+- [x] (2026-10-30) Milestone 3 - color and surface values. Commit `99bf751`. Code critic 2 rounds; every confirmed finding fixed.
+- [x] (2026-10-30) Milestone 4 - interaction, gestures, and motion. Commit `69d9063`. Code critic 2 rounds; every confirmed finding fixed.
+- [x] (2026-10-30) Milestone 5 - product patterns, charts, and typography. Commit `feac09a`. Code critic 2 rounds; every confirmed finding fixed.
+- [x] (2026-10-30) Milestone 6 - landing, mobile, macOS, and AI-interface patterns. Commit `646d1f9`. Code critic 2 rounds; every confirmed finding fixed.
+- [x] (2026-10-30) Milestone 7 - provenance and final checks. Every DoD command passes.
 
 Updated at every stopping point. This list, not memory, says where the work is.
 
@@ -116,6 +116,13 @@ The `dataviz` skill is available to agents in this harness through the Skill too
 | 39 | Bold numbers in copy | Allowed inside text. The hero-metric template stays banned | craft-floor.md:26 |
 | 40 | Glow made by a blurred duplicate | Banned as a zero-offset halo | craft-floor.md:10 |
 | 41 | Ambient shimmer on borders or strokes | Banned as a scattered effect. A loading shimmer on a skeleton is allowed and stops under reduced motion | craft-floor.md:13 |
+| 42 | Animation on keyboard shortcuts | Frequent keyboard actions get no animation (motion.md:20). A rare shortcut, or a surface that teaches shortcuts, may animate its result | motion.md:20, gap 253 |
+| 43 | Removing carousel arrows where swipe works | Keep visible previous and next buttons beside swipe, since keyboard and mouse users cannot swipe | WCAG 2.1.1 |
+| 44 | Blur in hero, hover, and long-press effects | Fade or dim instead of blur, per the decorative blur ban in row 21 | D3#21 |
+| 45 | Second loop beside a 3D centerpiece | The centerpiece is the page's one authored moment. No marquee or other loop runs beside it | D3#25, craft-floor.md:15 |
+| 46 | Menu commit on mouse down | A menu item commits on release, and releasing outside cancels. A down event runs no action | WCAG 2.5.2 |
+| 47 | Tab bar destination count | 3-5 destinations on Android (Material). Five or fewer on iOS (Apple); upstream ios.md:14 says 2-5 and stays | I11, ios.md:14 |
+| 48 | Blur material in macOS panels | A macOS panel may use the system window material the OS supplies. Custom glass still needs a glass world (row 21) | Apple HIG Materials, D3#21 |
 
 4. **Pointer lines.** Each upstream file gets at most one new line. No upstream rule text changes, except that our own line at `adapt.md:203` changes its link from `mobile-web.md` to `mobile.md`. The pointers:
    - `craft-floor.md`: a new last line that sends the agent to `details/README.md` for exact patterns and values by surface and topic, before building that surface. This is the route every UI edit takes.
@@ -269,6 +276,13 @@ Proof: the DoD below.
 - Observation: the mode files are printed by the `concept-seed` binary.
   Evidence: `mode-persuade.md:3` "`impeccable concept-seed --mode persuade` ... prints the two sections below as its MODE RULES block".
 
+- Observation: writers reversed source rules without a decision row, and stated video numbers as hard rules. Code critics caught both.
+  Evidence: rows 42-48 added in revision 5; starting-value tags added across color-values, motion, charts, and product-patterns.
+- Observation: README rows land in the Milestone 6 commit, not one per milestone, because the index links every new file.
+  Evidence: commit `646d1f9`.
+- Observation: research ids (A1, I8, D3#22) leaked into skill text. They would dangle after the plan is retired, so each became its real source name.
+  Evidence: `grep -rnE "D3#|\((A|C|D|I)[0-9]{1,2}\)" impeccable/reference/details` prints nothing.
+
 ## Decision Log
 
 - Decision: tooling critic (judo-review of Milestone 1) findings fixed: rejected and out-of-scope outcomes validated, status and rule compared with the gap tables, `--dest` limited to plan files and failing on zero rows, renamed files diffed against their old path, baseline commit required, fenced code skipped when finding headings, decision rows read from the decision 3 table only, bytecode untracked, gesture words bounded, exclusive ledger create, anchors need a content word. Backtick-in-heading finding dismissed: a wrong citation fails loudly.
@@ -303,22 +317,34 @@ Proof: the DoD below.
   Rationale: the repo rule ties `install.sh` to skill-set changes only.
   Date/Author: 2026-10-30, agent.
 
+- Decision: milestone critics found source rules reversed without a decision row. Rows 42-48 record each override. Pointer lines move to the end of each upstream file, so baseline `file:line` citations stay valid.
+  Rationale: decision 3 says every change to a source rule needs a row; a pointer near the top shifted every later line and made ledger citations stale.
+  Date/Author: 2026-10-30, agent.
+
+- Decision: final branch review fixes. Hover and pressed now step along the ramp (one step, then one more), matching the ramp line; research C21 found no evidence for either direction. Dismissed: the WCAG 2.2.2 pause rule appears in gestures, landing, mobile, and motion because each applies it to a different component; the hit-area sentence stays in its paragraph to keep surfaces.md at 300 lines; Persuade scroll transitions are transitions, not the one authored moment.
+  Rationale: one direction per state; each dismissed item fails confirmation as a defect.
+  Date/Author: 2026-10-30, agent.
+
+- Decision: final review round 2 found 3 items: the macOS top band, ramp hover step counts, and the paste widget. All three are fixed. Per the two-round cap, no third review ran, so the branch review ends without an APPROVE. The plan stays on disk for the owner instead of being retired.
+  Rationale: critic rounds cap at 2; plan-retire waits on an approving review.
+  Date/Author: 2026-10-30, agent.
+
 ## Outcomes & Retrospective
 
-Filled at completion.
+All 781 non-covered rules from the video notes have an outcome: landed, merged, rejected with a cited reason, or out of scope. Eight new details files and three extended ones carry them. Seven upstream files gained one pointer line each at the end. The ledger checker proves presence; the code critics proved substance, and found more than the checker could. Lesson: give writers the decision table and the starting-value rule in the brief, and forbid plan ids in skill text from the start.
 
 ## Definition of done
 
 Run every command from the repo root.
 
-- [ ] Ledger complete: `(cd .agents/plans/2026-10-30-impeccable-uiux-rules && python3 -I data/check-ledger)` prints `ledger ok: parsed 894, ledger 781, 0 pending, all anchors found` and exits 0.
-- [ ] Repo checks pass: `./check.sh | tail -1` prints `OK`.
-- [ ] Upstream text untouched: `git diff 4280335 -- impeccable ':(exclude)impeccable/reference/details' | grep -cE '^-[^-]'` prints `1`, and that one removed line is the old `adapt.md` pointer to `mobile-web.md`.
-- [ ] At most one new line per upstream file: `git diff --numstat 4280335 -- impeccable ':(exclude)impeccable/reference/details'` lists exactly these eight files: `adapt.md` as `1 1` (the relinked pointer), and `adapt.native.md`, `colorize.md`, `craft-floor.md`, `layout.md`, `onboard.md`, `operate.md`, and `shape.md` each as `2 0` (one pointer line plus the blank line that separates it, as our existing pointers do).
-- [ ] Pointers resolve: `for pair in craft-floor.md:README.md colorize.md:color-values.md operate.md:product-patterns.md operate.md:interaction.md operate.md:charts.md onboard.md:product-patterns.md layout.md:landing.md adapt.native.md:macos.md shape.md:ai-interface.md adapt.md:mobile.md; do f=${pair%%:*}; t=${pair##*:}; test -f impeccable/reference/details/$t && test "$(grep -c "details/$t" impeccable/reference/$f)" = 1 || echo "FAIL $pair"; done; grep -c '](gestures.md)' impeccable/reference/details/motion.md` prints no `FAIL` line, and its last line is `1`.
-- [ ] Every new or renamed file is indexed: `for f in interaction gestures color-values product-patterns charts landing macos ai-interface mobile; do test "$(grep -c "]($f.md)" impeccable/reference/details/README.md)" = 1 || echo "FAIL $f"; done` prints nothing.
-- [ ] Size budget: `wc -l impeccable/reference/details/*.md | awk '$2 != "total" && $1 > 300'` prints nothing.
-- [ ] No rejected pattern is recommended: `diff <(grep -rniP 'eyebrow|icon-only (rail|sidebar)|universal icon|golden ratio|60-30-10|feTurbulence|doodle|scribble' impeccable/reference/details | sed -E 's/^([^:]+):[0-9]+:/\1:/' | sort) <(sort .agents/plans/2026-10-30-impeccable-uiux-rules/data/banned-allowlist.txt)` prints nothing, and every allowlist line states a ban, a rejection, or a limit.
-- [ ] Provenance updated: `for f in interaction gestures color-values product-patterns charts landing macos ai-interface mobile adapt.native.md colorize.md craft-floor.md layout.md onboard.md operate.md shape.md; do grep -q "$f" VENDORED.md || echo "FAIL $f"; done; grep -c 'mobile-web' VENDORED.md` prints no `FAIL` line, and its last line is `0`.
+- [x] Ledger complete: `(cd .agents/plans/2026-10-30-impeccable-uiux-rules && python3 -I data/check-ledger)` prints `ledger ok: parsed 894, ledger 781, 0 pending, all anchors found` and exits 0.
+- [x] Repo checks pass: `./check.sh | tail -1` prints `OK`.
+- [x] Upstream text untouched: `git diff 4280335 -- impeccable ':(exclude)impeccable/reference/details' | grep -cE '^-[^-]'` prints `1`, and that one removed line is the old `adapt.md` pointer to `mobile-web.md`.
+- [x] At most one new line per upstream file: `git diff --numstat 4280335 -- impeccable ':(exclude)impeccable/reference/details'` lists exactly these eight files: `adapt.md` as `1 1` (the relinked pointer), and `adapt.native.md`, `colorize.md`, `craft-floor.md`, `layout.md`, `onboard.md`, `operate.md`, and `shape.md` each as `2 0` (one pointer line plus the blank line that separates it, as our existing pointers do).
+- [x] Pointers resolve: `for pair in craft-floor.md:README.md colorize.md:color-values.md operate.md:product-patterns.md operate.md:interaction.md operate.md:charts.md onboard.md:product-patterns.md layout.md:landing.md adapt.native.md:macos.md shape.md:ai-interface.md adapt.md:mobile.md; do f=${pair%%:*}; t=${pair##*:}; test -f impeccable/reference/details/$t && test "$(grep -c "details/$t" impeccable/reference/$f)" = 1 || echo "FAIL $pair"; done; grep -c '](gestures.md)' impeccable/reference/details/motion.md` prints no `FAIL` line, and its last line is `1`.
+- [x] Every new or renamed file is indexed: `for f in interaction gestures color-values product-patterns charts landing macos ai-interface mobile; do test "$(grep -c "]($f.md)" impeccable/reference/details/README.md)" = 1 || echo "FAIL $f"; done` prints nothing.
+- [x] Size budget: `wc -l impeccable/reference/details/*.md | awk '$2 != "total" && $1 > 300'` prints nothing.
+- [x] No rejected pattern is recommended: `diff <(grep -rniP 'eyebrow|icon-only (rail|sidebar)|universal icon|golden ratio|60-30-10|feTurbulence|doodle|scribble' impeccable/reference/details | sed -E 's/^([^:]+):[0-9]+:/\1:/' | sort) <(sort .agents/plans/2026-10-30-impeccable-uiux-rules/data/banned-allowlist.txt)` prints nothing, and every allowlist line states a ban, a rejection, or a limit.
+- [x] Provenance updated: `for f in interaction gestures color-values product-patterns charts landing macos ai-interface mobile adapt.native.md colorize.md craft-floor.md layout.md onboard.md operate.md shape.md; do grep -q "$f" VENDORED.md || echo "FAIL $f"; done; grep -c 'mobile-web' VENDORED.md` prints no `FAIL` line, and its last line is `0`.
 
-Revision notes: 2026-10-30 first draft. 2026-10-30 revision 2: fixed critic round 1 (ledger redesign, conflict rows corrected and split, routing via craft-floor, mobile file dropped, gestures file added, size budget, binary DoD with a repo baseline). 2026-10-30 revision 3: fixed critic round 2 (checker modes, id-set equality, new-line anchors, build-once ledger, rows 39-41, rows 15/25/27/29/38 corrected, gesture single home, Milestone 1 split, binary DoD with allowlist and provenance loop). 2026-10-30 revision 4: DoD numstat counts the blank line each pointer needs (found during Milestone 3).
+Revision notes: 2026-10-30 first draft. 2026-10-30 revision 2: fixed critic round 1 (ledger redesign, conflict rows corrected and split, routing via craft-floor, mobile file dropped, gestures file added, size budget, binary DoD with a repo baseline). 2026-10-30 revision 3: fixed critic round 2 (checker modes, id-set equality, new-line anchors, build-once ledger, rows 39-41, rows 15/25/27/29/38 corrected, gesture single home, Milestone 1 split, binary DoD with allowlist and provenance loop). 2026-10-30 revision 4: DoD numstat counts the blank line each pointer needs (found during Milestone 3). 2026-10-30 revision 5: rows 42-48 added after milestone critics; pointers moved to the end of each upstream file.

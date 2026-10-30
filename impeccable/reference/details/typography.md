@@ -166,8 +166,8 @@ Some fonts (like Inter) change the visual appearance of numerals with this prope
 - Product UI uses a ratio of 1.125 to 1.2 between steps, with 3 to 4 working sizes (see operate.md).
 - Marketing pages use a ratio of 1.25 to 1.333 between steps. (Art of Style Frame)
 - The golden ratio (1.62) is too large for a type scale.
-- A full landing page starts at no more than 6 sizes, then tune. A simple page uses about 3. (NN/g)
-- Start dashboard text at a 24px maximum, then tune.
+- A full landing page starts at no more than 6 sizes, then tune. A simple page uses about 3 (starting values).
+- Start dashboard text at a 24px maximum, then tune (starting value).
 - A landing page can step up by 1.27 from a 16px base, inside the 1.25 to 1.333 range.
 
 ## Line Height

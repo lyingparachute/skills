@@ -41,7 +41,7 @@ Decide in this order. Stop at the first step that says no, and give the non-moti
 | Constant motion (marquee, progress fill) | linear |
 | Anything else | ease-out |
 
-UI motion uses ease-out at the start: the first frames are the ones the user watches, and ease-in spends them standing still. A 200ms ease-out feels faster than a 200ms ease-in. This holds for exits too. Persuade may tune the curve for tone: snappy, springy, or smooth. Operate and Read keep the tokens below.
+UI motion uses ease-out at the start: the first frames are the ones the user watches, and ease-in spends them standing still. A 200ms ease-out feels faster than a 200ms ease-in. This holds for exits too. Persuade may tune the curve for tone, snappy or smooth, when the committed world asks for it. Operate and Read keep the tokens below.
 
 The built-in keywords are weak. With no project tokens, use these:
 
@@ -202,7 +202,7 @@ Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Rea
 - **Hover-linked diagram nodes.** On hover, dim the non-active nodes. Do not blur them: decorative blur is banned (craft-floor.md). Gate the hover behind the pointer query.
 - **Cursor-reactive backgrounds (Persuade).** Track the pointer through a spring. Decoration only. A functional visual follows the pointer exactly or not at all.
 - **Hover zoom (Persuade).** Zoom a hovered image in slightly. Start at scale 1.02, then tune. Gate it behind the pointer query, so touch does not leave it stuck.
-- **Hover tag spring (decorative only).** Start with a spring at bounce 0 and about 500 ms, then tune. Use it only on a decorative Persuade hover, as an override of the exponential ease-out default in craft-floor.md. The spring never overshoots, so it stays within the bounce 0 rule for product UI (see Interruption above).
+- **Hover tag spring (decorative only).** Start with a spring at bounce 0 and about 500 ms, then tune. Use it only on a decorative Persuade hover, when the committed world asks for it. The spring never overshoots, so it stays within the bounce 0 rule for product UI (see Interruption above).
 
 ### Marquee and loops
 

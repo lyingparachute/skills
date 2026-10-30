@@ -268,7 +268,7 @@ If the extended hit area overlaps another interactive element, shrink the pseudo
 ## Radius Flavors
 
 - A committed world sets the flavor: warm worlds use large radii, and modern worlds use sharp radii.
-- Small controls: start at 10px, below the card radius (starting value).
+- Small controls: start at 10px, below the card radius, or use a pill (starting value).
 - Match corner styles across a pair: a sharp image beside a rounded button looks disconnected.
 - Inner radius follows Concentric Border Radius. If the padding exceeds the outer radius, pick a smaller inner radius by eye. A pill-shaped element needs no adjustment.
 - Smooth iOS-style corners: add `corner-shape: squircle` beside `border-radius` inside `@supports (corner-shape: squircle)`. Browsers without it keep the plain radius.

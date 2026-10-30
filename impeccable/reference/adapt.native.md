@@ -57,4 +57,4 @@ When the adaptation feels native to each context, hand off to `$impeccable polis
 - Lock orientation to dodge a layout bug
 - Trust simulators alone (posture, gestures, and performance need hardware)
 
-macOS windows, utilities, and keyboard-first patterns live in [details/macos.md](details/macos.md).
+macOS windows and utilities live in [details/macos.md](details/macos.md); phone app structure and feel for iOS and Android live in [details/mobile.md](details/mobile.md).

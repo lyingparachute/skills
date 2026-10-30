@@ -16,7 +16,7 @@ Window, utility, and quick panel rules for Mac apps. Load it when building or re
 
 - Lay out a utility window in three zones: a top bar for global actions, a left sidebar for navigation, and a center canvas for content.
 - Place the traffic lights in the top bar or the sidebar, as layout elements.
-- Keep the top band free of controls, about 50 px (starting value: match the real title bar height).
+- Global actions sit in the top bar, right of the traffic lights. Keep the area around the traffic lights clear of controls. The bar is about 50 px tall (starting value: match the real title bar height).
 
 ## Text size
 

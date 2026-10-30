@@ -15,8 +15,8 @@ Prompt entry, suggestions, attachments, streaming, sources, confidence, inline r
 ## Attachments and pastes
 
 - Show each attachment as a compact preview block with its name and a remove action.
-- Collapse long pasted code into a collapsible block. Start at 10,000 characters, the threshold OpenAI uses for pastes, then tune.
-- Keep a Show in text field action to restore a collapsed paste (OpenAI).
+- Convert long pasted code into an attachment chip. Start at 10,000 characters, the threshold OpenAI uses for pastes, then tune.
+- Keep a Show in text field action that turns the chip back into text (OpenAI).
 
 ## Cost
 
@@ -27,7 +27,7 @@ Prompt entry, suggestions, attachments, streaming, sources, confidence, inline r
 
 - Stream text as it generates. Show a status label until the first token arrives (Cloudscape).
 - Track time to first token as the latency target (CHI 2026).
-- Start with three bouncing dots, as Notion AI does, then tune.
+- Start with three bouncing dots beside that status label, as Notion AI does, then tune.
 - Streamed AI text shows a status label, not a placeholder layout (Cloudscape).
 - Loaders for buttons and single modules follow [product-patterns.md](product-patterns.md).
 

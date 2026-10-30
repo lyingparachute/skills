@@ -1,0 +1,4 @@
+impeccable/reference/details/color-values.md:- Use 60-30-10 (NN/g) as a hierarchy guide, not a pie chart (Jasmine Alley). Dominant and secondary roles stay neutral. The accent goes to primary actions and state.
+impeccable/reference/details/landing.md:- Match illustration playfulness to brand tone: playful characters for a warm world, realistic floating product objects for a modern one. Doodle styles stay out (craft-floor.md).
+impeccable/reference/details/product-patterns.md:- Give every nav item a visible text label (NN/g). Do not build an icon-only rail.
+impeccable/reference/details/typography.md:- The golden ratio (1.62) is too large for a type scale.

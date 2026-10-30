@@ -49,4 +49,4 @@ Surface habits:
 
 The floor holds the mechanics; it never picks the direction. With every check green, spend the page on the committed world, and when torn between refined and committed, commit.
 
-Exact patterns and values by surface and topic (landing pages, app UI, charts, interaction timing, gestures, color, surfaces, type, mobile, macOS, AI interfaces) are indexed in [details/README.md](details/README.md); load the matching file before building that surface.
+Before building a surface, load the matching file from the index in [details/README.md](details/README.md) for exact patterns and values.

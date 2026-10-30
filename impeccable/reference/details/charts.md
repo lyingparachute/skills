@@ -49,7 +49,7 @@ Chart and KPI rules that the dataviz skill does not give. Load it when building 
 
 ## Time ranges
 
-- Use buttons when the ranges fit in one row. Use a compact dropdown when they do not, not a bulky time-scale slider. Test the choice with users. (starting choice; no research backs either)
+- Use buttons when the ranges fit in one row. Use a compact dropdown when they do not, not a bulky time-scale slider. Test the choice with users (starting choice).
 - Let users inspect every period in a range, such as all 12 months, not a few picked ones. On phones, a horizontal timeline can scroll through them.
 
 ## Tooltips and hover
@@ -76,7 +76,7 @@ Chart and KPI rules that the dataviz skill does not give. Load it when building 
 - Show each percentage change as a chip beside its value.
 - Show the top KPI row on the dashboard and on one analytics view, not on every tab.
 - Start KPI tiles at a 2-column grid, not one large box per metric.
-- Give each summary metric an icon beside a visible label.
+- Give each summary metric a visible label. Add an icon only when it names the metric.
 - Delete a chart that has no labels or repeats another chart's data.
 
 ## Micro-charts and progress diagrams

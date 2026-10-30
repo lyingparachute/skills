@@ -1,0 +1,13 @@
+341-575:487#2	landed	details/charts.md#Bar charts	Use square bar tops
+341-575:487#4	merged	details/charts.md#Bar charts	Use square bar tops
+341-575:359#3	merged	details/charts.md#KPI cards and dashboards	Do not show a raw number alone
+576-818:665a	landed	details/charts.md#KPI cards and dashboards	Do not show a raw number alone
+576-818:744a	rejected	research-charts-ai.md D1: smooth only continuous quantities, so a blanket ban on curving investment lines is overridden	
+576-818:760a	rejected	research-charts-ai.md D1: smooth only continuous quantities, so a blanket ban on curving line data is overridden	
+576-818:793a	landed	details/typography.md#Display and Script Faces	Use display and handwritten faces
+576-818:793b	landed	details/typography.md#Display and Script Faces	Never set body text in them
+576-818:797	landed	details/typography.md#Font Count and Roles	Two families by default
+140-340:177#2	landed	details/typography.md#Type Scale	Start dashboard text at a 24px maximum
+341-575:359#4	merged	dataviz	Date range first
+341-575:360#2	merged	dataviz	Date range first
+576-818:761b	merged	dataviz	Marker / end-dot

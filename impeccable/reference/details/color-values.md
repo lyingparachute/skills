@@ -36,7 +36,7 @@ Exact surface steps, text levels, ramps, state, semantic, dark-mode, and image-o
 ## Ramps
 
 - Lighter steps for backgrounds, darker steps for text. Build ramps in OKLCH: L is lightness, C is chroma (colorfulness), and H is hue. Change L per step and keep H steady. Chroma near white and black: see colorize.md.
-- Light mode ramp: 500 or 600 for the primary fill, 700 for hover, 400 or 500 for text links only if they pass 4.5:1 on the canvas; otherwise a darker step such as 600 (starting values).
+- Light mode ramp: 500 or 600 for the primary fill, one step darker (600 or 700) for hover, 400 or 500 for text links only if they pass 4.5:1 on the canvas; otherwise a darker step such as 600 (starting values).
 - Theme a neutral: lower its L by 0.03, raise its C by 0.02, and rotate its H to the brand hue (starting values).
 - If white text fails 4.5:1 on the brand color, darken the brand shade or pair it with a darker accessible shade.
 - Analogous hues: rotate slightly on the color wheel for multi-segment components, such as a storage bar.
@@ -46,8 +46,8 @@ Exact surface steps, text levels, ramps, state, semantic, dark-mode, and image-o
 
 - Button importance: the more important the action, the darker the fill. A ghost button is lightest. A primary button can be near-black with white text.
 - Utility buttons use a fill at 90-95% white (starting value).
-- Hover: a slightly lighter base color (starting value). Keep it as a named state token, not an ad hoc tweak.
-- Pressed: a slightly darker base color (starting value) on desktop and on a mobile tap, because a tap has no hover.
+- Hover: one ramp step from the base, such as 700 on a 600 fill in light mode (starting value). Keep it as a named state token, not an ad hoc tweak.
+- Pressed: one step past hover (starting value), on desktop and on a mobile tap, because a tap has no hover.
 - Disabled: a desaturated light-gray fill with muted text. Keep the shape and label, so the control reads without color. Inactive controls are exempt from the 3:1 rule (WCAG 1.4.11).
 - Every link has a hover state, such as a color shift or an underline.
 
@@ -68,7 +68,7 @@ Exact surface steps, text levels, ramps, state, semantic, dark-mode, and image-o
 - Reserve pure white for the most important titles and primary actions, such as the app logo.
 - Widen the lightness gap between cards and borders, so surfaces stay distinct.
 - Desaturate bright brand logos and accents, but only after testing contrast.
-- Dark mode accent: primary at 300 or 400 on the ramp (starting value), hover at 400 or 500 (starting value). Dim the body text, the primary text color, and brighten borders.
+- Dark mode accent: primary at 300 or 400 on the ramp, hover one step on (400 or 500) (starting values). Dim the body text, the primary text color, and brighten borders.
 
 ## Chips and badges
 

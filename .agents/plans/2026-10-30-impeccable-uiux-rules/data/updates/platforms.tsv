@@ -1,0 +1,56 @@
+140-340:145#1	landed	details/mobile.md#Bottom navigation	3-5 destinations of equal importance
+140-340:145#2	landed	details/mobile.md#Bottom navigation	Five destinations is the absolute cap
+140-340:145#3	landed	details/mobile.md#Bottom navigation	break one primary action out
+140-340:147#1	landed	details/mobile.md#Too many destinations	make the sidebar the home screen
+140-340:147#2	landed	details/mobile.md#Too many destinations	Align item counts and secondary actions to the right edge
+140-340:147#3	landed	details/mobile.md#Too many destinations	Put the notification bell and a More menu
+140-340:147#4	landed	details/mobile.md#Too many destinations	Reserve the bottom edge for a large search field
+140-340:148#1	landed	details/mobile.md#Type and size	Never shrink desktop text to fit a phone
+140-340:149	landed	details/mobile.md#One scroll axis	scrolls on one axis
+140-340:150	landed	details/mobile.md#Screen blocks	Compose a phone screen from four blocks
+140-340:153#1	landed	details/mobile.md#One screen, one job	One screen does one job
+140-340:153#2	landed	details/mobile.md#One screen, one job	A new feature gets a new screen
+140-340:160#1	landed	details/mobile.md#Focused flows	Hide the main navigation bar when
+140-340:160#2	landed	details/mobile.md#Focused flows	replace the bottom navigation with formatting
+140-340:160#3	landed	details/mobile.md#Focused flows	A template picker shows only Confirm
+576-818:657b	landed	details/mobile.md#Thumb reach	Leave only the close X at the top
+576-818:731b	landed	details/mobile.md#Feeds and story formats	snaps to one item per swipe
+576-818:731c	landed	details/mobile.md#Feeds and story formats	Autoplay video only with a visible pause control
+576-818:732b	landed	details/mobile.md#Thumb reach	Stack engagement icons on the lower-right edge
+140-340:148#2	landed	details/macos.md#Text size	Set the base text at 13 pt
+140-340:242	landed	details/macos.md#Utilities outside the main window	Put an on-demand utility outside the main window
+140-340:243#1	landed	details/macos.md#Quick panels	Remove the traffic lights from a transient quick panel
+140-340:243#2	landed	details/macos.md#Quick panels	holds only a drop zone, one input
+140-340:244	landed	details/macos.md#Quick panels	collapse the panel into a compact toast
+140-340:246	landed	details/macos.md#Window layout	in three zones: a top bar
+140-340:247	landed	details/macos.md#Window layout	Place the traffic lights in the top bar
+140-340:248	landed	details/macos.md#Window layout	Keep the top 50 px of the window free
+140-340:252#1	landed	details/macos.md#Single-screen utilities	Use a collapsible floating search bar
+140-340:254#1	landed	details/macos.md#Drag in and out	Accept dragged files on the quick-save drop zone
+140-340:254#2	landed	details/macos.md#Drag in and out	Let saved assets drag out of the canvas
+140-340:254#3	landed	details/macos.md#Drag in and out	Put a floating action bar in the preview panel
+341-575:380	landed	details/ai-interface.md#Entry	Make the prompt box the entry point
+341-575:381#1	landed	details/ai-interface.md#Attachments and pastes	Show each attachment as a compact preview block
+341-575:381#2	landed	details/ai-interface.md#Attachments and pastes	Collapse long pasted code into a collapsible block
+341-575:382#1	landed	details/ai-interface.md#Suggestions and modes	Make mode chips selectable
+341-575:382#2	landed	details/ai-interface.md#Suggestions and modes	Add @ context pills only where
+341-575:383#2	landed	details/ai-interface.md#Cost	Show a live low-high cost estimate
+341-575:383#3	landed	details/ai-interface.md#Waiting	Use a looping loader, such as bouncing dots
+341-575:385	landed	details/ai-interface.md#History	Show past sessions as a vertical list
+341-575:386#1	landed	details/ai-interface.md#History	Show the first line or snippet
+341-575:386#2	landed	details/ai-interface.md#History	Let users delete any chat
+341-575:386#3	landed	details/ai-interface.md#History	Put a search field over the history
+341-575:388#1	landed	details/ai-interface.md#Memory	Keep the memory panel one step from the chat
+341-575:388#2	landed	details/ai-interface.md#Memory	Show a storage meter for memory
+341-575:388#3	landed	details/ai-interface.md#Memory	Let the user delete many entries at once
+341-575:388#4	landed	details/ai-interface.md#Memory	Let the user add a key fact by hand
+341-575:390#1	landed	details/ai-interface.md#Inline refine	select a sentence or paragraph and type
+341-575:390#2	landed	details/ai-interface.md#Inline refine	Place quick actions such as Improve writing
+341-575:390#3	merged	details/macos.md#Keyboard first	Show each shortcut beside the action
+341-575:390#4	landed	details/ai-interface.md#Inline refine	Revise only the selected part
+341-575:392	landed	details/ai-interface.md#Sources and reasoning	Show the steps the AI took
+341-575:393#1	landed	details/ai-interface.md#Sources and reasoning	Reveal each step as it finishes, in order
+341-575:393#2	landed	details/ai-interface.md#Sources and reasoning	Collapse reasoning by default
+341-575:395	landed	details/ai-interface.md#Waiting	Stream text as it generates
+341-575:398#1	landed	details/ai-interface.md#Confidence	a pill labelled High confidence or Unverified
+341-575:398#2	landed	details/ai-interface.md#Confidence	Reveal the exact percentage on click

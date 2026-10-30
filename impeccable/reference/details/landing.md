@@ -134,7 +134,7 @@ Flavor comes from the committed world. Pick it from the brief, not by default.
 
 - Warm worlds use warm background tones.
 - Warm worlds use colorful graphics. Real illustration or none, never sketch-style SVG (craft-floor.md).
-- Warm worlds use larger button radii. Pills stay for small controls (craft-floor.md).
+- Warm worlds use larger button radii, within the radius rules in surfaces.md.
 - Modern worlds use desaturated imagery.
 - Match illustration playfulness to brand tone: playful characters for a warm world, realistic floating product objects for a modern one. Doodle styles stay out (craft-floor.md).
 

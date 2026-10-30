@@ -1,0 +1,105 @@
+001-139:7	landed	details/interaction.md#Clicks and presses	Wait the platform double-click time
+001-139:8	landed	details/interaction.md#Clicks and presses	Non-competing actions get no delay
+001-139:9	landed	details/interaction.md#Clicks and presses	Move a competing action off the target
+001-139:10#1	landed	details/interaction.md#Menus and tooltips	Draw a triangle from the pointer
+001-139:10#2	landed	details/interaction.md#Menus and tooltips	Outside the triangle, switch to the new item at once
+001-139:12	landed	details/interaction.md#Menus and tooltips	Expand a collapsed edge panel only after
+001-139:13#1	landed	details/interaction.md#Drag and edge scroll	show where the item will land
+001-139:13#2	landed	details/interaction.md#Drag and edge scroll	Scroll speed rises as the pointer
+001-139:14#2	landed	details/interaction.md#Undo, delay, and autosave	remove the item at once and show an Undo toast
+001-139:14#3	landed	details/interaction.md#Undo, delay, and autosave	A Recently Deleted area keeps items
+001-139:15#1	landed	details/interaction.md#Undo, delay, and autosave	Show the action as complete
+001-139:15#2	landed	details/interaction.md#Undo, delay, and autosave	Hold the real action in a buffer
+001-139:16#1	landed	details/interaction.md#Undo, delay, and autosave	autosave and show the saved state
+001-139:16#2	landed	details/interaction.md#Undo, delay, and autosave	Pair autosave with version history
+001-139:17#2	landed	details/interaction.md#Choosing a surface	sending bulk email to 10,000 recipients
+001-139:18	landed	details/interaction.md#Clicks and presses	Standard buttons act on release
+001-139:19	landed	details/interaction.md#Clicks and presses	Menu triggers may open on press
+001-139:20#2	landed	details/interaction.md#Clicks and presses	Hold-to-switch shortcuts commit on release
+341-575:364#2	landed	details/interaction.md#Choosing a surface D3#29	Inline or dialog, never a toast
+140-340:253	landed	details/interaction.md#Clicks and presses	Every shortcut shows its result at once
+341-575:521#1	landed	details/interaction.md#Menus and tooltips	Show a tooltip after about 500 ms of hover
+341-575:521#3	landed	details/interaction.md#Menus and tooltips	Mouse leave hides the tooltip at once
+001-139:20#1	landed	details/gestures.md#Commit feedback	Show progress toward the commit
+001-139:79#3	landed	details/gestures.md#Carousels	Slow-rotating image carousels follow the same rule
+001-139:104	landed	details/gestures.md#Swipe	Swipe actions hide utilities
+140-340:154#1	landed	details/gestures.md#Sheets	Mid-task choice uses a sheet
+140-340:154#2	landed	details/gestures.md#Sheets	A title, an optional search field
+140-340:154#3	landed	details/gestures.md#Sheets	Plus button opens the input
+140-340:156	landed	details/gestures.md#Swipe	offset the page underneath 35%
+140-340:157	landed	details/gestures.md#Sheets	Scale the background view down
+140-340:158	landed	details/gestures.md#Swipe	A vertical swipe-up on a main view opens global search
+140-340:159#1	landed	details/gestures.md#Long-press	Dim, do not blur, the background
+140-340:159#2	landed	details/gestures.md#Long-press	Enlarge the pressed element slightly
+140-340:159#3	landed	details/gestures.md#Long-press	Open a menu or a preview
+140-340:281#1	landed	details/gestures.md#Swipe D3#24	Swipe release uses a spring
+140-340:282	landed	details/gestures.md#Carousels	Skew cards as they near the screen edges
+140-340:283	landed	details/gestures.md#Carousels	The active dot stretches with the swipe position
+140-340:284	landed	details/gestures.md#Swipe	A circular thumb path, or items that shrink
+140-340:285	landed	details/gestures.md#Pair every gesture with a tap target	Every gesture has a visible control
+140-340:287#1	landed	details/gestures.md#Swipe	expand the card and its container to full screen at once
+140-340:287#2	landed	details/gestures.md#Swipe	Fade the body content up along the swipe direction
+140-340:287#3	landed	details/gestures.md#Swipe D3#24	settle with a low-bounce spring on release
+140-340:288	landed	details/gestures.md#Swipe	Onboarding Next works by tap and swipe
+140-340:291	landed	details/gestures.md#Swipe	stretches a magnetic indicator to confirm the add
+140-340:292#1	landed	details/gestures.md#Sheets	A bottom sheet closes on a swipe down
+140-340:292#2	merged	details/gestures.md#Sheets	Restore it to 100% as the sheet closes
+341-575:437	landed	details/gestures.md#Swipe	A tools tray that slides up with a horizontal page swipe
+341-575:482#1	landed	details/gestures.md#Carousels	A swipe is not keyboard operable
+341-575:525	landed	details/gestures.md#Swipe	rotate it away to 0% opacity
+576-818:731a	landed	details/gestures.md#Swipe	The primary swipe target spans nearly the full screen width
+140-340:293	landed	details/gestures.md#Slide to confirm	Replace the tap with a track
+001-139:60#1	merged	details/gestures.md#Carousels	Auto-rotate with a visible pause control
+341-575:520	merged	details/gestures.md#Carousels	needs a visible pause or stop control
+001-139:58	landed	details/motion.md#Authored moments D3#6	Pick one signature motion
+001-139:59	landed	details/motion.md#Scroll transitions	Slide the hero's floating assets off
+001-139:60#2	merged	details/motion.md#Reduced motion and pointer gating	Touch fires a hover on tap and leaves it stuck
+001-139:120	landed	details/motion.md#Feedback and state	Hover on a button alone is not enough
+001-139:125#1	landed	details/motion.md#Feedback and state	One staggered group on a landing page
+001-139:131	landed	details/motion.md#Scroll transitions	Fade the hero bottom into the next section
+001-139:136	merged	details/motion.md#Recipes	When two states visibly overlap
+001-139:137	landed	details/motion.md#Feedback and state	Swap its content with a short ease-in-out slide
+140-340:193	landed	details/motion.md#Text and labels	Swap the copy icon for a check
+140-340:265	rejected	craft-floor.md:46 (D3#22): doodles are banned; illustration style is not motion	
+140-340:267#1	merged	details/motion.md#Easing	UI motion uses ease-out at the start
+140-340:267#2	landed	details/motion.md#Marquee and loops D3#25	A floating asset may bob or rotate in place
+140-340:268	landed	details/motion.md#Marquee and loops D3#25	Parallax applies to margin assets only
+140-340:269	landed	details/motion.md#Text and labels	Animate a headline word only when the motion shows its meaning
+140-340:274#1	landed	details/motion.md#Authored moments	may hold a small interactive
+140-340:274#2	merged	details/motion.md#Authored moments	a real character illustration
+140-340:281#2	landed	details/motion.md#Easing	Persuade may tune the curve
+140-340:289	landed	details/motion.md#Feedback and state	A tapped card image zooms into the next page's hero
+341-575:396#2	landed	details/motion.md#Loading and waiting	A skeleton may shimmer, slowly and continuously
+341-575:426#1	landed	details/motion.md#Scroll transitions	Never delay the product reveal with a scroll effect
+341-575:430#1	landed	details/motion.md#Hover and reveal	Track the pointer through a spring
+341-575:434	rejected	research-interaction-nav-motion.md I9 (modals only for critical warnings)	
+341-575:438#1	landed	details/motion.md#Feedback and state	Slide a temporary or contextual layer up
+341-575:438#2	landed	details/motion.md#Feedback and state	Slide a step forward through a flow
+341-575:457#2	landed	details/motion.md#Scroll transitions	Scroll-linked motion never takes control
+341-575:512#1	landed	details/motion.md#Text and labels	Put two copies of the label in an
+341-575:513	landed	details/motion.md#Feedback and state	Animate a key cap press only on a surface
+341-575:514#1	landed	details/motion.md#Feedback and state	Show a spinner, then a success state
+341-575:514#2	landed	details/motion.md#Feedback and state D3#26	Only for rare, earned milestones
+341-575:517#1	landed	details/motion.md#Hover and reveal	The source spring (stiffness 636, damping 24, 500 ms) overshoots about 18%
+341-575:523	landed	details/motion.md#Hover and reveal	Position the preview absolutely so no text below moves
+341-575:524	landed	details/motion.md#Feedback and state	Mask a fill rectangle to the track
+341-575:526	landed	details/motion.md#Feedback and state	A collapsed search control shows a magnifier icon
+341-575:527	landed	details/motion.md#Text and labels	slide the old value out and the new value in
+341-575:541	landed	details/motion.md#Loading and waiting	Use a spinner for one button or one module
+341-575:543#2	landed	details/motion.md#Feedback and state	Step entrances 300 ms apart with a spring
+341-575:546#2	landed	details/motion.md#Text and labels	Mask the check inside its rounded square
+341-575:546#3	landed	details/motion.md#Text and labels	Slide it in with ease-out after a 300 ms delay
+576-818:607b	landed	details/motion.md#Marquee and loops	Use a marquee only in place of a static logo row
+576-818:608a	landed	details/motion.md#Marquee and loops	Mask the edges with a linear gradient
+576-818:608b	landed	details/motion.md#Marquee and loops	Add progressive blur on an edge only when the mask leaves a hard cut
+576-818:617a	merged	details/motion.md#The gate	Hover, press, color, a class or attribute toggle
+576-818:618	landed	details/motion.md#Authored moments	Build the moment in CSS, SVG, or code
+576-818:682a	merged	details/motion.md#Text and labels	On Persuade, the same mask swaps two messages
+576-818:682b	merged	details/motion.md#Text and labels	A small character can cross the copy on scroll
+576-818:686	landed	details/motion.md#Text and labels	Stretch or animate letters on load or scroll
+576-818:692a	landed	details/motion.md#Scroll transitions	Morph a media container's shape on load
+576-818:692b	merged	details/motion.md#Scroll transitions	or into oversized type on scroll
+576-818:693	landed	details/motion.md#Scroll transitions	Keep the scale moderate, because large resizes drop frames
+576-818:695b	landed	details/motion.md#Hover and reveal	On hover, dim the non-active nodes
+576-818:703b	landed	details/motion.md#Authored moments	Pair a 3D centerpiece with a quiet surround
+576-818:784c	landed	details/motion.md#Feedback and state	the active dot stretches into a pill that fills as the timer runs

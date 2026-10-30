@@ -90,7 +90,7 @@ def destination_heading(entry):
 def anchor_shape_ok(anchor):
     words = anchor.split()
     has_digit = any(ch.isdigit() for ch in anchor)
-    has_content = has_digit or any(len(w) >= 5 and w.lower() not in STOPWORDS for w in words)
+    has_content = has_digit or any(len(w) >= 4 and w.lower() not in STOPWORDS for w in words)
     return has_content and (len(words) >= 3 or (len(words) >= 2 and has_digit))
 
 

@@ -1,0 +1,10 @@
+140-340:145#2	landed	details/mobile.md#Bottom navigation	keep a tab bar to five or fewer destinations
+576-818:656b	landed	details/mobile.md#Feeds and story formats	Show a segmented progress bar
+576-818:658c	landed	details/mobile.md#Feeds and story formats	Pause playback when the user taps a share control
+576-818:660	landed	details/mobile.md#Feeds and story formats	Put a section jump at the bottom
+576-818:661a	landed	details/mobile.md#Feeds and story formats	Offer a summary at the end of each section
+576-818:661b	landed	details/mobile.md#Feeds and story formats	A summary fits on one screen
+140-340:243#2	landed	details/macos.md#Quick panels D3#48	holds only a drop zone, one input
+140-340:248	landed	details/macos.md#Window layout	Keep the top band free of controls
+341-575:390#3	landed	details/ai-interface.md#Inline refine	Show the keyboard shortcut next to each quick action
+341-575:383#3	landed	details/ai-interface.md#Waiting	Start with three bouncing dots

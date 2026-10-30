@@ -1,0 +1,4 @@
+140-340:175	landed	details/typography.md#Font Count and Roles D3#14	One family by default
+576-818:797	landed	details/typography.md#Font Count and Roles	Add a second, or a third
+576-818:761a	rejected	research-charts-ai.md D3: gridlines are faint, few, and dropped when every point is labelled, so always drawing both axes is rejected	
+576-818:794b	merged	details/typography.md#Tracking	Above 70 to 80px, tighten tracking

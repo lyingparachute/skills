@@ -1,0 +1,11 @@
+576-818:656a	landed	details/mobile.md#Feeds and story formats	Use vertical scroll instead of tap-through
+576-818:656b	landed	details/mobile.md#Feeds and story formats	Put a segmented progress bar on the right edge
+576-818:658a	landed	details/mobile.md#Feeds and story formats	in place of a visible pause button
+576-818:658b	landed	details/mobile.md#Feeds and story formats	Tap anywhere on the media to pause
+576-818:658c	landed	details/mobile.md#Feeds and story formats	Pause playback when the user taps Share
+576-818:660	landed	details/mobile.md#Feeds and story formats	Put a chapter chip at the bottom
+576-818:661a	landed	details/mobile.md#Feeds and story formats	End each chapter with a View Summary button
+576-818:661b	landed	details/mobile.md#Feeds and story formats	The summary opens a single-screen stat dashboard
+576-818:720	landed	details/mobile.md#Feeds and story formats	Replace multi-card browsing collages
+576-818:757a	landed	details/mobile.md#Bottom navigation	Keep every tab target on one baseline
+576-818:758c	landed	details/mobile.md#Bottom navigation	Show the user's profile picture

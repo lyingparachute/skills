@@ -1,0 +1,86 @@
+001-139:39	landed	details/landing.md#Feature sections	Never ship a landing page that only describes steps in plain text
+001-139:41#1	landed	details/landing.md#Anchor photo D3#1	Light or dark comes from the use scene
+001-139:41#2	landed	details/landing.md#Anchor photo	Crop and darken the anchor photo
+001-139:42	landed	details/landing.md#Anchor photo	Sample the primary tones from the anchor photo
+001-139:45	merged	new-work.md#6. Build with full commitment	The form supplies structure, reading order
+001-139:46	landed	details/landing.md#Focal point and scattered objects	Put the actionable copy at the center
+001-139:47	landed	details/landing.md#Social proof	Stop it offscreen and under reduced motion
+001-139:48	landed	details/landing.md#Feature sections	use oversized imagery, not rigid step boxes
+001-139:49	landed	details/landing.md#Tabs and visuals	full-screen colored tabs with oversized product visuals
+001-139:50	landed	details/landing.md#Social proof	Strip grid lines and header text
+001-139:51	landed	details/landing.md#CTA sections	left-aligned, heavy headline type
+001-139:53	landed	details/landing.md#CTA sections	at least 2x the heading-to-subtext distance
+001-139:54	landed	details/landing.md#Focal point and scattered objects	Place larger floating objects low
+001-139:55	landed	details/landing.md#Focal point and scattered objects	Darken the outer edges of the hero background
+001-139:56#1	merged	new-work.md#Both paths	a dense passage earns a quiet one
+001-139:56#3	landed	details/landing.md#Product UI in the hero	Make product screenshots dominant
+001-139:66	landed	details/landing.md#Hero zones and spacing	A hero has four zones
+001-139:68	landed	details/landing.md#Hero zones and spacing	Heading to subtext: 8px
+001-139:70	landed	details/landing.md#Hero zones and spacing	Subtext to CTA: 32px
+001-139:71#1	landed	details/landing.md#Hero zones and spacing	main heading to about 7 words
+001-139:71#2	landed	details/landing.md#Hero zones and spacing	subtext to about 14 words
+001-139:72	landed	details/landing.md#Navbar	Make only the primary conversion CTA visually prominent
+001-139:73#1	landed	details/landing.md#Focal point and scattered objects	Keep the focal point of the hero image clear
+001-139:73#2	merged	mode-persuade.md#Comps	text reads against whatever sits behind it
+001-139:77#1	landed	details/landing.md#Hero layouts	Text left, image right
+001-139:77#2	landed	details/landing.md#Hero layouts	Full-screen background image under the text
+001-139:77#3	landed	details/landing.md#Hero layouts	Text top, image bottom is the modern standard
+001-139:77#4	landed	details/landing.md#Hero layouts	Image top, text bottom is rare
+001-139:78#1	landed	details/landing.md#Edge alignment and reading flow	Centered text is the most common hero alignment
+001-139:78#2	landed	details/landing.md#Edge alignment and reading flow	Left alignment is the alternative
+001-139:78#3	landed	details/landing.md#Edge alignment and reading flow	heading on the left, body copy and CTA on the right
+001-139:79#2	landed	details/landing.md#Full-bleed background	full-width bleed image works behind
+001-139:80#1	landed	details/landing.md#Edge alignment and reading flow	surround it with generous whitespace
+001-139:80#2	landed	details/landing.md#Bento grid	use a bento grid so every item stays visible
+001-139:82#1	landed	details/landing.md#Committed world flavor	Warm worlds use warm background tones
+001-139:82#2	landed	details/landing.md#Committed world flavor	Warm worlds use colorful graphics
+001-139:82#4	landed	details/landing.md#Committed world flavor	Warm worlds use large rounded buttons
+001-139:83#2	landed	details/landing.md#Committed world flavor	Modern worlds use desaturated, premium imagery
+001-139:116#1	landed	details/landing.md#Section pacing	Do not repeat image-left, text-right sections down the whole page
+001-139:117#1	merged	new-work.md#Both paths	Search for the subject's physical object rather than the category
+001-139:117#2	landed	details/landing.md#Color restraint	Put it on the primary action and on state
+001-139:119#1	merged	details/landing.md#Navbar	Make only the primary conversion CTA visually prominent
+001-139:119#2	merged	details/landing.md#Navbar	Center the primary nav links
+001-139:122#1	merged	details/landing.md#Hero layouts	Text top, image bottom is the modern standard
+001-139:122#2	landed	details/landing.md#Product UI in the hero	Use the real product dashboard UI
+001-139:123#1	landed	details/landing.md#Color restraint	Pull the page's accent colors from the product UI
+001-139:123#2	landed	details/landing.md#Color restraint	set the primary CTA in high-contrast white
+001-139:124#1	landed	details/landing.md#Navbar	Center the primary nav links
+001-139:124#2	landed	details/landing.md#Navbar	Open a small dropdown for a primary item
+001-139:124#3	merged	details/landing.md#Navbar	Make only the primary conversion CTA visually prominent
+001-139:127#1	landed	details/landing.md#Product UI in the hero	high-signal part, not the whole raw screen
+001-139:127#2	landed	details/landing.md#Edge alignment and reading flow	sit on real layout columns or section edges
+001-139:128#1	landed	details/landing.md#Bento grid	Replace a row of four equal cards
+001-139:128#2	landed	details/landing.md#Tabs and visuals	tabs or a slider the visitor clicks through
+001-139:128#3	landed	details/landing.md#Section pacing	Keep feature sections short and compact
+001-139:129#1	rejected	craft-floor.md:27 eyebrow ban: kicker above a heading	
+001-139:129#2	landed	details/landing.md#Social proof	Place a client logo strip directly under the hero
+001-139:129#3	landed	details/landing.md#Social proof	one button from the logo strip
+001-139:130	landed	details/landing.md#Navbar	Use a mega menu for core links
+001-139:133#1	landed	details/landing.md#Product UI in the hero	Build a custom vignette for the story
+001-139:133#2	landed	details/landing.md#Edge alignment and reading flow	lead the eye into the content
+001-139:138	rejected	I7 (NN/g icon-usability): do not rely on hover to reveal text labels; the CTA must stay visible	
+140-340:172#1	landed	details/landing.md#Edge alignment and reading flow	12 columns on desktop and 8 on tablet
+140-340:173#2	merged	layout.md#Apply	A 4-unit base usually
+140-340:211#2	landed	details/landing.md#Product UI in the hero	cropped, edited vignettes of the real UI
+140-340:263	landed	details/landing.md#Focal point and scattered objects	generous empty whitespace around the central text block
+140-340:264	landed	details/landing.md#Focal point and scattered objects	trail toward the edges
+341-575:423#1	landed	details/landing.md#Copy and numbers D3#39	Bold numbers are allowed inside text
+341-575:423#3	landed	details/landing.md#Clarity test	scrolling for 5 seconds should name the core offer
+341-575:424#1	landed	details/landing.md#Clarity test	Name the product in the headline
+341-575:424#2	landed	details/landing.md#Product UI in the hero	Put the actual product UI above the fold
+341-575:426#2	landed	details/landing.md#Product reveal	Never delay the product reveal for a scroll effect
+341-575:427	landed	details/landing.md#Product reveal	Play the same demo on tap and keyboard focus
+341-575:429	landed	details/landing.md#Product reveal	slide feature text beside the isolated UI
+341-575:450#1	landed	details/landing.md#Edge alignment and reading flow	Read order runs top to bottom
+341-575:473#1	rejected	adapt.md:40 single column on mobile	
+341-575:494	rejected	not actionable in code: reference-image advice, see visualize.md:14	
+341-575:495#1	merged	visualize.md#Generate three compositional options	a picture wherever one exists
+341-575:567#2	rejected	not actionable in code: Figma nudge setting; the 4-unit scale is layout.md:51	
+576-818:586	landed	details/landing.md#Edge alignment and reading flow	Anchor asymmetric type with a horizontal divider
+576-818:591	landed	details/landing.md#Hero layouts	an interactive product showcase on the right
+576-818:611a	landed	details/landing.md#Hero layouts	Headline and CTA above a full-width dashboard preview
+576-818:620a	landed	details/landing.md#Bento grid	Use 2 to 4 asymmetric cards per row
+341-575:422	merged	details/landing.md#Copy and numbers	Consolidate copy into a few text blocks
+576-818:588	landed	details/landing.md#Hero zones and spacing	Design desktop heroes at real screen size
+576-818:589	landed	details/landing.md#Hero zones and spacing	Full-screen desktop heroes start at 1920px

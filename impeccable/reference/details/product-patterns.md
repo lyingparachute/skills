@@ -18,7 +18,7 @@ Patterns for Operate surfaces: app navigation, actions, lists, cards, forms, sea
 - Use tabs to switch related table views in place. Do not add sidebar links for them.
 - Put separate areas of one page, such as Billing and Usage, into tabs.
 - Give a dedicated page a back button or breadcrumbs.
-- Make the sidebar slightly darker than the canvas, or tint it with about 2% brand hue (a starting value).
+- Make the sidebar slightly darker than the canvas, or tint it as color-values.md describes for the app frame.
 
 ## Header actions
 
