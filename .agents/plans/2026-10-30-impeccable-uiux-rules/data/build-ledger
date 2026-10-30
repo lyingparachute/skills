@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+import re
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ledger_rows import (EXPECTED_NON_COVERED, EXPECTED_PARSED, LEDGER, LEDGER_HEADER,
+                         gap_rows, non_covered)
+
+DESTINATIONS = {
+    "interaction.md": "details/interaction.md",
+    "operate.md": "details/product-patterns.md",
+    "product-patterns.md": "details/product-patterns.md",
+    "components.md": "details/product-patterns.md",
+    "pricing.md": "details/product-patterns.md",
+    "onboard.md": "details/product-patterns.md",
+    "distill.md": "details/product-patterns.md",
+    "clarify.md": "details/product-patterns.md",
+    "shape.md": "details/product-patterns.md",
+    "document.md": "details/product-patterns.md",
+    "mode-persuade.md": "details/landing.md",
+    "new-work.md": "details/landing.md",
+    "layout.md": "details/landing.md",
+    "colorize.md": "details/color-values.md",
+    "quieter.md": "details/color-values.md",
+    "surfaces.md": "details/surfaces.md",
+    "craft-floor.md": "details/surfaces.md",
+    "typography.md": "details/typography.md",
+    "typeset.md": "details/typography.md",
+    "motion.md": "details/motion.md",
+    "animate.md": "details/motion.md",
+    "motion-performance.md": "details/motion.md",
+    "overdrive.md": "details/motion.md",
+    "delight.md": "details/motion.md",
+    "adapt.md": "details/mobile.md",
+    "mobile-web.md": "details/mobile.md",
+    "macos.md": "details/macos.md",
+    "charts.md": "details/charts.md",
+    "ai-interface.md": "details/ai-interface.md",
+}
+GESTURE_WORDS = re.compile(r"swipe|drag|long-press|sheet|carousel|pull-to-refresh", re.I)
+GESTURE_SOURCES = {"details/motion.md", "details/mobile.md"}
+
+
+def first_path(note):
+    marked = re.search(r"\b(?:dest|Dest)\b:?\s*(.*)", note)
+    text = marked.group(1) if marked else note
+    found = re.search(r"([A-Za-z0-9_./-]+\.md)", text)
+    return found.group(1).rsplit("/", 1)[-1] if found else ""
+
+
+def default_destination(row):
+    dest = DESTINATIONS.get(first_path(row["note"]), "unassigned")
+    if GESTURE_WORDS.search(row["rule"]) and (dest in GESTURE_SOURCES or dest == "unassigned"):
+        return "details/gestures.md"
+    return dest
+
+
+def ledger_line(row):
+    rule = row["rule"].replace("|", "/")
+    if row["status"] == "OUT-OF-SCOPE":
+        return f"| {row['id']} | {row['status']} | {rule} | out-of-scope |  |  |"
+    return f"| {row['id']} | {row['status']} | {rule} | pending | {default_destination(row)} |  |"
+
+
+def main():
+    if LEDGER.exists():
+        sys.exit("ledger.md exists")
+    rows = gap_rows()
+    todo = non_covered(rows)
+    if len(rows) != EXPECTED_PARSED or len(todo) != EXPECTED_NON_COVERED:
+        sys.exit(f"expected {EXPECTED_PARSED}/{EXPECTED_NON_COVERED}, parsed {len(rows)}/{len(todo)}")
+    lines = ["# Ledger", "", LEDGER_HEADER, "|---|---|---|---|---|---|"]
+    lines += [ledger_line(r) for r in todo]
+    LEDGER.write_text("\n".join(lines) + "\n")
+    print(f"parsed {len(rows)} rows, {len(todo)} non-covered, wrote ledger.md")
+
+
+if __name__ == "__main__":
+    main()
