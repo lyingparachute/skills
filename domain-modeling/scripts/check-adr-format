@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+import argparse
+from collections import Counter
+from datetime import date
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+SECTIONS = ['Status', 'Context', 'Decision', 'Consequences', 'Alternatives rejected']
+STATUSES = {'proposed', 'accepted', 'archived'}
+MAX_LINES = 50
+MAX_WORD_LOSS = 0.03
+SOURCE_PATH = re.compile(r'`[^`\n]*/[^`\n]*\.(?:ts|tsx|mjs|js|sql|py|java)`')
+FILENAME = re.compile(r'(\d{4})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md')
+
+
+def git(*args):
+    return subprocess.run(['git', *args], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True).stdout
+
+
+def words(text):
+    return Counter(re.findall(r"[\w]+(?:['-][\w]+)*", text.lower()))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--since')
+    parser.add_argument('directory', type=Path)
+    args = parser.parse_args()
+    root = args.directory
+    if not root.is_dir():
+        parser.error(f'not a directory: {root}')
+    errors = []
+    seen = {}
+    readme = root / 'README.md'
+    if readme.exists():
+        reserved = re.search(r'^Reserved numbers:\s*(.*)$', readme.read_text(), re.MULTILINE | re.IGNORECASE)
+        if reserved:
+            for number in re.findall(r'\b\d{4}\b', reserved.group(1)):
+                seen[number] = 'reserved in README.md'
+    records = sorted(path for path in root.rglob('*.md') if path.name not in {'README.md', 'TEMPLATE.md'})
+    renames = {}
+    previous_records = {}
+    repository = None
+    if args.since:
+        try:
+            repository = Path(git('rev-parse', '--show-toplevel').strip())
+            git('rev-parse', '--verify', f'{args.since}^{{commit}}')
+            for previous in git('ls-tree', '-r', '--name-only', args.since, '--', str(root.resolve().relative_to(repository))).splitlines():
+                match = FILENAME.fullmatch(Path(previous).name)
+                if match:
+                    previous_records.setdefault(match.group(1), []).append(previous)
+            for line in git('diff', '--name-status', '-M', args.since, '--').splitlines():
+                fields = line.split('\t')
+                if fields[0].startswith('R') and len(fields) == 3:
+                    renames[fields[2]] = fields[1]
+        except subprocess.CalledProcessError as error:
+            print(f'git error: {error.stderr.strip()}', file=sys.stderr)
+            return 1
+    for path in records:
+        text = path.read_text(encoding='utf-8')
+        lines = text.splitlines()
+        def fail(message):
+            errors.append(f'{path}: {message}')
+        filename = FILENAME.fullmatch(path.name)
+        if not filename:
+            fail('invalid filename')
+        else:
+            number = filename.group(1)
+            if number in seen:
+                fail(f'number {number} already used by {seen[number]}')
+            seen[number] = str(path)
+        front = re.match(r'\A---\n(.*?)\n---\n', text, re.DOTALL)
+        fields = dict(re.findall(r'^([a-z]+):\s*(.*?)\s*$', front.group(1), re.MULTILINE)) if front else {}
+        status = fields.get('status', '')
+        if status not in STATUSES:
+            fail('invalid status frontmatter')
+        try:
+            date_value = fields.get('date', '')
+            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date_value):
+                raise ValueError()
+            date.fromisoformat(date_value)
+        except ValueError:
+            fail('invalid date frontmatter')
+        archived = 'archived' in path.relative_to(root).parts[:-1]
+        if (status == 'archived') != archived:
+            fail('archived status and folder disagree')
+        title = re.search(r'^# (.+)$', text, re.MULTILINE)
+        if not filename or not title or not re.fullmatch(rf'ADR {filename.group(1)}: \S.*', title.group(1)):
+            fail('invalid title')
+        headings = list(re.finditer(r'^## (.+)$', text, re.MULTILINE))
+        if [heading.group(1) for heading in headings] != SECTIONS:
+            fail('invalid sections or order')
+        else:
+            bodies = [text[heading.end():headings[index + 1].start() if index + 1 < len(headings) else len(text)].strip() for index, heading in enumerate(headings)]
+            if not bodies[0].splitlines() or bodies[0].splitlines()[0] != f'{status.capitalize()}.':
+                fail('status section does not match frontmatter')
+            if not re.match(r'^\*\*[^\n*]+[.!?]\*\*(?:\s|$)', bodies[2]):
+                fail('decision must open with a bold sentence')
+            if not re.search(r'^\|\s*Alternative\s*\|\s*Why not\s*\|\s*\n\|\s*:?-{3,}:?\s*\|\s*:?-{3,}:?\s*\|', bodies[4], re.MULTILINE):
+                fail('alternatives table missing')
+        if SOURCE_PATH.search(text):
+            fail('backticked source path')
+        if len(lines) > MAX_LINES:
+            print(f'{path}: warning: more than {MAX_LINES} lines')
+        if args.since:
+            try:
+                relative = path.resolve().relative_to(repository).as_posix()
+                predecessor = renames.get(relative, relative)
+                try:
+                    old = git('show', f'{args.since}:{predecessor}')
+                except subprocess.CalledProcessError:
+                    candidates = previous_records.get(filename.group(1), []) if filename else []
+                    if len(candidates) != 1:
+                        raise
+                    old = git('show', f'{args.since}:{candidates[0]}')
+                old_front = re.match(r'\A---\n(.*?)\n---\n', old, re.DOTALL)
+                old_accepted = old_front and re.search(r'^status:\s*accepted\s*$', old_front.group(1), re.MULTILINE)
+                if status == 'accepted' or old_accepted:
+                    old_words = words(old)
+                    removed = sum((old_words - words(text)).values())
+                    total = sum(old_words.values())
+                    if removed:
+                        print(f'{path}: {removed} words removed')
+                    if total and removed / total > MAX_WORD_LOSS:
+                        fail('word loss exceeds 3%')
+            except (ValueError, subprocess.CalledProcessError):
+                if status == 'accepted':
+                    fail('no predecessor found at reference')
+    for error in errors:
+        print(error, file=sys.stderr)
+    print(f'{len(records)} records checked')
+    return bool(errors)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

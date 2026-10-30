@@ -1,60 +1,13 @@
-# ADR Format
+# ADR format
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+Write an ADR only for a hard-to-reverse, surprising decision with a real trade-off. Search existing decisions first and apply the durable-doc contest in `SKILL.md`.
 
-Create the `docs/adr/` directory lazily - only when the first ADR is needed.
+Use `adr/TEMPLATE.md` for the record and `adr/README-TEMPLATE.md` for the index. Group records by the part of the system they govern. Allocate the next unused four-digit number across all folders, including the archive and reserved numbers; never reuse a number.
 
-## Template
+Use domain concepts, apps, packages, modules and ADR numbers instead of implementation identifiers. Retain a function name only as a last resort when removing it obscures the decision; a critic reviews each retained name and its necessity. Exclude file paths, line numbers, test names, type names, field lists and command recipes.
 
-```md
-# {Short title of the decision}
+Set status to `proposed` during review and `accepted` when merged. Accepted decisions are immutable. For a changed decision, write a new ADR linking the old one, move the old record to `archived/`, set its status to `archived`, and name the replacement after the first Status line.
 
-{1-3 sentences: the constraint, what we decided, and why.}
-```
+Keep the five sections in template order. Begin Decision with a bold sentence. Put rejected alternatives in the table. When converting an older record, move reversal criteria to the last Consequences bullet beginning "Revisit if" and related ADRs to a closing Context line beginning "Related:". Bold the existing first Decision sentence without changing its words. If it cannot stand alone, the lead writes a sentence and records the ADR number in the plan's Surprises & Discoveries. Preserve the decision's meaning.
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* - not in filling out sections.
-
-An ADR is a decision record, not a cookbook, contract, or implementation spec. Every write passes the contest in `domain-modeling/SKILL.md`, Durable docs.
-
-Example:
-
-```md
-# Pods are disposable
-
-The platform can kill any pod at any time, so the app keeps no state in memory between requests. It persists state or rebuilds it.
-```
-
-Too much - a history lesson, not a decision:
-
-```md
-We first ran serverless. Cold starts broke the scheduler and billing grew, so in 2024 we moved to pods, which...
-```
-
-## Optional sections
-
-Only include these when they add genuine value. Most ADRs won't need them.
-
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) - useful when decisions are revisited
-- **Considered Options** - one line each: the option and the constraint that ruled it out
-
-## Numbering
-
-A new ADR takes the highest number plus one.
-
-## When to write an ADR
-
-All three of these must be true:
-
-1. **Hard to reverse** - the cost of changing your mind later is meaningful
-2. **Surprising without context** - a future reader will look at the code and wonder "why on earth did they do it this way?"
-3. **The result of a real trade-off** - there were genuine alternatives and you picked one for specific reasons
-
-Then scan `docs/adr/` for an ADR on the same topic. Same decision, stale words → edit it. Changed decision → supersede it.
-
-If a decision is easy to reverse, skip it - you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
-
-### What qualifies
-
-- **Architectural shape.** "The write model is event-sourced, the read model is projected into Postgres."
-- **Deliberate deviation from the obvious path.** "Manual SQL instead of an ORM, because X." It stops the next engineer from "fixing" it.
-- **Constraint not visible in the code.** "No AWS, because of compliance requirements."
+Run `domain-modeling/scripts/check-adr-format <adr-directory>` to check the records. More than 50 lines is a warning, not a limit. Use `--since REF` to check accepted records for word loss against a git revision, including renames.

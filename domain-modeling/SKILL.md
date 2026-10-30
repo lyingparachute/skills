@@ -51,7 +51,7 @@ Durable docs = ADRs, `GLOSSARY.md`, READMEs, `AGENTS.md` or `CLAUDE.md`, `docs/`
 4. **Enforced?** Each "must" or "never" in an ADR, README, or runbook names an automated check (test, lint, CI, hook) or a person or team who answers for it. None → state what the code does today, or cut it. Agent rules in `AGENTS.md` are enforced by the agent reading them.
 5. **History?** Keep the decision and its constraint. A rejected option gets one line: the constraint that ruled it out.
 6. **Useful?** Who reads this, and what do they do differently? No answer, or an agent does it by default → cut.
-7. **Shrink.** Edit, merge, or delete before adding. An ADR, `GLOSSARY.md`, README, `docs/` page, runbook or module guide (an `AGENTS.md` below the repo root) that this edit takes past 50 lines gets a split or a cut; a glossary splits by subheading. The repo-root `AGENTS.md` or `CLAUDE.md` and the agent rule files it routes harnesses to are exempt: harnesses load them by path or trigger, and splitting them changes loading.
+7. **Shrink.** Edit, merge, or delete before adding. A `GLOSSARY.md`, README, `docs/` page, runbook or module guide (an `AGENTS.md` below the repo root) that this edit takes past 50 lines gets a split or a cut; a glossary splits by subheading. ADR length is governed by [ADR-FORMAT.md](./ADR-FORMAT.md). The repo-root `AGENTS.md` or `CLAUDE.md` and the agent rule files it routes harnesses to are exempt: harnesses load them by path or trigger, and splitting them changes loading.
 
 Voice: `no-ai-slop`.
 
@@ -83,4 +83,4 @@ When a term is resolved and survives the contest, update `GLOSSARY.md` right the
 
 ### Write ADRs sparingly
 
-An ADR is 1-3 sentences: the constraint, the decision, and why. It stays true while the code moves, so it names no class, file, test, route, or plan, and carries no history or status story. A new ADR also passes the test in [ADR-FORMAT.md](./ADR-FORMAT.md) and the contest; read that file before you write or edit one.
+Read [ADR-FORMAT.md](./ADR-FORMAT.md) before writing or editing an ADR. Apply its decision test, lifecycle and format, and the durable-doc contest.

@@ -1,5 +1,7 @@
 # Provenance
 
+`domain-modeling/scripts/check-adr-format` is vendored by stacjo at `scripts/vendor/check-adr-format`, with a SHA-256 pin maintained by that consumer.
+
 Not everything here was written here. Without this file, "what changed upstream since I took this?" is an investigation. With it, it is a diff.
 
 **Rule:** a skill copied or adapted from someone else gets a row before it lands. A row with an unknown upstream is fine. A skill with no row is not.
