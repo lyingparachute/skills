@@ -15,6 +15,7 @@ Concrete values and fixes that sit below the command references. A command refer
 | [mobile.md](mobile.md) | A web or native app is built for, or feels wrong on, a phone |
 | [motion.md](motion.md) | Building, tuning, or reviewing any web animation or transition |
 | [motion-performance.md](motion-performance.md) | An animation stutters or drops frames, or will play while the page is busy |
+| [sources.md](sources.md) | A rule seems to contradict another source, you need the source behind a number, or you are upgrading impeccable |
 | [surfaces.md](surfaces.md) | Radii, optical alignment and icon size, shadows versus borders, padding, glass, image outlines, hit areas |
 | [typography.md](typography.md) | Type scale, font count and roles, line-height, tracking, fluid type, text wrapping, font smoothing, tabular numbers |
 | [worst-case.md](worst-case.md) | Stress-testing a component with realistic worst-case data behind a toggle |
