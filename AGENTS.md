@@ -39,7 +39,7 @@
 - **Construct objects completely.** Build in one place from all required inputs - factory, builder, or full-arg constructor. No empty init + scattered mutations. Mutation setters only when framework demands.
 - **No null returns.** Use typed absence - empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union - instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
-- **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → recommend one and state the trade-off. Ask only when the choice is the user's to make: product behavior, public API shape, scope, or cost. No silent pick. Trivial mechanical edit (rename, format, typo, missing import) = exempt.
+- **Assumptions surface, not buried.** Before any non-mechanical change: state assumptions explicitly. Two+ reasonable approaches → pick one, state the trade-off, and proceed. Ask only when the choice is the user's to make (product behavior, public API shape, scope, cost, irreversible action) and neither the request nor the rules settle it. When the user hands the decisions to you, in any words, those choices are yours too. A question you ask blocks the action it asks about until the user answers. No silent pick: the final report shows every non-mechanical pick in one table - decision, why, options weighed. Trivial mechanical edit (rename, format, typo, missing import) = exempt.
 - **No shortcuts. Production-grade or skip the change.** No "quick fix", "temporary hack", "clean up later" - later never comes. Push back on scope, never on quality. Before any compromise, ask: harder to fix in 6 months? would I accept this in review? Either unclear → do it properly or don't do it.
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
@@ -76,15 +76,15 @@
 
 ## Planning
 
-- **Plan before code.** Every non-trivial task starts with a written plan from the `exec-plan` skill. It owns what a plan contains, its template and format check, and its critic gate, which passes before any execution, no exception. Explore requirements and constraints before committing to a plan. One task = one concern = one verifiable outcome.
+- **Plan when the work needs a plan.** Write a plan with the `exec-plan` skill when any of these holds: the user asks for one; the work needs two or more milestones; it locks a decision that outlives the task (module boundary, public API, data model, migration); or open questions remain that only the user can answer. Everything else is a **direct change**: state assumptions, make the edit, run focused checks, report. A direct change has no plan file, no plan critic, no retire step. A plan that would hold one milestone and no locked decision is a direct change. Once you write a plan, `exec-plan` owns its content, template, format check, and critic gate, which passes before any execution, no exception. One task = one concern = one verifiable outcome.
 
 ## Testing & Delivery
 
-- **Done = plan met, reviewed, and verified output, not assertion.** "80% working" = 0% shipped. Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, in its own commit, even outside the files you touched.
+- **Done = ask met (and plan met and reviewed, when there is a plan), verified output, not assertion.** "80% working" = 0% shipped. Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, as a direct change in its own commit, even outside the files you touched. A fix big enough to need its own plan: name it in the report and keep going on the task.
 - **Commit message = one line**, per `caveman-commit`. Details go in the PR description.
 - **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
-- **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff.
+- **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff. A gate, a red check, or a critic finding is work to do, not a place to stop and report: fix it and continue until the ask is met or a real user decision blocks you.
 - **Test coverage is non-negotiable.** Every feature ships with tests. Untested code = unfinished code.
 - **Integration tests at boundaries over unit tests with mocks.** Test service in isolation against real/stubbed ports. Over-mocked unit tests = false confidence, break on refactors.
 - **Single focused tests over full-suite runs.** Narrowest test that covers the change. Run focused checks while working. If the repo defines a full local CI mirror and a moment for it, follow the repo; otherwise the full suite is CI's job.
@@ -143,11 +143,11 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - **Broad exploration or large tool output → spawn.** Searches across many modules, long research, big logs. Top reads the summary, not the raw dump. A few targeted reads or greps stay in the top agent.
 - **Large work = slices, one per subagent.** One slice = one concern, one verifiable outcome. No monolithic prompts. A medium feature that fits one context stays in one agent. Splitting it too fine loses shared context and breaks the seams.
 - **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. Parallelize independent work; parallel writers follow the repo's worktree rule.
-- **Non-trivial slice done → critic subagent review code before next slice.**
+- **Plan milestone done → critic subagent reviews the code before the next milestone.**
 
 ## Critic Subagent Rules
 
 - **Critic = fresh context, never the writer.** Same agent self-approve = theatre. Brief = attack, not validate; a close call gets called out.
 - **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief and the output format.
-- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed. Dismissal is only for a finding that fails confirmation against the source, or one the user dismisses, each written with its reason; a confirmed finding is fixed, or deferred to a tracked plan when the user chooses. Quality bar: no code smell, no debt created, no debt left behind.
+- **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed. Dismissal is only for a finding that fails confirmation against the source, or one the user dismisses, each written with its reason (for a user dismissal, their words are the reason); a confirmed finding is fixed, or deferred to a tracked plan when the user chooses. Quality bar: no code smell, no debt created, no debt left behind.
 - **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 → report to user, never a third loop.

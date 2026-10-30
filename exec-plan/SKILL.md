@@ -93,7 +93,7 @@ Once `Status: ready`, the baton passes out of this skill (a fold sends it back t
 
 ## Red Flags
 
-- "The plan is simple, it needs no critic" - one fresh round minimum, no exception.
+- "The plan is simple, it needs no critic" - one fresh round minimum, no exception. If it is that simple (one milestone, no locked decision), it is a direct change per the global rules file: drop the draft and make the edit.
 - Writing implementation code/pseudo-code into milestones - that's the implementer's job.
 - A DoD bullet with no command - untestable = not done-able.
 - "This is new work, it needs its own plan" - search for a fold target first.
