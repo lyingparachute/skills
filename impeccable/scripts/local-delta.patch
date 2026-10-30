@@ -1,0 +1,159 @@
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: impeccable
+-description: "Use when the user wants to design, redesign, shape, critique, audit, polish, simplify, harden, animate, or otherwise improve a frontend interface: websites, landing pages, dashboards, product UI, components, forms, settings, onboarding, empty states, and native iOS or Android screens. Handles UX review, hierarchy, layout, typography, color, motion, UX copy, accessibility, responsive behavior, edge cases, and capturing or documenting design systems (DESIGN.md, tokens). Also for making bland UI bolder, loud UI quieter, or ambitious visual effects. Not for backend-only or non-UI tasks."
++description: "Use when the user wants to design, redesign, critique, audit, polish, simplify, harden, animate, or otherwise improve a frontend interface (websites, landing pages, dashboards, product UI, components, forms, onboarding, empty states, native iOS or Android screens), asks about its UX, layout, typography, color, motion, copy, accessibility, or responsive behavior, wants UI made bolder or quieter, or wants a design system captured (DESIGN.md, tokens). Not for backend-only work."
+ metadata:
+   version: 4.8.0
+ ---
+--- a/reference/adapt.md
++++ b/reference/adapt.md
+@@ -199,6 +199,8 @@
+ ---
+ 
+ ## Reference Material
++
++Phone-only platform fixes (tap highlight, viewport units, input zoom, overscroll, gesture axes, status bar color) live in [details/mobile.md](details/mobile.md).
+ 
+ The sections below were previously `responsive-design.md` and live inline now so the adapt flow has its deep responsive reference in one place.
+ 
+--- a/reference/adapt.native.md
++++ b/reference/adapt.native.md
+@@ -56,3 +56,5 @@
+ - Hide core functionality on smaller devices (if it matters, make it work)
+ - Lock orientation to dodge a layout bug
+ - Trust simulators alone (posture, gestures, and performance need hardware)
++
++macOS windows and utilities live in [details/macos.md](details/macos.md); phone app structure and feel for iOS and Android live in [details/mobile.md](details/mobile.md).
+--- a/reference/animate.md
++++ b/reference/animate.md
+@@ -2,6 +2,8 @@
+ 
+ Use motion to explain state, relationship, and hierarchy, or to create one authored moment the surface has earned. Decoration without purpose is animation debt.
+ 
++Exact curves, durations, recipes, and the motion review checklist live in [details/motion.md](details/motion.md); load it before writing or reviewing motion code. For frame drops, load [details/motion-performance.md](details/motion-performance.md).
++
+ ---
+ 
+ ## Visitor mode
+--- a/reference/audit.md
++++ b/reference/audit.md
+@@ -8,6 +8,8 @@
+ 
+ Run comprehensive checks across 5 dimensions. Score each dimension 0-4 using the criteria below.
+ 
++When the user asks for a guidelines or compliance check, also run [web-interface-guidelines.md](web-interface-guidelines.md).
++
+ ### 1. Accessibility (A11y)
+ 
+ **Check for**:
+@@ -26,6 +28,7 @@
+ **Check for**:
+ - **Layout thrashing**: Reading/writing layout properties in loops
+ - **Expensive animations**: Casual layout-property animation, unbounded blur/filter/shadow effects, or effects that visibly drop frames
++- **Motion craft**: every animation checked against the review table in [details/motion.md](details/motion.md#review)
+ - **Missing optimization**: Images without lazy loading, unoptimized assets
+ - **will-change overuse**: `will-change` applied broadly or left on at rest (it is a targeted hint for known expensive animations, not a baseline requirement)
+ - **Bundle size**: Unnecessary imports, unused dependencies
+--- a/reference/colorize.md
++++ b/reference/colorize.md
+@@ -84,3 +84,5 @@
+ ```
+ 
+ Add at most two variant-specific parameters, such as palette, temperature, or tint behavior. Follow [live.md](live.md)'s parameter contract.
++
++Exact surface steps, text levels, state colors, semantic colors, dark-mode values, and text-over-image rules live in [details/color-values.md](details/color-values.md).
+--- a/reference/craft-floor.md
++++ b/reference/craft-floor.md
+@@ -10,7 +10,7 @@
+ - **Depth:** shadows carry an offset and a soft blur. A zero-offset colored halo is decoration.
+ - **Spacing:** tight groups, generous separation, more space above a heading than below it. Read the computed values.
+ - **Type:** body measure 65–75ch, display max 6rem, tracking floor -0.04em, balanced headings, obvious scale and weight steps. Run the real copy at every breakpoint and fix what overflows.
+-- **Motion:** one authored moment, not scattered effects and not one identical entrance on every section. Exponential ease-out from an already-visible default. Reach past transform and opacity: blur, backdrop-filter, clip-path, mask, and shadow belong to the palette when they stay smooth.
++- **Motion:** one authored moment, not scattered effects and not one identical entrance on every section. Exponential ease-out from an already-visible default. Reach past transform and opacity: blur, backdrop-filter, clip-path, mask, and shadow belong to the palette when they stay smooth. When the edit touches motion, take values and recipes from [details/motion.md](details/motion.md).
+ - **States:** hover, disabled, loading, error, empty. Plus real content, working controls, responsive composition, keyboard focus.
+ - **Browser surfaces:** the parts you did not draw still carry the design. Text selection, the caret, custom scrollbars, focus rings, underline offset, and the numerals in tabular data all ship with browser defaults that belong to no design system. Theme them from the palette. This is the cheapest signal that a page was built rather than assembled, and the one models skip most reliably.
+ - **Copy:** the product's own language. Controls name their action; errors name the problem and the recovery.
+@@ -48,3 +48,5 @@
+ - Claims and configuration come from supplied truth; label illustrative values honestly. Naming a concept and then ironizing it is not a claim.
+ 
+ The floor holds the mechanics; it never picks the direction. With every check green, spend the page on the committed world, and when torn between refined and committed, commit.
++
++Before building a surface, load the matching file from the index in [details/README.md](details/README.md) for exact patterns and values.
+--- a/reference/harden.md
++++ b/reference/harden.md
+@@ -1,6 +1,8 @@
+ Designs that only work with perfect data aren't production-ready. Harden the interface against the inputs, errors, languages, and network conditions that real users will throw at it.
+ 
+ ## Assess Hardening Needs
++
++When the user asks to stress-test, break, or try the worst case on a component, follow [details/worst-case.md](details/worst-case.md) instead of the dimensions below.
+ 
+ Identify weaknesses and edge cases:
+ 
+--- a/reference/layout.md
++++ b/reference/layout.md
+@@ -82,3 +82,5 @@
+ ```
+ 
+ Add one structural parameter only when the topology genuinely branches. Follow [live.md](live.md)'s parameter contract.
++
++Landing-page hero layouts, spacing starting values, and section patterns live in [details/landing.md](details/landing.md).
+--- a/reference/onboard.md
++++ b/reference/onboard.md
+@@ -232,3 +232,5 @@
+ - **Time to value**: How long until users get first value?
+ 
+ When users hit the aha moment fast and don't drop off, hand off to `$impeccable polish` for the final pass.
++
++Empty-state, no-results, contextual-tip, and first-run sequencing patterns for app UI live in [details/product-patterns.md](details/product-patterns.md).
+--- a/reference/operate.md
++++ b/reference/operate.md
+@@ -59,3 +59,5 @@
+ - Standard navigation patterns: top bar + side nav, breadcrumbs, tabs, command palettes.
+ - Density. Tables with many rows, panels with many labels, dense information when users need it.
+ - Consistency over surprise. The same visual vocabulary screen to screen is a virtue; delight is saved for moments, not pages.
++
++App UI patterns (navigation, lists, tables, forms, search, empty states, pricing) live in [details/product-patterns.md](details/product-patterns.md), click and menu timing in [details/interaction.md](details/interaction.md), and chart rules in [details/charts.md](details/charts.md).
+--- a/reference/optimize.md
++++ b/reference/optimize.md
+@@ -114,6 +114,8 @@
+ - Bound expensive paint areas for blur/filter/shadow effects (smaller and isolated is faster)
+ 
+ ### Animation Performance
++
++Symptom table, diagnosis order, and framework traps: [details/motion-performance.md](details/motion-performance.md).
+ 
+ **GPU Acceleration**:
+ ```css
+--- a/reference/polish.md
++++ b/reference/polish.md
+@@ -73,6 +73,7 @@
+ - Every control needs appropriate default, hover, focus, active, disabled, loading, error, and success behavior.
+ - Preserve visible keyboard focus, logical tab order, labels, and platform-appropriate touch targets.
+ - Keep motion coherent, interruptible, and performant. Do not add animation merely to make polish visible.
++- Take exact detail values (nested radii, optical alignment, shadows, tabular numbers, motion) from [details/README.md](details/README.md).
+ - Validate long, missing, localized, offline, slow, and permission-limited content where the product can encounter it.
+ 
+ ### Content and code
+--- a/reference/shape.md
++++ b/reference/shape.md
+@@ -57,3 +57,5 @@
+ Present the brief for explicit confirmation or one correction round, then stop: shape never writes code or a direction contract.
+ 
+ When no human or structured answer mechanism exists, mark assumptions plainly, return the brief, and stop.
++
++When the product is an AI interface (prompt entry, streaming, sources, memory, history), shape against [details/ai-interface.md](details/ai-interface.md).
+--- a/reference/typeset.md
++++ b/reference/typeset.md
+@@ -62,6 +62,8 @@
+ 
+ - Set `text-wrap: balance` on headings and short centered blocks, and `text-wrap: pretty` on body copy. Both are progressive: a browser that ignores them keeps its default wrap.
+ - `pretty` pulls a word down beside a lone last word. It does not fill the last line, and a two-word tail is fine.
++
++Font smoothing, tabular numbers, and wrap details for UI text live in [details/typography.md](details/typography.md).
+ - In a column too narrow for either to help, edit the copy or widen the column.
+ - Break a heading by hand only between phrases, and check the break at every width the heading renders at. A hard break that lands mid-line on a phone is worse than the default wrap.
+ - An uneven break can carry meaning: a headline that lands on one word for weight, a poster line, a pull quote. Make it deliberate with a hard break or a wrap set on that element, and keep it rare. The detector's `straggler` and `unbalanced-heading` findings are advisory for this reason; say which breaks are intended.

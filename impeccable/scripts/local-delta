@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""Carry our additions to the vendored impeccable skill across upstream upgrades.
+
+  local-delta refresh UPSTREAM   record UPSTREAM as the baseline and our edits to it as the patch
+  local-delta apply UPSTREAM     stage UPSTREAM plus our files and edits, then swap it in
+  local-delta check              fail when the tree drifts from baseline + patch, or a link breaks
+
+UPSTREAM is the pristine `.agents/skills/impeccable` folder of an upstream build.
+--skill DIR points at a skill folder other than the one holding this script.
+"""
+import argparse
+import hashlib
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+OWN = (
+    "reference/details",
+    "reference/web-interface-guidelines.md",
+    "scripts/local-delta",
+    "scripts/local-delta.patch",
+    "scripts/local-delta.base",
+    "scripts/local-delta.test.sh",
+)
+PATCH = "scripts/local-delta.patch"
+BASE = "scripts/local-delta.base"
+UPSTREAM_MARKERS = ("SKILL.md", "reference", "scripts/impeccable")
+MARKDOWN_LINK = re.compile(r"\]\(([^)#\s]+\.md)(?:#[^)\s]*)?\)")
+
+
+def is_own(relative):
+    return any(relative == own or relative.startswith(own + "/") for own in OWN)
+
+
+def entries_under(root):
+    return {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file() or p.is_symlink()}
+
+
+def upstream_entries(root):
+    return {e for e in entries_under(root) if not is_own(e)}
+
+
+def fingerprint(path):
+    if path.is_symlink():
+        return "link:" + str(path.readlink())
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def require_upstream(upstream, skill):
+    missing = [m for m in UPSTREAM_MARKERS if not (upstream / m).exists()]
+    if missing:
+        sys.exit(f"{upstream} is not an impeccable build: missing {', '.join(missing)}")
+    if not re.search(r"^name:\s*impeccable\s*$", (upstream / "SKILL.md").read_text(), re.M):
+        sys.exit(f"{upstream}/SKILL.md does not declare name: impeccable")
+    if upstream == skill or skill in upstream.parents or upstream in skill.parents:
+        sys.exit("UPSTREAM and the skill folder overlap")
+    clashes = sorted(e for e in entries_under(upstream) if is_own(e))
+    if clashes:
+        sys.exit("upstream now ships our paths, merge by hand first:\n" + "\n".join(clashes))
+
+
+def edited_paths(skill):
+    return re.findall(r"^\+\+\+ b/(.+)$", (skill / PATCH).read_text(errors="replace"), re.M)
+
+
+def refresh(skill, upstream):
+    require_upstream(upstream, skill)
+    ours, theirs = upstream_entries(skill), upstream_entries(upstream)
+    problems = [f"deleted upstream file: {e}" for e in sorted(theirs - ours)]
+    problems += [f"added file outside OWN: {e}" for e in sorted(ours - theirs)]
+    hunks = []
+    for relative in sorted(ours & theirs):
+        mine, base = skill / relative, upstream / relative
+        if fingerprint(mine) == fingerprint(base):
+            continue
+        if mine.is_symlink() or base.is_symlink():
+            problems.append(f"edited symlink, keep it as upstream ships it: {relative}")
+        elif b"\0" in mine.read_bytes() or b"\0" in base.read_bytes():
+            problems.append(f"edited binary file, keep it as upstream ships it: {relative}")
+        else:
+            hunks.append(unified_diff(base, mine, relative))
+    if problems:
+        sys.exit("\n".join(problems))
+    (skill / PATCH).write_bytes(b"".join(hunks))
+    (skill / BASE).write_text("".join(f"{fingerprint(upstream / e)}  {e}\n" for e in sorted(theirs)))
+    print(f"wrote {PATCH} and {BASE}: {len(hunks)} upstream files carry our edits")
+
+
+def unified_diff(base, mine, relative):
+    diff = subprocess.run(
+        ["diff", "-u", "--label", f"a/{relative}", "--label", f"b/{relative}", base, mine],
+        capture_output=True)
+    if diff.returncode != 1:
+        sys.exit(f"diff failed on {relative}: {diff.stderr.decode()}")
+    return diff.stdout
+
+
+def baseline_copies(skill, scratch):
+    edited = edited_paths(skill)
+    base = scratch / "base"
+    for relative in edited:
+        (base / relative).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(skill / relative, base / relative, follow_symlinks=False)
+    if edited:
+        unpatch = subprocess.run(["git", "apply", "-R", "-p1", str(skill / PATCH)],
+                                 cwd=base, capture_output=True, text=True)
+        if unpatch.returncode != 0:
+            return edited, base, unpatch.stderr.strip()
+    return edited, base, ""
+
+
+def drift(skill):
+    recorded = dict(reversed(line.split("  ", 1)) for line in (skill / BASE).read_text().splitlines())
+    current = upstream_entries(skill)
+    problems = [f"upstream file missing: {e}" for e in sorted(set(recorded) - current)]
+    problems += [f"file outside OWN and not in the baseline: {e}" for e in sorted(current - set(recorded))]
+    with tempfile.TemporaryDirectory() as scratch:
+        edited, base, error = baseline_copies(skill, Path(scratch))
+        if error:
+            return problems + [f"{PATCH} does not match the tree: {error}"]
+        for relative in sorted(current & set(recorded)):
+            source = base / relative if relative in edited else skill / relative
+            if fingerprint(source) != recorded[relative]:
+                problems.append(f"edit not captured in {PATCH}: {relative} (run refresh)")
+    return problems
+
+
+def broken_links(skill):
+    problems = []
+    for page in sorted([skill / "SKILL.md", *(skill / "reference").rglob("*.md")]):
+        for target in MARKDOWN_LINK.findall(page.read_text()):
+            if "://" not in target and not (page.parent / target).resolve().is_file():
+                problems.append(f"broken link in {page.relative_to(skill)}: {target}")
+    return problems
+
+
+def unindexed_details(skill):
+    details = skill / "reference/details"
+    indexed = {name for name in MARKDOWN_LINK.findall((details / "README.md").read_text()) if "/" not in name}
+    reachable = set(indexed)
+    for name in indexed:
+        if (details / name).is_file():
+            reachable.update(MARKDOWN_LINK.findall((details / name).read_text()))
+    return [f"details/README.md does not index {page.name}"
+            for page in sorted(details.glob("*.md")) if page.name != "README.md" and page.name not in reachable]
+
+
+def check(skill):
+    problems = [f"missing OWN path: {own}" for own in OWN if not (skill / own).exists()]
+    if not problems:
+        problems = drift(skill) + broken_links(skill) + unindexed_details(skill)
+    for problem in problems:
+        print(f"FAIL {problem}")
+    if problems:
+        sys.exit(1)
+    print("local delta ok")
+
+
+def apply(skill, upstream):
+    require_upstream(upstream, skill)
+    retired = skill.with_name(skill.name + ".before-upgrade")
+    leftovers = sorted(skill.parent.glob(".local-delta-stage-*")) + ([retired] if retired.exists() else [])
+    if leftovers:
+        sys.exit("an earlier upgrade was interrupted. " + retired.name + " holds the tree from before it; "
+                 "if the skill folder is missing, rename it back. Then delete:\n" + "\n".join(map(str, leftovers)))
+    problems = drift(skill)
+    if problems:
+        sys.exit("fix the tree before upgrading:\n" + "\n".join(problems))
+    stage = Path(tempfile.mkdtemp(prefix=".local-delta-stage-", dir=skill.parent))
+    try:
+        conflicts = merged_stage(skill, upstream, stage)
+        swap(skill, stage, retired)
+    except BaseException:
+        shutil.rmtree(stage, ignore_errors=True)
+        raise
+    shutil.rmtree(retired)
+    if conflicts:
+        sys.exit("upstream changed lines next to our edits. Resolve the <<<<<<< markers in:\n"
+                 + "\n".join(conflicts)
+                 + "\nthen run `local-delta refresh UPSTREAM` and `local-delta check`.")
+    refresh(skill, upstream)
+    print("upgrade done; update the VENDORED.md row")
+
+
+def swap(skill, stage, retired):
+    skill.rename(retired)
+    try:
+        stage.rename(skill)
+    except BaseException:
+        retired.rename(skill)
+        raise
+
+
+def merged_stage(skill, upstream, stage):
+    shutil.copytree(upstream, stage, symlinks=True, dirs_exist_ok=True)
+    for own in OWN:
+        source = skill / own
+        if source.is_dir():
+            shutil.copytree(source, stage / own, symlinks=True)
+        elif source.exists():
+            shutil.copy2(source, stage / own, follow_symlinks=False)
+    with tempfile.TemporaryDirectory() as scratch:
+        edited, base, error = baseline_copies(skill, Path(scratch))
+        if error:
+            sys.exit(f"{PATCH} does not match the tree: {error}")
+        gone = [e for e in edited if not (stage / e).exists()]
+        if gone:
+            sys.exit("upstream removed or renamed files that carry our edits; nothing was changed.\n"
+                     "Move each edit into the new upstream file, then run refresh:\n" + "\n".join(gone))
+        redirected = [e for e in edited if (stage / e).resolve() != stage.resolve() / e]
+        if redirected:
+            sys.exit("upstream turned files we edit into symlinks; nothing was changed:\n" + "\n".join(redirected))
+        return [e for e in edited if not merge_into(stage / e, skill / e, base / e)]
+
+
+def merge_into(target, ours, base):
+    merged = subprocess.run(
+        ["git", "merge-file", "-p", "-L", "ours", "-L", "old upstream", "-L", "new upstream",
+         ours, base, target],
+        capture_output=True)
+    if merged.returncode < 0 or merged.returncode > 127:
+        sys.exit(f"git merge-file failed on {target}: {merged.stderr.decode()}")
+    target.write_bytes(merged.stdout)
+    return merged.returncode == 0
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--skill", type=Path, default=Path(__file__).resolve().parent.parent)
+    commands = parser.add_subparsers(dest="command", required=True)
+    for name in ("refresh", "apply"):
+        commands.add_parser(name).add_argument("upstream", type=Path)
+    commands.add_parser("check")
+    args = parser.parse_args()
+    skill = args.skill.resolve()
+    if args.command == "refresh":
+        refresh(skill, args.upstream.resolve())
+    elif args.command == "apply":
+        apply(skill, args.upstream.resolve())
+    else:
+        check(skill)
+
+
+if __name__ == "__main__":
+    main()
