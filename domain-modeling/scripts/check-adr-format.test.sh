@@ -90,4 +90,62 @@ if (cd "$tmp" && "$checker" --since HEAD records) > "$tmp/output" 2>&1; then
   exit 1
 fi
 grep -q 'no predecessor found at reference' "$tmp/output"
+rm "$tmp/records/other/0003-new.md"
+legacy="$tmp/legacy"
+mkdir -p "$legacy/records"
+printf '# 0004 - Keep sessions durable\n\n## Status\n\n**Accepted**, 2026-07-09\n\n## Context\n\nWorkers can stop between requests, but sessions must survive restarts and deploys.\n\n## Decision\n\nStore session state in durable storage.\n' > "$legacy/records/0004-legacy.md"
+git -C "$legacy" init -q
+git -C "$legacy" -c user.name=Test -c user.email=test@example.invalid add records
+git -C "$legacy" -c user.name=Test -c user.email=test@example.invalid commit -qm initial
+mkdir -p "$legacy/records/archived"
+git -C "$legacy" mv records/0004-legacy.md records/archived/0004-legacy.md
+sed -e 's/ADR 0001:/ADR 0004:/' -e 's/status: accepted/status: archived/' -e 's/^Accepted\./Archived./' "$example" > "$legacy/records/archived/0004-legacy.md"
+if (cd "$legacy" && "$checker" --since HEAD records) > "$tmp/output" 2>&1; then
+  echo 'FAIL: legacy accepted to archived word loss accepted' >&2
+  exit 1
+fi
+grep -q 'word loss exceeds 3%' "$tmp/output"
+legacy_tree="$tmp/legacy-tree"
+mkdir -p "$legacy_tree/shared"
+cp "$example" "$legacy_tree/shared/0001-durable-state.md"
+printf '# 0005 - Old shape\n\n## Status\n\nAccepted\n' > "$legacy_tree/0005-old.md"
+"$checker" --legacy-flat "$legacy_tree" > "$tmp/output"
+grep -q '^1 records checked$' "$tmp/output"
+sed 's/ADR 0001:/ADR 0005:/' "$example" > "$legacy_tree/shared/0005-copy.md"
+if "$checker" --legacy-flat "$legacy_tree" > "$tmp/output" 2>&1; then
+  echo 'FAIL: legacy number reuse accepted' >&2
+  exit 1
+fi
+grep -q 'already used' "$tmp/output"
+rm "$legacy_tree/shared/0005-copy.md"
+if "$checker" "$legacy_tree" > "$tmp/output" 2>&1; then
+  echo 'FAIL: legacy record accepted without --legacy-flat' >&2
+  exit 1
+fi
+grep -q '0005-old.md: invalid status' "$tmp/output"
+mkdir -p "$legacy_tree/2026-archive"
+printf '# 0006 - Nested old shape\n' > "$legacy_tree/2026-archive/0006-nested.md"
+if "$checker" --legacy-flat "$legacy_tree" > "$tmp/output" 2>&1; then
+  echo 'FAIL: nested legacy-shaped record accepted with --legacy-flat' >&2
+  exit 1
+fi
+grep -q '0006-nested.md: invalid status' "$tmp/output"
+rm -r "$legacy_tree/2026-archive"
+printf '# Decisions\n' > "$legacy_tree/README.md"
+if "$checker" --legacy-flat "$legacy_tree" > "$tmp/output" 2>&1; then
+  echo 'FAIL: README without reserved line accepted' >&2
+  exit 1
+fi
+grep -q 'missing "Reserved numbers:" line or value' "$tmp/output"
+printf 'Reserved numbers:\n\n| 0001 | x |\n' > "$legacy_tree/README.md"
+if "$checker" --legacy-flat "$legacy_tree" > "$tmp/output" 2>&1; then
+  echo 'FAIL: README with empty reserved value accepted' >&2
+  exit 1
+fi
+grep -q 'missing "Reserved numbers:" line or value' "$tmp/output"
+if grep -q 'already used' "$tmp/output"; then
+  echo 'FAIL: empty reserved value read the next line' >&2
+  exit 1
+fi
+rm "$legacy_tree/README.md"
 echo 'ADR format tests passed'

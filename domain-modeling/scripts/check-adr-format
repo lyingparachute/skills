@@ -23,9 +23,18 @@ def words(text):
     return Counter(re.findall(r"[\w]+(?:['-][\w]+)*", text.lower()))
 
 
+def accepted_at_reference(text):
+    front = re.match(r'\A---\n(.*?)\n---\n', text, re.DOTALL)
+    if front:
+        return bool(re.search(r'^status:\s*accepted\s*$', front.group(1), re.MULTILINE))
+    legacy_status = re.search(r'^## Status\s*\n\s*(\S[^\n]*)', text, re.MULTILINE)
+    return bool(legacy_status and re.match(r'accepted\b', legacy_status.group(1).strip(' *_'), re.IGNORECASE))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--since')
+    parser.add_argument('--legacy-flat', action='store_true')
     parser.add_argument('directory', type=Path)
     args = parser.parse_args()
     root = args.directory
@@ -35,11 +44,26 @@ def main():
     seen = {}
     readme = root / 'README.md'
     if readme.exists():
-        reserved = re.search(r'^Reserved numbers:\s*(.*)$', readme.read_text(), re.MULTILINE | re.IGNORECASE)
-        if reserved:
+        reserved = re.search(r'^Reserved numbers:[ \t]*(.*)$', readme.read_text(), re.MULTILINE | re.IGNORECASE)
+        if not reserved or not reserved.group(1).strip():
+            errors.append(f'{readme}: missing "Reserved numbers:" line or value')
+        else:
             for number in re.findall(r'\b\d{4}\b', reserved.group(1)):
                 seen[number] = 'reserved in README.md'
-    records = sorted(path for path in root.rglob('*.md') if path.name not in {'README.md', 'TEMPLATE.md'})
+    records = []
+    for path in sorted(root.rglob('*.md')):
+        if path.name in {'README.md', 'TEMPLATE.md'}:
+            continue
+        if args.legacy_flat and path.parent == root:
+            legacy = FILENAME.fullmatch(path.name)
+            if not legacy:
+                errors.append(f'{path}: invalid filename')
+            elif legacy.group(1) in seen:
+                errors.append(f'{path}: number {legacy.group(1)} already used by {seen[legacy.group(1)]}')
+            else:
+                seen[legacy.group(1)] = str(path)
+            continue
+        records.append(path)
     renames = {}
     previous_records = {}
     repository = None
@@ -115,9 +139,7 @@ def main():
                     if len(candidates) != 1:
                         raise
                     old = git('show', f'{args.since}:{candidates[0]}')
-                old_front = re.match(r'\A---\n(.*?)\n---\n', old, re.DOTALL)
-                old_accepted = old_front and re.search(r'^status:\s*accepted\s*$', old_front.group(1), re.MULTILINE)
-                if status == 'accepted' or old_accepted:
+                if status == 'accepted' or accepted_at_reference(old):
                     old_words = words(old)
                     removed = sum((old_words - words(text)).values())
                     total = sum(old_words.values())
