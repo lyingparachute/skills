@@ -186,16 +186,27 @@ def apply(skill, upstream):
 
 
 def swap(skill, stage, retired):
-    skill.rename(retired)
     try:
+        skill.rename(retired)
         stage.rename(skill)
     except BaseException:
-        retired.rename(skill)
+        if retired.exists() and not skill.exists():
+            retired.rename(skill)
         raise
+
+
+def redirected(stage, relatives):
+    root = stage.resolve()
+    return [r for r in relatives
+            if (stage / r).is_symlink() or (stage / r).parent.resolve() != (root / r).parent]
 
 
 def merged_stage(skill, upstream, stage):
     shutil.copytree(upstream, stage, symlinks=True, dirs_exist_ok=True)
+    escapes = redirected(stage, [*OWN, *edited_paths(skill)])
+    if escapes:
+        sys.exit("upstream symlinks would send our files outside the skill; nothing was changed:\n"
+                 + "\n".join(escapes))
     for own in OWN:
         source = skill / own
         if source.is_dir():
@@ -210,9 +221,6 @@ def merged_stage(skill, upstream, stage):
         if gone:
             sys.exit("upstream removed or renamed files that carry our edits; nothing was changed.\n"
                      "Move each edit into the new upstream file, then run refresh:\n" + "\n".join(gone))
-        redirected = [e for e in edited if (stage / e).resolve() != stage.resolve() / e]
-        if redirected:
-            sys.exit("upstream turned files we edit into symlinks; nothing was changed:\n" + "\n".join(redirected))
         return [e for e in edited if not merge_into(stage / e, skill / e, base / e)]
 
 

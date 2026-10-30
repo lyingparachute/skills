@@ -87,6 +87,50 @@ expect apply-rejects-symlinked-edit-target 1 skill apply "$work/v5"
 expect outside-file-untouched 0 grep -qx 'outside' "$work/outside.md"
 expect tree-untouched-after-symlink 0 unchanged_since before
 
+cp -R "$work/v3" "$work/v6"
+mkdir -p "$work/elsewhere" && cp -R "$work/v6/reference/." "$work/elsewhere/"
+rm -rf "$work/v6/reference" && ln -s "$work/elsewhere" "$work/v6/reference"
+(cd "$work/elsewhere" && find . | sort) > "$work/elsewhere.before"
+snapshot before
+expect apply-rejects-symlinked-parent 1 skill apply "$work/v6"
+expect symlinked-parent-target-untouched 0 sh -c "cd '$work/elsewhere' && find . | sort | cmp -s - '$work/elsewhere.before'"
+expect tree-untouched-after-symlinked-parent 0 unchanged_since before
+
+interrupt_swap() {
+  python3 -I -B - "$tool" "$work/swap" "$1" <<'PY'
+import importlib.machinery, importlib.util, pathlib, sys
+loader = importlib.machinery.SourceFileLoader("local_delta", sys.argv[1])
+module = importlib.util.module_from_spec(importlib.util.spec_from_loader("local_delta", loader))
+loader.exec_module(module)
+root, fail_on = pathlib.Path(sys.argv[2]), int(sys.argv[3])
+skill, stage, retired = root / "skill", root / "stage", root / "skill.before-upgrade"
+original, calls = pathlib.Path.rename, []
+def rename(self, target):
+    result = original(self, target)
+    calls.append(target)
+    if len(calls) == fail_on:
+        raise KeyboardInterrupt
+    return result
+pathlib.Path.rename = rename
+try:
+    module.swap(skill, stage, retired)
+except KeyboardInterrupt:
+    pass
+pathlib.Path.rename = original
+live = (skill / "marker").read_text().strip() if skill.exists() else "missing"
+print(live, "retired" if retired.exists() else "no-retired")
+PY
+}
+swap_case() {
+  rm -rf "$work/swap" && mkdir -p "$work/swap/skill" "$work/swap/stage"
+  echo old > "$work/swap/skill/marker" && echo new > "$work/swap/stage/marker"
+  interrupt_swap "$1" > "$work/swap.out"
+}
+swap_case 1
+expect interrupt-after-first-rename-restores-old 0 grep -qx 'old no-retired' "$work/swap.out"
+swap_case 2
+expect interrupt-after-second-rename-keeps-new 0 grep -qx 'new retired' "$work/swap.out"
+
 mkdir "$work/skill.before-upgrade"
 expect apply-stops-after-interrupted-upgrade 1 skill apply "$work/v3"
 rmdir "$work/skill.before-upgrade"
