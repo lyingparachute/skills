@@ -10,7 +10,7 @@ How a click, press, hover, or drag commits, how undo and autosave behave, and wh
 - **Standard buttons act on release.** Fire on the click (mouseup), not on mousedown, so dragging off the button cancels the action (WCAG 2.5.2).
 - **Menu items commit on release.** Releasing outside every option cancels, and a press alone runs no action (WCAG 2.5.2).
 - **Hold-to-switch shortcuts commit on release.** For a Cmd+Tab style switcher, commit on key release and cancel on Esc.
-- **Shortcuts show their result at once.** Show the state change (selected, toggled, panel open) with no animation. Only a rare shortcut, or a surface that teaches shortcuts, may animate its result. Frequent shortcuts stay instant (motion.md).
+- **Shortcuts show their result at once.** Show the state change (selected, toggled, panel open) with no animation. Only a key cap on a surface that teaches shortcuts, such as onboarding or docs, may animate (motion.md).
 
 ## Menus and tooltips
 

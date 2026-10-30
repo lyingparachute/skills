@@ -8,7 +8,7 @@ Prompt entry, suggestions, attachments, streaming, sources, confidence, inline r
 
 ## Suggestions and modes
 
-- Show 3 to 6 relevant suggestions, ordered by context. Each one fills the prompt, so the user can edit it before it runs (shapeof.ai).
+- Show 3 to 5 relevant suggestions, 6 at most, ordered by context (shapeof.ai). A suggestion fills the prompt for editing. It runs at once only when the action is cheap and easy to undo.
 - Make mode chips selectable. Show the active one, and give costly modes a visible guardrail (shapeof.ai).
 - Add @ context pills only where the user must point at a source or object.
 

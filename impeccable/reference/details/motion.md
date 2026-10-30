@@ -224,7 +224,7 @@ Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Rea
 
 - **Signature motion.** Pick one signature motion for the page. Repeat it only at meaningful moments, such as a section change. Identical entrances on every section stay banned (craft-floor.md).
 - **Centerpiece.** Pair a 3D centerpiece with a quiet surround. The centerpiece carries the motion, so no other loop runs beside it.
-- **Build in code.** Build the moment in CSS, SVG, or code. Video and Lottie exports render blurry on retina screens.
+- **Build in code.** Build the moment in CSS, SVG, or code. A raster video export blurs when scaled on high-density screens. A vector Lottie stays sharp but adds a player runtime, so use it only when code cannot draw the motion.
 - **404 page.** A 404 may hold a small interactive, such as a mini-game that redirects when it ends, and a real character illustration. It names the way back.
 
 ## Review
