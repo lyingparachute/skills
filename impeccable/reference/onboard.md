@@ -232,3 +232,5 @@ Test with real users:
 - **Time to value**: How long until users get first value?
 
 When users hit the aha moment fast and don't drop off, hand off to `$impeccable polish` for the final pass.
+
+Empty-state, no-results, contextual-tip, and first-run sequencing patterns for app UI live in [details/product-patterns.md](details/product-patterns.md).

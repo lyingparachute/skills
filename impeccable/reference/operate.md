@@ -59,3 +59,5 @@ Product can afford things brand surfaces can't.
 - Standard navigation patterns: top bar + side nav, breadcrumbs, tabs, command palettes.
 - Density. Tables with many rows, panels with many labels, dense information when users need it.
 - Consistency over surprise. The same visual vocabulary screen to screen is a virtue; delight is saved for moments, not pages.
+
+App UI patterns (navigation, lists, tables, forms, search, empty states, pricing) live in [details/product-patterns.md](details/product-patterns.md), click and menu timing in [details/interaction.md](details/interaction.md), and chart rules in [details/charts.md](details/charts.md).
