@@ -55,6 +55,7 @@ This is what an architect means by "AI slop" most often: correct content at the 
 - **Issues / tickets.** State the **contract**: the wire/auth/error shape, scope (in and out), and binary acceptance criteria. Do not prescribe `file:line` implementation, control flow, or helper names. The implementer owns tactics. Give them the *what* and *why*, not a step-by-step of *how*.
 - **In-repo docs** (ADRs, `GLOSSARY.md`, READMEs, `AGENTS.md`). What to keep is decided by the contest in `domain-modeling`; this skill sets the voice.
 - **PR descriptions.** The sections come from `pr`. This skill sets the voice inside them. Say what changed and why at the level a reviewer needs to judge it. Don't restate the ticket. Skip the play-by-play of how you got there.
+- **Replies to review threads.** Say it is fixed, then at most one sentence on what now behaves differently, in the reviewer's own terms. If "Fixed." answers the comment, write "Fixed." Leave out the commit hash and the commit link. The thread already shows the new diff, and no person cites a SHA in a reply. Leave out the internals too: the provider, the fallback, the order of checks. The reviewer asked about behavior, so answer with behavior.
 - **Review comments.** Every sentence is something the author must do or decide. If they cannot act on it, cut it. Praise is the sentence that fails that test most often: no "nice catch", no "this is well structured", no compliment softening the ask, no praise sandwich around it. Open on the finding. Post the result, not the workings: the ask, plus the one fact that makes it true. A chain of citations proving how you got there ("this constructor null-checks it, and that one defaults it, so…") tells the author about your search, not their change. So does your own trail ("I traced all three paths", "each of the four tests fails on develop"). Say the finding once. Conclusion, restated conclusion, verdict, and ask is one comment doing one job four times. Keep a comment to one location. A second site with the same problem gets its own thread, so the author can resolve it on its own. Skip line numbers the review tool already anchors for you. Evidence belongs beside the ask it justifies, the verdict is the approve / request-changes state, and the full assessment goes to the user in conversation, not the thread, unless they ask you to post it.
 
 ## Facts must be real
@@ -81,6 +82,7 @@ These keep you from doing the wrong thing in the right voice:
 - Every fact checkable, no internal contradictions.
 - First person, and the single decision or ask is obvious.
 - In review comments, every sentence is something the author must do or decide. Result, not workings. Finding stated once. One location per comment.
+- In review-thread replies, "Fixed" plus at most one sentence of behavior. No commit hash, no internals.
 - No praise anywhere: not of the user, not of the author or their code, not of your own work. No chat filler. Straight quotes, sentence-case headings, no decorative emoji.
 - Self-audit: read it back and answer "what here makes this obviously AI-generated?", then fix that.
 - Not posting to a shared system unless explicitly asked.
@@ -117,3 +119,15 @@ On `listOwnedTasks`:
 > Same as `statusInstantForSort`: the timestamp is never null, so `nullsLast` can go.
 
 The two constructors are still the proof. They belong in the reply if the author pushes back, not in the opening comment.
+
+## Example: tightening a review-thread reply
+
+**Slop:**
+
+> Fixed in 27f20f8. The remote rule-set list now sits behind a lazy provider that is only the `orElse` fallback, so the connection probe doesn't run when `pmdRuleFiles` is set. The `onlyIf` also checks `pmdRuleFiles` first, so the execution-time probe is skipped in that case too.
+
+Why it fails: the commit hash points at what the thread already shows. Two sentences walk through the wiring when the reviewer asked one thing: does the task still hit the network.
+
+**Tightened:**
+
+> Fixed. When `pmdRuleFiles` is set, the task no longer checks the remote connection.

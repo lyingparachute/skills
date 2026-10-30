@@ -48,6 +48,6 @@ The fix is the **receipt**. Acknowledge in diffs and verdicts, so every reply ca
 
 ## Posting a response
 
-Any response that goes back to the reviewer on the remote (a thread reply, a PR/MR comment) is published content: run it through **no-ai-slop** first. That strips the em-dash and the performative filler before it lands where the team reads it.
+The `Fixed:` receipt above, with its `file:line` and command output, goes to the user. A reply to the reviewer on the remote (a thread reply, a PR/MR comment) is published content and follows **no-ai-slop** (Replies to review threads): "Fixed" plus at most one sentence of behavior, no commit hash.
 
 Always reply to the specific comment being addressed, in its own thread, not as a top-level review comment. This holds whatever the host is (GitHub, GitLab, Bitbucket); use that host's inline-reply mechanism.
