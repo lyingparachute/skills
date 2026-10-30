@@ -38,7 +38,7 @@ DESTINATIONS = {
     "charts.md": "details/charts.md",
     "ai-interface.md": "details/ai-interface.md",
 }
-GESTURE_WORDS = re.compile(r"swipe|drag|long-press|sheet|carousel|pull-to-refresh", re.I)
+GESTURE_WORDS = re.compile(r"\b(?:swipe|drag|long-press|sheet|carousel|pull-to-refresh)\b", re.I)
 GESTURE_SOURCES = {"details/motion.md", "details/mobile.md"}
 
 
@@ -64,15 +64,17 @@ def ledger_line(row):
 
 
 def main():
-    if LEDGER.exists():
-        sys.exit("ledger.md exists")
     rows = gap_rows()
     todo = non_covered(rows)
     if len(rows) != EXPECTED_PARSED or len(todo) != EXPECTED_NON_COVERED:
         sys.exit(f"expected {EXPECTED_PARSED}/{EXPECTED_NON_COVERED}, parsed {len(rows)}/{len(todo)}")
     lines = ["# Ledger", "", LEDGER_HEADER, "|---|---|---|---|---|---|"]
     lines += [ledger_line(r) for r in todo]
-    LEDGER.write_text("\n".join(lines) + "\n")
+    try:
+        with LEDGER.open("x") as ledger:
+            ledger.write("\n".join(lines) + "\n")
+    except FileExistsError:
+        sys.exit("ledger.md exists")
     print(f"parsed {len(rows)} rows, {len(todo)} non-covered, wrote ledger.md")
 
 

@@ -41,11 +41,11 @@
 | 001-139:33#3 | PARTIAL | Replace card wrappers with one vertical column divider; rows and sections group | pending | details/surfaces.md |  |
 | 001-139:37 | OUT-OF-SCOPE | Premise: vibe-coded sites lack domain identity, custom photography, cohesive scroll motion | out-of-scope |  |  |
 | 001-139:39 | PARTIAL | Never ship text-only setup steps; pair value heading with real domain imagery | pending | details/landing.md |  |
-| 001-139:41#1 | CONFLICT | Anchor: start from one moody domain photo, not sterile light or flat dark mode | pending | unassigned |  |
+| 001-139:41#1 | CONFLICT | Anchor: start from one moody domain photo, not sterile light or flat dark mode | pending | details/landing.md D3#1 |  |
 | 001-139:41#2 | MISSING | Crop and darken the anchor photo | pending | details/landing.md |  |
-| 001-139:41#3 | CONFLICT | Layer noise over the anchor photo | pending | unassigned |  |
+| 001-139:41#3 | CONFLICT | Layer noise over the anchor photo | rejected | banned grain D3#2 |  |
 | 001-139:42 | MISSING | Sample earthy primary tones from anchor photo; pair with high-contrast accent | pending | details/landing.md |  |
-| 001-139:43#2 | CONFLICT | Pair expressive serif with clean sans-serif | pending | unassigned |  |
+| 001-139:43#2 | CONFLICT | Pair expressive serif with clean sans-serif | pending | details/typography.md D3#3 |  |
 | 001-139:44 | PARTIAL | Custom feature icons in brand accent colors | pending | details/surfaces.md |  |
 | 001-139:45 | MISSING | Build layout skeleton from proven structural patterns before brand styling | pending | details/landing.md |  |
 | 001-139:46 | MISSING | Hero: central actionable copy with domain objects scattered around | pending | details/landing.md |  |
@@ -58,16 +58,16 @@
 | 001-139:54 | MISSING | Scatter: larger floating assets low, smaller high, strict safety margin around center text | pending | details/landing.md |  |
 | 001-139:55 | MISSING | Vignette: darken outer hero edges to focus center copy | pending | details/landing.md |  |
 | 001-139:56#1 | PARTIAL | Alternate section treatments to pace the scroll | pending | details/landing.md |  |
-| 001-139:56#2 | CONFLICT | Graph-paper grid texture on a cream section | pending | unassigned |  |
+| 001-139:56#2 | CONFLICT | Graph-paper grid texture on a cream section | rejected | graph paper needs a real canvas D3#4 |  |
 | 001-139:56#3 | PARTIAL | Dominant product screenshots in the clean section | pending | details/landing.md |  |
-| 001-139:58 | CONFLICT | 1-2 signature motion patterns repeated across the whole site | pending | unassigned |  |
+| 001-139:58 | CONFLICT | 1-2 signature motion patterns repeated across the whole site | pending | details/motion.md D3#6 |  |
 | 001-139:59 | MISSING | Hero-to-section scroll: slide assets off, blur hero text, slide section over hero; reverse at bottom CTA | pending | details/motion.md |  |
 | 001-139:60#1 | PARTIAL | Multi-image showcase on automatic rotation timer | pending | details/motion.md |  |
 | 001-139:60#2 | PARTIAL | Subtle zoom-in on cursor hover | pending | details/motion.md |  |
 | 001-139:64 | OUT-OF-SCOPE | Premise: master UI/UX in 28 days by cloning, restyling, mapping flows | out-of-scope |  |  |
 | 001-139:66 | MISSING | Four-zone hero skeleton: navbar, main text, hero image, stats block | pending | details/landing.md |  |
 | 001-139:68 | MISSING | Heading-to-subtext gap 8 px | pending | details/landing.md |  |
-| 001-139:69 | CONFLICT | Eyebrow text 12 px above heading | pending | unassigned |  |
+| 001-139:69 | CONFLICT | Eyebrow text 12 px above heading | rejected | eyebrow ban, craft-floor.md:27 D3#7 |  |
 | 001-139:70 | MISSING | Subtext-to-CTA gap 32 px | pending | details/landing.md |  |
 | 001-139:71#1 | MISSING | Main heading about 7 words | pending | details/landing.md |  |
 | 001-139:71#2 | MISSING | Subtext about 14 words | pending | details/landing.md |  |
@@ -90,11 +90,11 @@
 | 001-139:80#2 | MISSING | Multi-item feature list: Bento grid so all items stay visible | pending | details/landing.md |  |
 | 001-139:82#1 | MISSING | Warm flavor: warm background tones | pending | details/landing.md |  |
 | 001-139:82#2 | MISSING | Warm flavor: colorful graphics | pending | details/landing.md |  |
-| 001-139:82#3 | CONFLICT | Warm flavor: heavily rounded corners | pending | unassigned |  |
+| 001-139:82#3 | CONFLICT | Warm flavor: heavily rounded corners | pending | details/surfaces.md D3#8 |  |
 | 001-139:82#4 | MISSING | Warm flavor: large bubbly buttons | pending | details/landing.md |  |
-| 001-139:83#1 | CONFLICT | Modern flavor: sharp, minimal corner radii | pending | unassigned |  |
+| 001-139:83#1 | CONFLICT | Modern flavor: sharp, minimal corner radii | pending | details/surfaces.md D3#8 |  |
 | 001-139:83#2 | MISSING | Modern flavor: desaturated, premium imagery | pending | details/landing.md |  |
-| 001-139:83#3 | CONFLICT | Modern flavor: subtle background noise | pending | unassigned |  |
+| 001-139:83#3 | CONFLICT | Modern flavor: subtle background noise | rejected | banned grain D3#2 |  |
 | 001-139:84#1 | MISSING | Signup: login escape hatch on name/email screen for returning users | pending | details/product-patterns.md |  |
 | 001-139:84#2 | MISSING | Email verification: decide hard-block vs gentle reminder intentionally | pending | details/product-patterns.md |  |
 | 001-139:84#3 | MISSING | Ask team size at workspace creation: managers to invite screen, solo users skip it | pending | details/product-patterns.md |  |
@@ -161,7 +161,7 @@
 | 001-139:137 | MISSING | Persistent mega menu: morph content instead of close and reopen | pending | details/motion.md |  |
 | 001-139:138 | MISSING | Reveal social-proof CTA on hover over logo strip only | pending | details/landing.md |  |
 | 140-340:142 | OUT-OF-SCOPE | Premise: mobile needs bigger base type, one-axis sections, single-purpose screens, bottom sheets, gesture nav | out-of-scope |  |  |
-| 140-340:145#1 | PARTIAL | Floating bottom bar with 3-4 key icons | pending | unassigned |  |
+| 140-340:145#1 | PARTIAL | Floating bottom bar with 3-4 key icons | pending | details/mobile.md |  |
 | 140-340:145#2 | MISSING | Max 5 bottom-bar links, absolute cap | pending | details/mobile.md |  |
 | 140-340:145#3 | MISSING | Optional primary action breakout on right of bottom bar | pending | details/mobile.md |  |
 | 140-340:147#1 | MISSING | Too many nav items: sidebar becomes homepage, recent items at top | pending | details/mobile.md |  |
@@ -192,7 +192,7 @@
 | 140-340:163#3 | PARTIAL | Spelling/typo suggestions on no results | pending | details/product-patterns.md |  |
 | 140-340:163#4 | PARTIAL | Clear button to exit the empty state | pending | details/product-patterns.md |  |
 | 140-340:167 | OUT-OF-SCOPE | Premise: ten foundational UI/UX pillars | out-of-scope |  |  |
-| 140-340:169#1 | CONFLICT | Wrap related items in a shared container as signifier | pending | details/landing.md |  |
+| 140-340:169#1 | CONFLICT | Wrap related items in a shared container as signifier | pending | details/product-patterns.md D3#9 |  |
 | 140-340:169#2 | MISSING | Wrap active toggle option in inner pill container | pending | details/product-patterns.md |  |
 | 140-340:169#3 | PARTIAL | Gray out disabled text | pending | details/product-patterns.md |  |
 | 140-340:169#5 | PARTIAL | Tooltip as signifier | pending | details/product-patterns.md |  |
@@ -200,16 +200,16 @@
 | 140-340:170#2 | MISSING | Card: primary title large and bold, top-left | pending | details/landing.md |  |
 | 140-340:170#3 | MISSING | Card: price top-right in blue | pending | details/landing.md |  |
 | 140-340:170#4 | PARTIAL | Secondary metadata (time/date) shrinks below title | pending | details/typography.md |  |
-| 140-340:170#5 | CONFLICT | Replace "From/To" text labels with directional icons joined by a line | pending | unassigned |  |
+| 140-340:170#5 | CONFLICT | Replace "From/To" text labels with directional icons joined by a line | rejected | icons never replace text, I7 D3#10 |  |
 | 140-340:172#1 | MISSING | 12 columns desktop, 8 tablet, 4 mobile for repeating layouts | pending | details/landing.md |  |
 | 140-340:173#2 | PARTIAL | Example: 32px vertical gap between major hero blocks | pending | details/landing.md |  |
-| 140-340:175 | CONFLICT | One clean sans-serif font across the design | pending | details/typography.md |  |
-| 140-340:176#2 | CONFLICT | Large display headings: line-height 110-120% | pending | details/typography.md |  |
-| 140-340:177#1 | CONFLICT | Max 6 font sizes on landing pages/websites | pending | details/typography.md |  |
+| 140-340:175 | CONFLICT | One clean sans-serif font across the design | pending | details/typography.md D3#14 |  |
+| 140-340:176#2 | CONFLICT | Large display headings: line-height 110-120% | pending | details/typography.md D3#16 |  |
+| 140-340:177#1 | CONFLICT | Max 6 font sizes on landing pages/websites | pending | details/typography.md D3#15 |  |
 | 140-340:177#2 | MISSING | Dashboard typography capped at 24px | pending | details/typography.md |  |
 | 140-340:179 | PARTIAL | Build color ramp from one brand color: lighter for backgrounds, darker for text | pending | details/color-values.md |  |
 | 140-340:180#1 | PARTIAL | Reserve semantic colors strictly for functional meaning | pending | details/color-values.md |  |
-| 140-340:180#2 | CONFLICT | Fixed hues: blue=trust, red=danger, yellow=warning, green=success | pending | details/color-values.md |  |
+| 140-340:180#2 | CONFLICT | Fixed hues: blue=trust, red=danger, yellow=warning, green=success | pending | details/color-values.md D3#18 |  |
 | 140-340:183 | PARTIAL | Dark mode depth: elevated surfaces lighter than background (shadows don't read) | pending | details/color-values.md |  |
 | 140-340:184#1 | PARTIAL | Desaturate and dim bright status chip backgrounds | pending | details/color-values.md |  |
 | 140-340:184#2 | MISSING | Flip chip text to a brighter tint | pending | details/color-values.md |  |
@@ -224,11 +224,11 @@
 | 140-340:194#1 | PARTIAL | Never place raw text over busy images | pending | details/color-values.md |  |
 | 140-340:194#2 | MISSING | Never dull a photo with a flat full-screen dark overlay | pending | details/color-values.md |  |
 | 140-340:194#3 | MISSING | Linear gradient transitioning into the text zone | pending | details/color-values.md |  |
-| 140-340:194#4 | CONFLICT | Progressive blur over gradient for a "modern finish" | pending | details/surfaces.md |  |
+| 140-340:194#4 | CONFLICT | Progressive blur over gradient for a "modern finish" | pending | details/color-values.md D3#20 |  |
 | 140-340:198 | OUT-OF-SCOPE | Premise: AI-built SaaS shows five telltale flaws | out-of-scope |  |  |
 | 140-340:201#1 | PARTIAL | Replace clashing bright AI button/icon fills with cohesive dark-tinted surfaces | pending | details/color-values.md |  |
 | 140-340:201#2 | PARTIAL | Remove decorative card icons | pending | details/surfaces.md |  |
-| 140-340:201#3 | CONFLICT | Inject color through functional micro-charts, not rainbow buttons | pending | details/surfaces.md |  |
+| 140-340:201#3 | CONFLICT | Inject color through functional micro-charts, not rainbow buttons | pending | details/charts.md D3#23 |  |
 | 140-340:203#1 | MISSING | Eliminate redundant KPI rows repeated across tabs | pending | details/charts.md |  |
 | 140-340:203#2 | MISSING | Confine metrics to Dashboard and dedicated Analytics tab | pending | details/charts.md |  |
 | 140-340:204#1 | MISSING | Left-align sidebar items with tighter vertical spacing | pending | details/product-patterns.md |  |
@@ -237,7 +237,7 @@
 | 140-340:205#2 | MISSING | Move date to center of data card | pending | details/landing.md |  |
 | 140-340:205#3 | MISSING | Reduce verbose status chips to simple icons | pending | details/product-patterns.md |  |
 | 140-340:205#4 | PARTIAL | Right-align click counts | pending | details/typography.md |  |
-| 140-340:207#1 | CONFLICT | Few-input creation form: centered modal instead of full-height side flyout | pending | details/product-patterns.md |  |
+| 140-340:207#1 | CONFLICT | Few-input creation form: centered modal instead of full-height side flyout | rejected | modal only for critical actions, I9 D3#28 |  |
 | 140-340:207#3 | OUT-OF-SCOPE | Include domain/link-card switcher and description field | out-of-scope |  |  |
 | 140-340:208#1 | PARTIAL | Delete non-functional placeholder cards | pending | details/product-patterns.md |  |
 | 140-340:208#2 | PARTIAL | Organize Billing and Usage into tabs | pending | details/mobile.md |  |
@@ -260,7 +260,7 @@
 | 140-340:219#2 | MISSING | Reserve 100% white for elevated cards on a slightly darker canvas | pending | details/color-values.md |  |
 | 140-340:220#1 | PARTIAL | App frame / sidebar slightly darker than canvas | pending | details/product-patterns.md |  |
 | 140-340:220#2 | PARTIAL | Tint app frame with ~2% brand hue | pending | details/color-values.md |  |
-| 140-340:221 | CONFLICT | Light-mode card border: ~85% white (15% black), never pure black | pending | details/surfaces.md |  |
+| 140-340:221 | CONFLICT | Light-mode card border: ~85% white (15% black), never pure black | pending | details/surfaces.md D3#27 |  |
 | 140-340:222#1 | MISSING | Button importance scale: more important = darker, ghost to pure black | pending | details/color-values.md |  |
 | 140-340:222#2 | MISSING | Utility buttons at 90-95% white | pending | details/color-values.md |  |
 | 140-340:224 | MISSING | Heading text ~11% white, never 0% | pending | details/color-values.md |  |
@@ -296,23 +296,23 @@
 | 140-340:255#1 | PARTIAL | Dismiss onboarding by requiring the real keyboard shortcut | pending | details/product-patterns.md |  |
 | 140-340:255#2 | PARTIAL | Permanent shortcut cheat sheet inside settings popover | pending | details/product-patterns.md |  |
 | 140-340:259 | OUT-OF-SCOPE | Premise: hacks to kill sterile web layouts | out-of-scope |  |  |
-| 140-340:262 | CONFLICT | Center hero copy, surround with domain illustrations (coins, invoices, doodles, scribbles) | pending | details/surfaces.md |  |
+| 140-340:262 | CONFLICT | Center hero copy, surround with domain illustrations (coins, invoices, doodles, scribbles) | rejected | sketch SVG ban, craft-floor.md:46 D3#22 |  |
 | 140-340:263 | PARTIAL | Generous empty whitespace around the central text block | pending | details/landing.md |  |
 | 140-340:264 | MISSING | Angle and scale outer elements to trail toward edges, pointing eye to center | pending | details/landing.md |  |
 | 140-340:265 | PARTIAL | Match illustration playfulness to brand tone (blobs, neo-brutalist doodles, realistic objects) | pending | details/motion.md |  |
 | 140-340:267#1 | PARTIAL | Non-linear, physics-eased entrances on floating assets | pending | details/motion.md |  |
-| 140-340:267#2 | CONFLICT | Balloon bobs up and down in place (perpetual idle motion) | pending | details/motion.md |  |
-| 140-340:268 | CONFLICT | Scroll parallax on margin elements for 3D depth | pending | details/motion.md |  |
+| 140-340:267#2 | CONFLICT | Balloon bobs up and down in place (perpetual idle motion) | pending | details/motion.md D3#25 |  |
+| 140-340:268 | CONFLICT | Scroll parallax on margin elements for 3D depth | pending | details/motion.md D3#25 |  |
 | 140-340:269 | PARTIAL | Animate words inside headline to illustrate meaning | pending | details/motion.md |  |
 | 140-340:270 | OUT-OF-SCOPE | "~80% of websites are text" | out-of-scope |  |  |
-| 140-340:271#1 | CONFLICT | Hover-triggered text blur reveals floating message bubbles | pending | details/surfaces.md |  |
+| 140-340:271#1 | CONFLICT | Hover-triggered text blur reveals floating message bubbles | rejected | decorative blur ban, craft-floor.md:34 D3#21 |  |
 | 140-340:271#2 | PARTIAL | Subtle hover interaction on every simple link | pending | details/color-values.md |  |
 | 140-340:272#2 | PARTIAL | Conversational phrasing ("We sweat the details") | pending | details/product-patterns.md |  |
 | 140-340:274#1 | MISSING | Interactive 404: mini-game, auto-redirect when finished | pending | details/motion.md |  |
 | 140-340:274#2 | PARTIAL | Charming character illustration on 404 | pending | details/motion.md |  |
-| 140-340:274#3 | CONFLICT | Playful conversational error copy on 404 | pending | details/product-patterns.md |  |
+| 140-340:274#3 | CONFLICT | Playful conversational error copy on 404 | pending | details/product-patterns.md D3#37 |  |
 | 140-340:278 | OUT-OF-SCOPE | Premise: three categories of swipe interaction | out-of-scope |  |  |
-| 140-340:281#1 | CONFLICT | Never linear easing on swipe; add bounce for momentum | pending | details/gestures.md |  |
+| 140-340:281#1 | CONFLICT | Never linear easing on swipe; add bounce for momentum | pending | details/gestures.md D3#24 |  |
 | 140-340:281#2 | PARTIAL | Tune easing to tone: snappy, springy, or smooth | pending | details/motion.md |  |
 | 140-340:282 | MISSING | 3D ring: skew carousel cards near screen edges | pending | details/gestures.md |  |
 | 140-340:283 | MISSING | Magnetic fluid pagination dots that stretch during swipe | pending | details/gestures.md |  |
@@ -320,7 +320,7 @@
 | 140-340:285 | PARTIAL | Pair every swipe with explicit tap target (swipe plus button) | pending | details/gestures.md |  |
 | 140-340:287#1 | MISSING | Swipe-up expands card and container to full screen together | pending | details/gestures.md |  |
 | 140-340:287#2 | MISSING | Body content fades up along swipe vector | pending | details/gestures.md |  |
-| 140-340:287#3 | CONFLICT | Elastic snap at top of expansion | pending | details/motion.md |  |
+| 140-340:287#3 | CONFLICT | Elastic snap at top of expansion | pending | details/gestures.md D3#24 |  |
 | 140-340:288 | MISSING | Onboarding: expanding circle background transition; Next button clickable and swipeable | pending | details/gestures.md |  |
 | 140-340:289 | PARTIAL | Hero zoom continuity: tapped card image zooms into next page hero | pending | details/motion.md |  |
 | 140-340:291 | MISSING | Magnetic swipe-to-add row with long-press backup | pending | details/gestures.md |  |
@@ -342,12 +342,12 @@
 | 140-340:310 | OUT-OF-SCOPE | Pair mockups with clickable prototypes showing gestures and sequences | out-of-scope |  |  |
 | 140-340:312 | OUT-OF-SCOPE | Premise: seven color mistakes | out-of-scope |  |  |
 | 140-340:317 | PARTIAL | Never use 5 bright accent fills on sibling cards | pending | details/color-values.md |  |
-| 140-340:318#1 | CONFLICT | Follow 60-30-10 (60% neutral, 30% secondary, 10% accent) | pending | details/color-values.md |  |
+| 140-340:318#1 | CONFLICT | Follow 60-30-10 (60% neutral, 30% secondary, 10% accent) | pending | details/color-values.md D3#19 |  |
 | 140-340:318#2 | MISSING | If brand color overpowers secondary cards, use soft-tint card fill and black text | pending | details/color-values.md |  |
 | 140-340:319#1 | PARTIAL | Keep icons neutral; reserve color for status | pending | details/color-values.md |  |
 | 140-340:321#1 | PARTIAL | No bright gradient app background; neutral gray canvas | pending | details/color-values.md |  |
 | 140-340:321#2 | PARTIAL | Or white canvas with light-gray feature containers | pending | details/color-values.md |  |
-| 140-340:323 | CONFLICT | Remove background fill when it clutters; define card with border | pending | details/surfaces.md |  |
+| 140-340:323 | CONFLICT | Remove background fill when it clutters; define card with border | pending | details/surfaces.md D3#27 |  |
 | 140-340:325#1 | PARTIAL | Analogous colors: rotate slightly on wheel for multi-segment components | pending | details/color-values.md |  |
 | 140-340:325#2 | MISSING | Complementary accent across the wheel | pending | details/color-values.md |  |
 | 140-340:326 | PARTIAL | Darken brand or pair with darker accessible shade when white text fails WCAG | pending | details/color-values.md |  |
@@ -367,7 +367,7 @@
 | 140-340:338 | PARTIAL | Active/pressed: slightly darker base color (desktop and mobile tap) | pending | details/color-values.md |  |
 | 140-340:339 | PARTIAL | Disabled: desaturate to low-contrast light gray fill with muted text | pending | details/color-values.md |  |
 | 341-575:345 | MISSING | Sidebar top: profile avatar + dropdown instead of static logo | pending | details/product-patterns.md |  |
-| 341-575:347#3 | CONFLICT | Sidebar collapses to icon-only rail | pending | unassigned |  |
+| 341-575:347#3 | CONFLICT | Sidebar collapses to icon-only rail | rejected | icon-only nav, I7 D3#13 |  |
 | 341-575:347#4 | MISSING | Right-aligned count / "New" chips in nav items | pending | details/product-patterns.md |  |
 | 341-575:348#2 | MISSING | Push Settings and Help to bottom of sidebar | pending | details/product-patterns.md |  |
 | 341-575:348#3 | PARTIAL | Nest expanding link lists in dropdowns | pending | details/product-patterns.md |  |
@@ -392,13 +392,13 @@
 | 341-575:363#2 | PARTIAL | Modal requires explicit Create or Cancel click | pending | details/product-patterns.md |  |
 | 341-575:363#3 | MISSING | Toast after modal confirms the change | pending | details/product-patterns.md |  |
 | 341-575:364#1 | PARTIAL | Toast for non-intrusive feedback without taking over screen | pending | details/product-patterns.md |  |
-| 341-575:364#2 | CONFLICT | Toast for warnings and errors | pending | unassigned |  |
+| 341-575:364#2 | CONFLICT | Toast for warnings and errors | pending | details/interaction.md D3#29 |  |
 | 341-575:365#1 | MISSING | Dedicated page for permanent deep contexts | pending | details/product-patterns.md |  |
 | 341-575:365#2 | PARTIAL | Back button or breadcrumbs on dedicated pages | pending | details/product-patterns.md |  |
 | 341-575:367#3 | MISSING | Separate list items with alternating row background | pending | details/product-patterns.md |  |
 | 341-575:367#4 | MISSING | Turn tables interactive with Search, Filter, Sort | pending | details/product-patterns.md |  |
 | 341-575:368#1 | PARTIAL | Cards have generous internal padding | pending | details/product-patterns.md |  |
-| 341-575:368#3 | CONFLICT | Light mode cards use surface fills, not outlines | pending | unassigned |  |
+| 341-575:368#3 | CONFLICT | Light mode cards use surface fills, not outlines | pending | details/surfaces.md D3#27 |  |
 | 341-575:369 | MISSING | Combine forms inside modals, settings lists, table cards | pending | details/product-patterns.md |  |
 | 341-575:370 | PARTIAL | Tabs switch related views in place, not sidebar links | pending | details/product-patterns.md |  |
 | 341-575:372#1 | MISSING | Line chart hover: exact value plus % change bubble | pending | details/charts.md |  |
@@ -431,18 +431,18 @@
 | 341-575:396#2 | MISSING | Moving shimmer on skeleton placeholders | pending | details/motion.md |  |
 | 341-575:398#1 | MISSING | Clickable confidence pill labelled High Confidence or Unverified | pending | details/ai-interface.md |  |
 | 341-575:398#2 | MISSING | Click reveals exact numeric confidence % | pending | details/ai-interface.md |  |
-| 341-575:399#1 | CONFLICT | Dark glass: semi-transparent dark fill | pending | unassigned |  |
-| 341-575:399#2 | CONFLICT | Dark glass: subtle fill gradient | pending | unassigned |  |
-| 341-575:399#3 | CONFLICT | Dark glass: background blur | pending | unassigned |  |
+| 341-575:399#1 | CONFLICT | Dark glass: semi-transparent dark fill | pending | details/surfaces.md D3#21 |  |
+| 341-575:399#2 | CONFLICT | Dark glass: subtle fill gradient | pending | details/surfaces.md D3#21 |  |
+| 341-575:399#3 | CONFLICT | Dark glass: background blur | pending | details/surfaces.md D3#21 |  |
 | 341-575:399#5 | MISSING | Dark glass: soft inner shadow | pending | details/surfaces.md |  |
-| 341-575:399#6 | CONFLICT | Dark glass: shimmer moving across the border | pending | unassigned |  |
+| 341-575:399#6 | CONFLICT | Dark glass: shimmer moving across the border | rejected | ambient border shimmer, craft-floor.md:13 D3#41 |  |
 | 341-575:410 | PARTIAL | Map multi-screen flows: how user arrived, what they need next | pending | details/product-patterns.md |  |
 | 341-575:411 | PARTIAL | After creation, chain to next prompt (add members) with Skip | pending | details/product-patterns.md |  |
 | 341-575:412 | MISSING | Chain related decisions in one sequence (outreach, template, batch) | pending | details/product-patterns.md |  |
 | 341-575:414 | PARTIAL | Primary color reserved for safe, non-destructive action in all dialogs | pending | details/product-patterns.md |  |
 | 341-575:415#2 | OUT-OF-SCOPE | Example "Create Listing" modal layout | out-of-scope |  |  |
 | 341-575:422 | PARTIAL | Eliminate scattered micro-boxes, overlapping popups, decorative shapes | pending | details/mobile.md |  |
-| 341-575:423#1 | CONFLICT | Consolidated text blocks with bold numbers | pending | unassigned |  |
+| 341-575:423#1 | CONFLICT | Consolidated text blocks with bold numbers | pending | details/landing.md D3#39 |  |
 | 341-575:423#3 | PARTIAL | 5-second clarity test | pending | details/landing.md |  |
 | 341-575:424#1 | MISSING | Never hide the product category in a small corner label over a photo | pending | details/landing.md |  |
 | 341-575:424#2 | PARTIAL | Bring the actual product UI above the fold | pending | details/landing.md |  |
@@ -462,7 +462,7 @@
 | 341-575:446 | MISSING | Primary intent first: search bar split into key parameters | pending | details/product-patterns.md |  |
 | 341-575:449 | PARTIAL | Do not invent contrarian layouts unless demonstrably better | pending | details/product-patterns.md |  |
 | 341-575:450#1 | PARTIAL | Information flows top-to-bottom and left-to-right | pending | details/landing.md |  |
-| 341-575:450#2 | CONFLICT | Keep navigation at the top | pending | details/product-patterns.md |  |
+| 341-575:450#2 | CONFLICT | Keep navigation at the top | pending | details/product-patterns.md D3#35 |  |
 | 341-575:452 | PARTIAL | Browse cards omit long descriptions; show only location, rating, price | pending | details/product-patterns.md |  |
 | 341-575:453#3 | MISSING | Solid circle behind overlay icons on bright photos | pending | details/surfaces.md |  |
 | 341-575:455#1 | MISSING | Consolidate overflowing nav into animated menu | pending | details/product-patterns.md |  |
@@ -483,12 +483,12 @@
 | 341-575:473#1 | PARTIAL | 3-column or 2-column grid on mobile | pending | details/landing.md |  |
 | 341-575:473#3 | OUT-OF-SCOPE | Apply Auto Layout to cards and chips | out-of-scope |  |  |
 | 341-575:473#4 | OUT-OF-SCOPE | Turn off Vertical Trim | out-of-scope |  |  |
-| 341-575:476#1 | CONFLICT | Lock small component radius to 10px | pending | unassigned |  |
-| 341-575:478 | CONFLICT | Replace text-only actions with icons | pending | unassigned |  |
+| 341-575:476#1 | CONFLICT | Lock small component radius to 10px | pending | details/surfaces.md D3#8 |  |
+| 341-575:478 | CONFLICT | Replace text-only actions with icons | rejected | icons never replace text, I7 D3#10 |  |
 | 341-575:479#3 | OUT-OF-SCOPE | Named icon packs (Feather, Phosphor, Flaticon) | out-of-scope |  |  |
-| 341-575:480#1 | CONFLICT | Universal icons (Home, Bookmark, User) need no text label | pending | unassigned |  |
+| 341-575:480#1 | CONFLICT | Universal icons (Home, Bookmark, User) need no text label | rejected | no universal-icon exemption, I7 D3#11 |  |
 | 341-575:480#2 | PARTIAL | Ambiguous icons need an onboarding tooltip | pending | details/product-patterns.md |  |
-| 341-575:480#3 | CONFLICT | Different icon styles allowed in separate functional zones | pending | unassigned |  |
+| 341-575:480#3 | CONFLICT | Different icon styles allowed in separate functional zones | rejected | one icon family, C14 D3#12 |  |
 | 341-575:482#1 | PARTIAL | Remove redundant carousel arrows where swipe is natural | pending | details/gestures.md |  |
 | 341-575:482#2 | PARTIAL | Remove decorative arrows inside buttons | pending | details/surfaces.md |  |
 | 341-575:482#3 | PARTIAL | Dim overpowering secondary button fills | pending | details/product-patterns.md |  |
@@ -511,33 +511,33 @@
 | 341-575:504#4 | MISSING | Push Settings and Help to bottom of sidebar | pending | details/product-patterns.md |  |
 | 341-575:505#1 | PARTIAL | Desaturate overly saturated purples toward blue | pending | details/color-values.md |  |
 | 341-575:505#2 | PARTIAL | Darken bluish backgrounds into deep purple-gray | pending | details/color-values.md |  |
-| 341-575:505#4 | CONFLICT | Subtle background grid pattern | pending | unassigned |  |
+| 341-575:505#4 | CONFLICT | Subtle background grid pattern | rejected | grid overlay needs a real canvas D3#4 |  |
 | 341-575:506#1 | PARTIAL | Gantt bars match the semantic legend | pending | details/color-values.md |  |
 | 341-575:506#2 | PARTIAL | KPI cards use numeric percentage, not "In Progress" | pending | details/product-patterns.md |  |
 | 341-575:512#1 | MISSING | Masked text slide on hover (two text copies in a clip mask) | pending | details/motion.md |  |
 | 341-575:513 | MISSING | Keyboard shortcut caps animate pressed, then success badge | pending | details/motion.md |  |
 | 341-575:514#1 | PARTIAL | Toast chains spinner then success state | pending | details/motion.md |  |
-| 341-575:514#2 | CONFLICT | Particle burst on success | pending | unassigned |  |
+| 341-575:514#2 | CONFLICT | Particle burst on success | pending | details/motion.md D3#26 |  |
 | 341-575:516 | OUT-OF-SCOPE | Avatar name tag: rounded pill, black fill, slight tilt | out-of-scope |  |  |
 | 341-575:517#1 | PARTIAL | Name tag spring: 500ms, stiffness 636, damping 24 | pending | details/motion.md |  |
-| 341-575:518#1 | CONFLICT | Rotating angular-gradient shimmer stroke | pending | unassigned |  |
+| 341-575:518#1 | CONFLICT | Rotating angular-gradient shimmer stroke | rejected | ambient border shimmer, craft-floor.md:13 D3#41 |  |
 | 341-575:518#2 | OUT-OF-SCOPE | Build 1px border by boolean subtraction and masking | out-of-scope |  |  |
 | 341-575:520 | PARTIAL | Pause/play toggle for continuous rotation | pending | details/motion.md |  |
 | 341-575:521#1 | PARTIAL | 1000ms delay before icon tooltip | pending | details/motion.md |  |
-| 341-575:521#2 | CONFLICT | Bouncy spring easing on tooltip | pending | unassigned |  |
+| 341-575:521#2 | CONFLICT | Bouncy spring easing on tooltip | rejected | tooltips stay at bounce 0, motion.md:87 D3#24 |  |
 | 341-575:521#3 | MISSING | Mouse leave resets tooltip immediately | pending | details/motion.md |  |
 | 341-575:523 | MISSING | Inline keyword hover pops out preview without taking layout space | pending | details/motion.md |  |
 | 341-575:524 | PARTIAL | Masked progress fill slides across track on step completion | pending | details/motion.md |  |
 | 341-575:525 | PARTIAL | Stacked notification cards: swipe front away, scale back cards up | pending | details/gestures.md |  |
 | 341-575:526 | MISSING | Magnifier icon morphs into expanding search input | pending | details/motion.md |  |
 | 341-575:527 | PARTIAL | Old limit number slides out and new one slides in, in place | pending | details/motion.md |  |
-| 341-575:533#1 | CONFLICT | Light card: 1px outline plus soft drop shadow | pending | details/surfaces.md |  |
-| 341-575:533#2 | CONFLICT | Shadow color very light gray, not transparent black | pending | unassigned |  |
+| 341-575:533#1 | CONFLICT | Light card: 1px outline plus soft drop shadow | pending | details/surfaces.md D3#27 |  |
+| 341-575:533#2 | CONFLICT | Shadow color very light gray, not transparent black | pending | details/surfaces.md D3#27 |  |
 | 341-575:534 | OUT-OF-SCOPE | Hide via layer opacity, not fill opacity | out-of-scope |  |  |
 | 341-575:536 | OUT-OF-SCOPE | Smart Animate matches by exact layer name | out-of-scope |  |  |
 | 341-575:537#2 | PARTIAL | Icon background tints off-white on hover | pending | details/surfaces.md |  |
 | 341-575:538#1 | PARTIAL | Focused app card: heavy bright yellow stroke | pending | details/surfaces.md |  |
-| 341-575:538#2 | CONFLICT | Duplicate rectangle behind with 24px blur as glow | pending | unassigned |  |
+| 341-575:538#2 | CONFLICT | Duplicate rectangle behind with 24px blur as glow | rejected | zero-offset halo, craft-floor.md:10 D3#40 |  |
 | 341-575:539#2 | OUT-OF-SCOPE | Scale tool (K) shortcut | out-of-scope |  |  |
 | 341-575:541 | PARTIAL | Five-frame loading spinner with 180-degree rotation steps | pending | details/motion.md |  |
 | 341-575:543#1 | OUT-OF-SCOPE | Chain frames with After Delay 300ms | out-of-scope |  |  |
@@ -550,16 +550,16 @@
 | 341-575:554#3 | MISSING | Pill shapes need no concentric adjustment | pending | details/surfaces.md |  |
 | 341-575:555 | MISSING | iOS corner smoothing at 100% | pending | details/surfaces.md |  |
 | 341-575:556 | OUT-OF-SCOPE | Pick colors in HSB, not HEX | out-of-scope |  |  |
-| 341-575:557 | CONFLICT | Companion layers: saturation +20, brightness -10 per layer | pending | unassigned |  |
-| 341-575:558 | CONFLICT | Shift hue 20 points toward darker spectrum (blue and purple darker) | pending | unassigned |  |
+| 341-575:557 | CONFLICT | Companion layers: saturation +20, brightness -10 per layer | rejected | HSB steps, OKLCH instead, C20 D3#34 |  |
+| 341-575:558 | CONFLICT | Shift hue 20 points toward darker spectrum (blue and purple darker) | rejected | HSB hue shift, OKLCH instead, C20 D3#34 |  |
 | 341-575:560 | MISSING | Strip explicit labels ("Name:", "Price:") from cards | pending | details/product-patterns.md |  |
 | 341-575:562#1 | PARTIAL | Stack name+location top-left, cost+rating top-right, icons in middle | pending | details/landing.md |  |
 | 341-575:562#2 | MISSING | Keep labels only on dates | pending | details/product-patterns.md |  |
-| 341-575:564#1 | CONFLICT | Delete horizontal divider lines between list items | pending | unassigned |  |
+| 341-575:564#1 | CONFLICT | Delete horizontal divider lines between list items | pending | details/product-patterns.md D3#36 |  |
 | 341-575:564#3 | MISSING | Subtle alternating row fill when rows are packed | pending | details/product-patterns.md |  |
 | 341-575:567#1 | OUT-OF-SCOPE | Figma Nudge Amount set to 8px | out-of-scope |  |  |
 | 341-575:567#2 | MISSING | Large distances: scale exponentially or round to 5 or 10 | pending | details/landing.md |  |
-| 341-575:569 | CONFLICT | Replace pure white and pure black backgrounds with extreme brand tints | pending | unassigned |  |
+| 341-575:569 | CONFLICT | Replace pure white and pure black backgrounds with extreme brand tints | pending | details/color-values.md D3#33 |  |
 | 341-575:571 | MISSING | Light mode: Tailwind 50 background, 500 accent | pending | details/color-values.md |  |
 | 341-575:572 | MISSING | Dark mode: Tailwind 950 background, 300 accent | pending | details/color-values.md |  |
 | 341-575:574#2 | PARTIAL | Dark elevation: raise brightness +4 to +6, lower saturation -10 to -20 per layer | pending | details/color-values.md |  |
@@ -574,7 +574,7 @@
 | 576-818:591 | MISSING | Ultrawide hero split in two: left full-height image with overlaid copy, right interactive product showcase | pending | details/landing.md |  |
 | 576-818:593 | MISSING | Place brand wordmark front and center/left in navbar | pending | details/product-patterns.md |  |
 | 576-818:594a | PARTIAL | Collapse secondary utilities (Favorites, Notifications) into one Menu button | pending | details/product-patterns.md |  |
-| 576-818:594b | CONFLICT | Convert Cart text link into an icon | pending | details/product-patterns.md |  |
+| 576-818:594b | CONFLICT | Convert Cart text link into an icon | pending | details/product-patterns.md D3#10 |  |
 | 576-818:594c | PARTIAL | Replace Profile icon with an explicit Sign In action | pending | details/product-patterns.md |  |
 | 576-818:594d | MISSING | Add a search bar to balance the top bar | pending | details/product-patterns.md |  |
 | 576-818:596a | PARTIAL | Multi-product half-column becomes a horizontal slider | pending | details/product-patterns.md |  |
@@ -600,7 +600,7 @@
 | 576-818:618 | MISSING | Build animations crisp and native; avoid blurry third-party Lottie/video exports | pending | details/motion.md |  |
 | 576-818:620a | PARTIAL | Simple bento: 2 to 4 asymmetric cards per row | pending | details/landing.md |  |
 | 576-818:620b | MISSING | Optional slight tilt on an interior card element | pending | details/surfaces.md |  |
-| 576-818:622 | CONFLICT | Visible full-bleed 1px vertical and horizontal grid lines framing sections, bento cells, and hero | pending | details/surfaces.md |  |
+| 576-818:622 | CONFLICT | Visible full-bleed 1px vertical and horizontal grid lines framing sections, bento cells, and hero | pending | details/surfaces.md D3#5 |  |
 | 576-818:624 | MISSING | Visual mega-menus with thumbnails in nav dropdowns | pending | details/product-patterns.md |  |
 | 576-818:630 | OUT-OF-SCOPE | Resource: UIverse coded UI library with Copy to Figma | out-of-scope |  |  |
 | 576-818:631 | OUT-OF-SCOPE | Resource: Logo System gallery | out-of-scope |  |  |
@@ -646,8 +646,8 @@
 | 576-818:675c | OUT-OF-SCOPE | Stamp sender's name at the top of shared content | out-of-scope |  |  |
 | 576-818:682a | PARTIAL | Two messages in one typographic slot that swap on hover or mask reveal | pending | details/motion.md |  |
 | 576-818:682b | MISSING | Scroll-driven inline character animation that swaps text | pending | details/motion.md |  |
-| 576-818:684a | CONFLICT | Pair sharp geometric headline with hand-drawn pencil scribbles, underlines, sketched arrows | pending | details/surfaces.md |  |
-| 576-818:684b | CONFLICT | Hover-triggered scribble animations | pending | details/surfaces.md |  |
+| 576-818:684a | CONFLICT | Pair sharp geometric headline with hand-drawn pencil scribbles, underlines, sketched arrows | rejected | sketch SVG ban, craft-floor.md:46 D3#22 |  |
+| 576-818:684b | CONFLICT | Hover-triggered scribble animations | rejected | sketch SVG ban, craft-floor.md:46 D3#22 |  |
 | 576-818:686 | PARTIAL | Stretch or animate display type per letter on scroll or load | pending | details/motion.md |  |
 | 576-818:687a | OUT-OF-SCOPE | DevTools trick to identify fonts on a live site | out-of-scope |  |  |
 | 576-818:687b | MISSING | Verify font licensing before commercial use | pending | details/typography.md |  |
@@ -684,7 +684,7 @@
 | 576-818:732c | OUT-OF-SCOPE | Stat: 70–80% of users are right-handed | out-of-scope |  |  |
 | 576-818:739a | PARTIAL | Don't spend top-of-screen space on a massive header | pending | details/product-patterns.md |  |
 | 576-818:739c | MISSING | Sidebar anatomy: logo, menu toggle, team avatars and Manage Team, Add Widget, Settings pinned at bottom | pending | details/product-patterns.md |  |
-| 576-818:739d | CONFLICT | Designed collapsed icon-only sidebar state | pending | details/product-patterns.md |  |
+| 576-818:739d | CONFLICT | Designed collapsed icon-only sidebar state | rejected | icon-only nav, I7 D3#13 |  |
 | 576-818:740c | PARTIAL | Strip useless voice-dictation mic icons | pending | details/product-patterns.md |  |
 | 576-818:740d | PARTIAL | Turn a hidden "View Tasks" header button into an always-visible widget | pending | details/product-patterns.md |  |
 | 576-818:742a | MISSING | Credit card widget omits send, receive, and direct-deposit actions | pending | details/product-patterns.md |  |
@@ -703,7 +703,7 @@
 | 576-818:745a | PARTIAL | Replace "Minimize" icon with labeled "All Activities" button | pending | details/product-patterns.md |  |
 | 576-818:745b | PARTIAL | Delete tiny unclickable pagination dots | pending | details/surfaces.md |  |
 | 576-818:745c | PARTIAL | Fraud alert card: warning icon, amount, date, location | pending | details/product-patterns.md |  |
-| 576-818:745d | CONFLICT | Loan card with a 90°-rotated progress diagram | pending | details/surfaces.md |  |
+| 576-818:745d | CONFLICT | Loan card with a 90°-rotated progress diagram | pending | details/charts.md D3#23 |  |
 | 576-818:745e | OUT-OF-SCOPE | Loan card shows loan amount and repayment date | out-of-scope |  |  |
 | 576-818:746a | MISSING | Wide thin container holding two reminder cards, respecting outer grid margins | pending | details/landing.md |  |
 | 576-818:746c | PARTIAL | High-contrast red "All Tasks" button | pending | details/color-values.md |  |
@@ -733,20 +733,20 @@
 | 576-818:766b | PARTIAL | Switch solid CTA to ghost stroke button when fill breaks hierarchy | pending | details/product-patterns.md |  |
 | 576-818:767a | MISSING | Plan name and short description on pricing card | pending | details/product-patterns.md |  |
 | 576-818:767b | PARTIAL | Billing terms and renewal rate below the price | pending | details/product-patterns.md |  |
-| 576-818:768a | CONFLICT | Checkmark glyphs (✓) instead of bullets | pending | details/surfaces.md |  |
+| 576-818:768a | CONFLICT | Checkmark glyphs (✓) instead of bullets | pending | details/product-patterns.md D3#31 |  |
 | 576-818:768b | MISSING | List excluded features explicitly | pending | details/product-patterns.md |  |
 | 576-818:769 | PARTIAL | Tinted brand header instead of a divider between price and features | pending | details/color-values.md |  |
 | 576-818:771 | OUT-OF-SCOPE | Figma star recipe: 12 points, rounded corners | out-of-scope |  |  |
 | 576-818:772a | PARTIAL | Quirky display font for sticker badges (Gorditas, Barriecito) | pending | details/surfaces.md |  |
 | 576-818:772b | OUT-OF-SCOPE | Inner outline or circular path text (To Path plugin) | out-of-scope |  |  |
-| 576-818:772c | CONFLICT | Offset drop shadow at 100% opacity in a darker shade | pending | details/surfaces.md |  |
+| 576-818:772c | CONFLICT | Offset drop shadow at 100% opacity in a darker shade | rejected | offset sticker shadow outside neobrutalism, craft-floor.md:36 D3#32 |  |
 | 576-818:772d | OUT-OF-SCOPE | Kaleidoscope effect on dark UIs | out-of-scope |  |  |
 | 576-818:774b | PARTIAL | Permanent label above every input | pending | details/product-patterns.md |  |
 | 576-818:774c | PARTIAL | Realistic example text in placeholder | pending | details/product-patterns.md |  |
 | 576-818:775a | PARTIAL | Clear "Create account" subheading | pending | details/product-patterns.md |  |
 | 576-818:775b | MISSING | "Log in" redirect link for existing users | pending | details/product-patterns.md |  |
 | 576-818:776b | MISSING | Subtle off-white input background | pending | details/product-patterns.md |  |
-| 576-818:776c | CONFLICT | Input border stroke at 40% opacity | pending | details/color-values.md |  |
+| 576-818:776c | CONFLICT | Input border stroke at 40% opacity | pending | details/color-values.md D3#30 |  |
 | 576-818:778a | PARTIAL | Don't copy a 5-column footer for only 3–5 links | pending | details/product-patterns.md |  |
 | 576-818:779a | MISSING | Centered single-row footer: logo, 3–5 links, social icons | pending | details/product-patterns.md |  |
 | 576-818:779b | MISSING | Copyright bottom-left, design credits bottom-right | pending | details/product-patterns.md |  |
@@ -770,16 +770,16 @@
 | 576-818:800 | MISSING | At small sizes, weight and opacity reduction look nearly identical | pending | details/typography.md |  |
 | 576-818:801a | MISSING | Avoid ultra-bold and ultra-thin weights on body copy | pending | details/typography.md |  |
 | 576-818:801b | PARTIAL | Primary text at 100% opacity | pending | details/color-values.md |  |
-| 576-818:801c | CONFLICT | Secondary muted text at 40–70% opacity | pending | details/color-values.md |  |
+| 576-818:801c | CONFLICT | Secondary muted text at 40–70% opacity | pending | details/color-values.md D3#30 |  |
 | 576-818:802a | PARTIAL | Don't make small body paragraphs light gray | pending | details/typography.md |  |
 | 576-818:803 | PARTIAL | Main heading: large, regular weight, 100% opacity; size alone sets dominance | pending | details/typography.md |  |
 | 576-818:804 | PARTIAL | Subheadings: medium size, bold weight | pending | details/typography.md |  |
 | 576-818:805 | PARTIAL | Body: base size, regular weight, 100% opacity | pending | details/typography.md |  |
 | 576-818:807 | MISSING | Golden ratio 1.62 across four heading levels balloons H1 to 110px | pending | details/typography.md |  |
 | 576-818:808 | MISSING | Landing scale: sqrt(1.62) = 1.27, applied sequentially from 16px | pending | details/typography.md |  |
-| 576-818:811 | CONFLICT | Fluid font size by linear interpolation between 320px and 1920px | pending | details/typography.md |  |
+| 576-818:811 | CONFLICT | Fluid font size by linear interpolation between 320px and 1920px | pending | details/typography.md D3#17 |  |
 | 576-818:813 | PARTIAL | Clamp fluid sizes with min() and max() bounds | pending | details/typography.md |  |
 | 576-818:815a | MISSING | Increase line-height as font size gets smaller | pending | details/typography.md |  |
 | 576-818:815c | MISSING | Decrease line-height as font size gets larger | pending | details/typography.md |  |
-| 576-818:816 | CONFLICT | Body line-height ~1.5 (150%) | pending | details/typography.md |  |
+| 576-818:816 | CONFLICT | Body line-height ~1.5 (150%) | pending | details/typography.md D3#16 |  |
 | 576-818:817 | MISSING | Heading line-height 1.1–1.3 | pending | details/typography.md |  |
