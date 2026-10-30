@@ -82,3 +82,5 @@ Every variant declares a coarse `density` parameter and authors spacing against 
 ```
 
 Add one structural parameter only when the topology genuinely branches. Follow [live.md](live.md)'s parameter contract.
+
+Landing-page hero layouts, spacing starting values, and section patterns live in [details/landing.md](details/landing.md).

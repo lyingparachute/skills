@@ -1,6 +1,73 @@
-# Mobile web feel
+# Mobile feel for web and native apps
 
-The platform-layer fixes that make a web app feel installed rather than embedded on a phone. [adapt.md](../adapt.md) owns layout, touch targets, input-method queries, and safe areas; this file holds what it leaves out. Almost every fix is one declaration: reach for a media query, a meta tag, or a CSS property before JavaScript, and gate by capability, never by user agent or screen width.
+Fixes that make a web or native app feel built for a phone rather than embedded in one. [adapt.md](../adapt.md) owns layout, touch targets, input-method queries, and safe areas; this file holds what it leaves out. Platform controls live in [ios.md](../ios.md) and [android.md](../android.md). Gesture motion lives in [gestures.md](gestures.md). For web fixes, almost every one is one declaration: reach for a media query, a meta tag, or a CSS property before JavaScript, and gate by capability, never by user agent or screen width.
+
+The structure rules below are Operate. Feed and story formats are Read.
+
+## Bottom navigation
+
+- On Android, use a bottom bar with 3-5 destinations of equal importance (Material).
+- On iOS, keep a tab bar to five or fewer destinations (Apple). Move anything else out of the bar.
+- Optional: break one primary action out at the right end of the bar. Treat it as a starting layout and test it on users.
+- Keep every tab target on one baseline. Do not raise a center button above the bar.
+- Show the user's profile picture in the profile tab, not a generic user icon.
+
+## Too many destinations
+
+- When the bar cannot hold every destination, make the sidebar the home screen. Put recent items at its top.
+- Align item counts and secondary actions to the right edge, so the list balances.
+- Put the notification bell and a More menu at the top.
+- Reserve the bottom edge for a large search field or the primary action.
+
+## Focused flows
+
+- Hide the main navigation bar when a user enters a focused workflow.
+- In an editor, replace the bottom navigation with formatting and share controls.
+- A template picker shows only Confirm and the close X. Nothing else competes with the choice.
+
+## One screen, one job
+
+- One screen does one job. The home screen is the only exception.
+- A new feature gets a new screen. Do not add it to a screen that already does another job.
+
+## Mid-task choices
+
+- Use a bottom sheet for a choice made mid-task, not a dropdown (adapt.md). The sheet holds one choice and closes when the user picks it. Its motion follows [gestures.md](gestures.md).
+
+## Screen blocks
+
+- Compose a phone screen from four blocks: cards, text and links, images, and inputs.
+
+## Type and size
+
+- Never shrink desktop text to fit a phone. Body text on iOS starts at 17 pt (Apple HIG).
+
+## One scroll axis
+
+- A section on a phone scrolls on one axis: stack its items vertically, or scroll them horizontally, never both.
+
+## Thumb reach
+
+- Leave only the close X at the top of a full-screen story.
+- Stack engagement icons on the lower-right edge. Start there, then test with real users.
+
+## Feeds and story formats
+
+- A full-screen feed scrolls on one axis and snaps to one item per swipe. The commit and motion rules are in [gestures.md](gestures.md).
+- Replace multi-card browsing collages with a full-screen feed. Its only primary action is the swipe.
+- Autoplay video only with a visible pause control (WCAG 2.2.2).
+- Use vertical scroll instead of tap-through slides in a story format.
+- Show a segmented progress bar as a visible position indicator on the right edge of a story format.
+- Keep a visible pause control on a story format.
+- Tap anywhere on the media to pause and resume, as an extra to the visible control.
+- Pause playback when the user taps a share control.
+- Put a section jump at the bottom of a story, so users reach any section without tapping through every slide.
+- Offer a summary at the end of each section of a story.
+- A summary fits on one screen, so the user can scan it without leaving the story.
+
+## Empty states on phone
+
+- An empty screen states why it is empty and gives one primary action (NN/g).
 
 ## Symptoms
 

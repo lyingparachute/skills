@@ -200,7 +200,7 @@ When the adaptation feels native to each context, hand off to `$impeccable polis
 
 ## Reference Material
 
-Phone-only platform fixes (tap highlight, viewport units, input zoom, overscroll, gesture axes, status bar color) live in [details/mobile-web.md](details/mobile-web.md).
+Phone-only platform fixes (tap highlight, viewport units, input zoom, overscroll, gesture axes, status bar color) live in [details/mobile.md](details/mobile.md).
 
 The sections below were previously `responsive-design.md` and live inline now so the adapt flow has its deep responsive reference in one place.
 
