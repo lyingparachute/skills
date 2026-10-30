@@ -10,7 +10,7 @@ Reference for the Standards axis. Three rules govern every entry below:
 
 Twelve shapes from Fowler's catalogue, each with the move that resolves it. Where a move here overlaps Preferred Remedies in `SKILL.md`, that section is authoritative on the remedy; this list is what you scan the diff for. Scan the whole list against the touched flow, past the first hit.
 
-- **Mysterious or misleading name** - a name that needs the body read to be understood, or that predicts the wrong result. Check every new or renamed name against the `Method name = what it returns or changes` rule in `AGENTS.md`. Rename until the call site reads on its own.
+- **Mysterious or misleading name** - a name that needs the body read to be understood, or that predicts the wrong result. Check every new or renamed name against the `Method name = what it returns or changes` rule in `AGENTS.md`: a query names its result, a command its effect, a near-copy keeps the name plus its one difference (`findUser` / `findUserOrThrow`), and no method shares a type or event name (`orderPlaced()` beside event `OrderPlaced` → `placeOrder()`). Rename until the call site reads on its own.
 - **Duplicated code** - the same logic in two places. Extract it, or move it to the layer that owns the concept.
 - **Feature envy** - a function reaching repeatedly into another object's data. Move it next to the data it uses.
 - **Data clumps** - the same group of parameters or fields travelling together. Give the group a type.
@@ -25,7 +25,7 @@ Twelve shapes from Fowler's catalogue, each with the move that resolves it. Wher
 
 ## Comments
 
-The repo's own rule ("comment only what naming can't carry") sets the bar. Two shapes it does not name:
+The repo's own rule and `Default to no comment` in `AGENTS.md` set the bar. A comment that narrates, restates the code, carries `@param`/`@return` tags, a section banner, a removal marker, or change history is a finding. Two shapes those rules do not name:
 
 - **A long inline justification is a confession.** When a comment argues for why the code is shaped the way it is, the finding is the shape, not the comment. Ask for the reshape.
 - **A suppression is a claim, so check it.** `eslint-disable`, `@ts-ignore`, `@ts-expect-error` and their kin: read the rule being silenced. If it was protecting real correctness, the suppression is the finding.

@@ -7,6 +7,10 @@ A skill exists to wrangle determinism out of a stochastic system. **Predictabili
 
 **Bold terms** are defined in [`GLOSSARY.md`](GLOSSARY.md); look them up there for the full meaning.
 
+## In this repo
+
+The `skills` repo is the single source of truth; `install.sh` symlinks every skill into each harness's skill dir. Edit, rename, or delete a skill here, never in a harness dir. After adding, renaming, or removing one, re-run `install.sh` to relink and prune stale links.
+
 ## Invocation
 
 Two choices, trading different costs:

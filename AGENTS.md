@@ -3,12 +3,6 @@
 - **Global vs project rules.** This file = system-wide only. Project-specific rules live in the repo-level agent rules file and override conflicts here. Domain context (APIs, schemas, frameworks, conventions, build commands) belongs in the repo file, not here.
 - **Same correction 2x = rule gap, not slip.** First correction → fix + memory entry. Second correction same topic → stop and ask the user: promote to a skill, or add a rule to this file (or repo rules file, whichever scopes best)? Memory alone no fix the gap; rule must move into a skill or rules file.
 
-# Skills
-
-- **Skills live in one repo, symlinked everywhere.** The `skills` repo is the single source of truth; `install.sh` symlinks every skill into each harness's skill dir (`~/.agents`, Claude Code, Codex, Cursor, Grok, OpenCode). Never edit, rename, or delete a skill in a harness's own skill dir - that edits a symlink target and desyncs the rest. Edit the file in the `skills` repo.
-- **Writing or editing a skill → follow `writing-great-skills`.** Any new skill or change to an existing one obeys that skill's rules (predictability, invocation choice, information hierarchy, pruning, leading words). No exceptions.
-- **After add/rename/remove → re-run `install.sh`.** Adding, renaming, or removing a skill changes the symlink set; re-run `install.sh` to relink and prune stale links so every harness stays validated.
-
 # Communication Style
 
 **Decision order - first match wins:**
@@ -34,8 +28,8 @@
 
 ## Code Quality
 
-- **Default to no comment.** Doc blocks (`/** */`, Javadoc, docstrings) are the last resort: only when a tool reads them or the repo rules require them. A needed multi-line comment uses a plain block comment (`/* */`), never stacked `//` lines. Code explains itself through names, types, and small functions. Code needs a comment to make sense → rename or restructure first. A comment is allowed only when all three hold: the fact cannot live in code, a reader would get it wrong without it, and git history is the wrong place for it. Real cases: hidden invariant, workaround for a named library bug (link the issue), non-obvious spec or protocol constraint, why a surprising choice was made. Never: narration (`// now we do X`), restating the code, `@param`/`@return` tags, section banners, removal markers (`// removed X`), change history. Redundant comments on lines you touch → delete. In doubt: no comment.
-- **Method name = what it returns or changes.** Never how it works, when it runs, who calls it, or why one caller needs it: such names mislead the next caller (`sendWelcomeEmail` that sends any body → `sendEmail`). Query → name the result. Command → name the effect. A near-copy keeps the name plus its one difference (`findUser` / `findUserOrThrow`). Prefixes keep their promise: `is`/`has` return boolean, `get` changes nothing, plural returns a collection (`isValid` returning errors → `validationErrors`). One concept, one name: no value with two names, no method sharing a type or event name (`orderPlaced()` beside event `OrderPlaced` → `placeOrder()`). No filler (`process`, `manage`, `data`, `util`). Before naming, state to yourself in one line what it returns or changes; name disagrees → rename. Exempt: names the language or framework fixes (`of`/`from`, `useX`, `handleX`, Next.js files); casing is the linter's job.
+- **Default to no comment.** Code needs a comment to make sense → rename or restructure first. A comment stays only when the fact cannot live in code, a reader would get it wrong without it, and git history is the wrong place: a hidden invariant, a workaround for a named library bug (link the issue), a protocol constraint, a surprising choice. Doc blocks only when a tool reads them or the repo rules require them. A multi-line comment is one `/* */` block, never stacked `//`. Delete redundant comments on lines you touch.
+- **Method name = what it returns or changes.** Never how it works, when it runs, or who calls it (`sendWelcomeEmail` that sends any body → `sendEmail`). Prefixes keep their promise: `is`/`has` return boolean, `get` changes nothing, plural returns a collection. One concept, one name. No filler (`process`, `manage`, `data`, `util`). Exempt: names the language or framework fixes (`of`, `useX`, `handleX`).
 - **Construct objects completely.** Build in one place from all required inputs - factory, builder, or full-arg constructor. No empty init + scattered mutations. Mutation setters only when framework demands.
 - **No null returns.** Use typed absence - empty sentinel (`X.empty()`, `[]`, `{}`), `Optional`/`Maybe`, or discriminated union - instead of null/undefined. Wrappers belong on return types only, never on fields or parameters.
 - **Verify before acting.** Every claim from reviewer/sub-agent/LLM about existing code = hypothesis. Read source, confirm, then act or forward.
@@ -57,13 +51,10 @@
 - **Explicit over implicit.** Constructor injection / explicit parameters over hidden globals, inline singletons, magic framework injection that obscures data flow.
 - **Boundaries are contracts.** Module/service boundary = public API. One validation layer at the boundary, no scattered guards inside business logic.
 - **Dependencies point inward.** Infra and interface layers depend on domain core. Domain depends on nothing outside itself. Domain never imports infrastructure types.
-- **Battle-tested patterns before inventing architecture.** Check production open-source first.
-- **Understand framework before fighting it.** Feels wrong with framework → assumption wrong, not framework. Verify first.
 
 ## Design & Style
 
-- **Clarity over cleverness.** Flat data over deep hierarchies. Indirection with no name that justifies it → remove.
-- **Data structures over algorithms.** Right data layout makes algorithm obvious. Optimize shape first.
+- **Shape first, flat, no unearned indirection.** Fix the data shape before the algorithm. Flat data over deep hierarchies. Indirection with no name that justifies it → remove. Check production open-source before inventing architecture.
 - **Refactor in small, safe steps.** Each step leaves code working. Rewrite and refactor never in the same commit.
 - **Evolutionary design.** Design for next concrete requirement, not every hypothetical future. Extend when needed.
 - **Screaming architecture.** Package/module = business purpose, not technical layer. Top-level: `Ordering`, `Billing`, `Inventory` - never `Controllers`, `Services`, `Repositories`.
@@ -95,9 +86,8 @@
 
 # Harness Tools
 
-A harness (T3 Code, a CLI, an IDE) may ship its own tools and its own instructions for them. Rules and skills name the job; the harness's instructions and tool descriptions name the tool. Tool names change, so no rule or skill names one. A job the harness has no tool for falls back to your own tools.
+Rules and skills name the job; the harness's own instructions name the tool, since tool names change. When the harness (T3 Code, a CLI, an IDE) has a tool for a job, use it over your own browser tooling, a shell loop, or a chat message.
 
-- **Harness tool over your own.** When the harness offers a tool for a job, use it over a generic fallback: your own browser tooling, a shell loop, a chat message.
 - **Show, don't describe.** A trend, a comparison, a flow, an architecture, or a design's desired outcome reaches the user as a visual rendered in the conversation: chart, diagram, or screenshot. A file path, an ASCII sketch, or a prose description of a visual is not showing it.
 - **Drive the real app** in the harness's browser preview; native apps through its device tools. Steps: `implement/UI.md`.
 - **Wait on background work** through the harness's wait, never `sleep` or polling loops.
@@ -106,10 +96,6 @@ A harness (T3 Code, a CLI, an IDE) may ship its own tools and its own instructio
 # Workflow Triggers
 
 User phrases below activate specific workflows. Follow the protocol literally.
-
-## "Implement the plan" / "execute the plan"
-
-- Use the `implement` skill. It owns the protocol.
 
 ## "Review the implementation" / "verify the implementation"
 
@@ -124,10 +110,6 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - Operational claims get probed against the live system: curl the endpoint, invoke the CLI, query the API, check the job status. Reading the code that would do it is not evidence.
 - Output: `PASS` or `FAIL`. On FAIL, the exact error output and what must change, with `file:line` where it is code.
 - FAIL → fix, then re-verify. Max 2 rounds, then report what is left standing.
-
-## "Review the plan" / "critique the plan"
-
-- Use `exec-plan` (On-demand critique).
 
 # Context Boundaries
 
@@ -146,9 +128,7 @@ User phrases below activate specific workflows. Follow the protocol literally.
 - **Independent slices = parallel.** Multiple non-dependent tasks → one message, many `Agent` calls same block. Parallelize independent work; parallel writers follow the repo's worktree rule.
 - **Plan milestone done → critic subagent reviews the code before the next milestone.**
 
-## Critic Subagent Rules
+## Critic Subagents
 
-- **Critic = fresh context, never the writer.** Same agent self-approve = theatre. Brief = attack, not validate; a close call gets called out.
-- **Each critic runs its skill.** Plan critic → `exec-plan` critic gate. Code critic → `judo-review`, plus every rule in `## Code Quality` and `## Architecture`. Acting on findings → `receiving-code-review`. The skill owns the brief and the output format.
 - **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed. Dismissal is only for a finding that fails confirmation against the source, or one the user dismisses, each written with its reason (for a user dismissal, their words are the reason); a confirmed finding is fixed, or deferred to a tracked plan when the user chooses. Quality bar: no code smell, no debt created, no debt left behind.
-- **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 → report to user, never a third loop.
+- **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 go in the report; no third round.
