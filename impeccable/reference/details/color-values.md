@@ -54,7 +54,7 @@ Exact surface steps, text levels, ramps, state, semantic, dark-mode, and image-o
 ## Semantic and destructive colors
 
 - Reserve semantic hues for meaning. Do not use them for decoration.
-- Error or danger is red, warning is amber, success is green, and info is blue (Carbon). Pair each status color with a non-color cue (colorize.md).
+- Where the platform or domain has no color convention, default to red for error or danger, amber for warning, green for success, and blue for info (Carbon). An existing convention wins (colorize.md). Pair each status color with a non-color cue.
 - Build states get distinct colors: success, failure, and in-progress each have their own color and label.
 - Destructive actions use the danger role, red, with a verb label (Apple HIG). Use the primary danger style only when the step is required.
 - Never give a destructive action the brand primary color. It pulls attention the wrong way.

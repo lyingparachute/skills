@@ -6,7 +6,7 @@ How swipe, drag, sheet, long-press, carousel, pull-to-refresh, and slide-to-conf
 
 - **Every gesture has a visible control.** Each swipe, drag, or long-press does the same job as a button or link. A user who never finds the gesture is never stuck.
 - **Size the control to the minimum.** Target 44 pt on iOS (Apple HIG) or 48 dp on Android (Material). On web, never go below the 24 CSS px floor (WCAG 2.5.8).
-- **Pairs in practice.** Swipe-to-delete plus a delete button. Swipe-up search plus a search button. Swipe-to-add plus a long-press menu. Swipe-down dismissal plus a close button. Swipe to leave a full-screen view plus a tap on the backdrop.
+- **Pairs in practice.** Swipe-to-delete plus a delete button. Swipe-up search plus a search button. Swipe-to-add plus an Add button. Swipe-down dismissal plus a close button. Swipe to leave a full-screen view plus a tap on the backdrop.
 
 ## Commit feedback
 

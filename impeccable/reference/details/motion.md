@@ -17,7 +17,7 @@ Decide in this order. Stop at the first step that says no, and give the non-moti
    | Occasional (modals, drawers, toasts) | Standard animation |
    | Rare or first-time (onboarding, success, celebration) | Delight lives here |
 
-   Keyboard-initiated actions get no animation. They repeat hundreds of times a day, and motion makes them feel slow.
+   Keyboard-initiated actions get no animation, except a key cap on a surface that teaches shortcuts. They repeat hundreds of times a day, and motion makes them feel slow.
 
 2. **Purpose.** Name it in one word: feedback, spatial consistency, state indication, preventing a jarring change, explanation, or delight (rare tier only). No name, no animation. Data the user reads or acts on stays still.
 
@@ -187,7 +187,7 @@ Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Rea
 - **Timer pill.** On an auto-advancing carousel, the active dot stretches into a pill that fills as the timer runs. The pause rules in [gestures.md](gestures.md#carousels) apply.
 - **Search expansion (Operate, Persuade).** A collapsed search control shows a magnifier icon. On activation, the handle retracts and the icon morphs into the expanding search input. Opening search is an occasional action, so the morph is allowed.
 - **Multi-stage toast.** Show a spinner, then a success state in the same toast, then auto-dismiss. Set the dismiss timing by the toast rule in [interaction.md](interaction.md#choosing-a-surface).
-- **Entrance chain.** Step entrances 300 ms apart with a spring: start at stiffness 550, damping 40, mass 1, then tune. That spring overshoots under 1%, so it reads as no bounce.
+- **Entrance chain.** Step entrances by the stagger rules above, each on a spring: start at stiffness 550, damping 40, mass 1, then tune. That spring overshoots under 1%, so it reads as no bounce.
 - **Particle burst (Persuade).** Only for rare, earned milestones. Never for routine actions.
 
 ### Loading and waiting
@@ -239,7 +239,7 @@ Check every animation in scope against this list:
 
 | Finding | Fix |
 | --- | --- |
-| Animation on a keyboard action or 100+/day element | Remove it |
+| Animation on a keyboard action or 100+/day element, outside a shortcut-teaching surface | Remove it |
 | No nameable purpose | Remove it |
 | `transition: all` or Tailwind `transition` | Name the properties |
 | `scale(0)` entrance | `scale(0.95)` plus `opacity: 0` |
@@ -257,6 +257,6 @@ Check every animation in scope against this list:
 
 Propose fixes in this order, earlier before later: delete the animation; reduce it (shorter, smaller, fewer properties); fix the easing; fix origin and physicality; make it interruptible; move it to compositor properties; make timing asymmetric; polish (blur seam, stagger, `@starting-style`, springs); then reduced motion, hover gating, and fit to the product's personality.
 
-Close with a decision. **Block** on any feel-breaking change, animation on a keyboard or 100+/day action, `scale(0)` or ease-in on UI, or a layout-property animation with an easy transform fix. **Approve** only when none of those remain, nothing obvious should be deleted, durations and easing sit inside the tables above, interruption is handled where it can happen, and reduced motion is respected.
+Close with a decision. **Block** on any feel-breaking change, animation on a keyboard or 100+/day action outside a shortcut-teaching surface, `scale(0)` or ease-in on UI, or a layout-property animation with an easy transform fix. **Approve** only when none of those remain, nothing obvious should be deleted, durations and easing sit inside the tables above, interruption is handled where it can happen, and reduced motion is respected.
 
 Feel that code cannot settle (a crossfade, a spring's bounce, opacity against height in a growing list) gets a feel-check, not a guess: play it at 2-5x duration or in the DevTools Animations panel, step it frame by frame, try gestures on a real phone, and look again the next day.

@@ -275,7 +275,7 @@ If the extended hit area overlaps another interactive element, shrink the pseudo
 
 ## Padding and Icon Size
 
-- Label-only buttons: horizontal padding about 1.5-2x the vertical height (starting value; one source gives about 1.6x).
+- Label-only buttons: horizontal padding about 1.5-2x the vertical padding (starting value; one source gives about 1.6x).
 - Chips are vertically thinner than buttons. Vertical padding is 1/2 or 1/4 of horizontal: 20px horizontal gives 10px or 5px (starting value).
 - Icon size: match the line height of the adjacent text, such as a 24px icon beside 24px line height (starting value). Some systems anchor to cap height instead.
 - Stacked list with a taller icon: add a subline so the bottom edge aligns.

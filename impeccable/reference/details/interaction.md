@@ -46,11 +46,12 @@ How a click, press, hover, or drag commits, how undo and autosave behave, and wh
 | A small choice tied to one control | Popover anchored to its trigger |
 | Context must stay visible while the user works | Non-modal side panel or drawer (NN/g) |
 | Critical warning, data loss, or irreversible action | Modal (NN/g) |
+| Short input the user must give to continue a process they started | Modal (NN/g) |
 | Outcome of an action, with an optional undo | Toast |
 | Error the user must act on | Inline or dialog, never a toast |
 | Deep context with its own URL, or a long task with steps | Page |
 
-- **Modal scope.** Modals are for critical warnings, data loss, and irreversible actions (NN/g). Examples: sending bulk email to 10,000 recipients, or transferring money.
+- **Modal scope.** Modals are for critical warnings, data loss, irreversible actions, and short input needed to continue a process the user started (NN/g). Examples: confirming bulk email to 10,000 recipients, or a transfer amount. Create and edit forms stay inline or in a non-modal side panel, so the page stays visible.
 - **Modal waits for a choice.** A modal for a critical action waits for an explicit button click. Name the action on each button. Clicking outside does not dismiss it.
 - **Hidden layers are designed states.** Design every drawer and modal as a state. Name its trigger, its close path, and the element that gets focus on close.
 - **Popover scope.** Use a popover for simple, non-blocking context, such as display settings. Clicking outside dismisses it, but only when closing loses nothing. Otherwise keep it open, or use a modal.
