@@ -20,16 +20,16 @@ Run impeccable's Setup steps in order on the first call: `<impeccable base dir>/
 
 ## Drive the app
 
-When T3 Code's `preview_*` tools are available, drive the app with them, not with your own browser tooling. Without them, use the browser tools the harness has.
+Drive the app with the harness's browser-preview tools when it has them, otherwise with your own browser tools. Their descriptions name each call. The jobs:
 
-- Open the dev server: `preview_open`, then `preview_navigate` with `target: {kind: "environment-port", port}`.
-- Widths: `preview_resize`, `freeform` with a width, or a device `preset`.
-- Themes: `preview_set_appearance` with `light` and `dark`.
-- Interact: `preview_snapshot` for element refs, then `preview_act` to click, type, scroll, and press keys; `preview_wait_for` until the state shows.
-- Screenshot: `preview_snapshot` with `save: true` returns a `screenshotPath`.
-- Motion and multi-step flows: `preview_recording_start`, then `preview_recording_stop`.
-- Native apps: `device_open`, then `device_screenshot`.
-- Parallel subagents each open their own tab with `reuseExistingTab: false` and use its `tabId`.
+- Open the dev server's port.
+- Set each width: a free width or a device preset.
+- Switch between light and dark themes.
+- Read the page for element refs, then click, type, scroll, and press keys; wait until the state shows.
+- Save each screenshot to disk, for the Show step.
+- Record motion and multi-step flows.
+- Native apps: the harness's device tools, open then screenshot.
+- Parallel subagents each open their own tab, never a shared one.
 
 ## Check each milestone
 

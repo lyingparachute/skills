@@ -88,7 +88,7 @@ Done when each check holds:
 
 ## Opening the PR
 
-Run the gate the repo's PR template or rules name (a `ci:local` script, a checklist command) before you open the PR, and tick only the boxes whose command you saw pass. A gate that is red or cannot finish here: fix it, or tell the user and leave the PR unopened.
+Run the gate the repo's PR template or rules name (a `ci:local` script, a checklist command) before you open the PR, and tick only the boxes whose command you saw pass. A gate that is red or cannot finish here: fix it, or tell the user and leave the PR unopened. When the harness can link a PR to the thread, link every PR you open or push to. When it can watch a PR and the user asked you to monitor one, watch it instead of polling.
 
 ## Updating the branch
 

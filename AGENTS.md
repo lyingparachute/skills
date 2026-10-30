@@ -44,7 +44,7 @@
 - **No orphan TODO/FIXME/HACK.** TODO requires tracked followup (issue link, ticket ID, project followups doc). Naked TODO = debt - fix now or track.
 - **No dead code.** No commented-out blocks, unused imports, unreachable branches, stale flags. Delete it. Git remembers.
 - **No silent failures.** Never swallow exceptions. Never return empty on error without surfacing. Errors propagate as typed results or crash loudly.
-- **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values. Need a secret from the user? Call `request_secret` when T3 Code offers it; without it, ask the user to set an environment variable, never to paste the value in chat.
+- **Secrets never reach the transcript.** Before any command, log, trace, payload, or screenshot lands in the conversation or a written artifact, replace every token, key, password, connection string, cookie, and piece of customer data with `<REDACTED>`. Build commands against environment variables, not literal values. Need a secret from the user? Use the harness's secret request when it has one; without it, ask the user to set an environment variable, never to paste the value in chat.
 - **No skipped tests.** No `.skip`, `.only`, `xit`, "tests later". Failing tests block merge. Skip only when paired with a tracked followup (issue link, ticket ID) explaining why and when re-enable - naked `.skip` = debt.
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
@@ -93,14 +93,15 @@
 
 - **Strict types everywhere.** No `any`, no cast without a comment saying why. Discriminated unions over boolean flags. Domain concepts as value objects or branded types, validated at construction. Every error state in the type system, matched exhaustively. Details: `type-system-discipline`.
 
-# T3 Code Tools
+# Harness Tools
 
-When T3 Code's tools are loaded, they replace your own for the same job:
+A harness (T3 Code, a CLI, an IDE) may ship its own tools and its own instructions for them. Rules and skills name the job; the harness's instructions and tool descriptions name the tool. Tool names change, so no rule or skill names one. A job the harness has no tool for falls back to your own tools.
 
-- **Browser and app checks** → `preview_*` (open, navigate, resize, appearance, act, snapshot, recording); native apps → `device_*`. Details: `implement/UI.md`.
-- **Secrets** → `request_secret`.
-- **Waiting on background work** → `t3_background_wait`, never `sleep` or polling loops.
-- **Charts and visuals in chat** → `html_preview`, then `html_render`.
+- **Harness tool over your own.** When the harness offers a tool for a job, use it over a generic fallback: your own browser tooling, a shell loop, a chat message.
+- **Show, don't describe.** A trend, a comparison, a flow, an architecture, or a design's desired outcome reaches the user as a visual rendered in the conversation: chart, diagram, or screenshot. A file path, an ASCII sketch, or a prose description of a visual is not showing it.
+- **Drive the real app** in the harness's browser preview; native apps through its device tools. Steps: `implement/UI.md`.
+- **Wait on background work** through the harness's wait, never `sleep` or polling loops.
+- **Clickable references.** Files by absolute path; threads and PRs in the link form the harness gives.
 
 # Workflow Triggers
 
