@@ -9,6 +9,8 @@ Once the plan is ready, implement the work it describes. Re-check every cited `f
 
 Keep the plan current as you go: it is the cross-session source of truth, so tick its Progress boxes as work lands. `Status` stays `ready` while work runs, becomes `landed` in the last milestone's commit, and becomes `blocked - <reason>` when the run stops short. A milestone that needs another plan that has not landed is blocked; every other milestone still runs, in plan order. When that other plan is `ready`, implement it first and say so. A plan in a feature folder: its index row's "starts after" names those other plans, and its row follows its `Status` (see /exec-plan); when the plan and the index disagree on what waits, say so and ask once. A plan's "do NOT remove X" premise can be invalidated by a later-landed change, so verify such premises against committed code before enforcing them.
 
+Work or facts you find that belong to another plan go into that plan's file now, per /exec-plan: new work is a fold, a changed fact (a renamed field, a moved file, a check that now waits) is a revision. Commit the edit with the current milestone. Done when the other plan reads correct on its own, with no note left in your report for anyone to carry over. A landed or deleted plan owns nothing: that work goes to `receiving-code-review`'s fix-now-or-ask rule.
+
 Before milestone 1, run the repo's lint, type check, and the tests of the area the plan touches. A red check you did not cause is still yours: fix it now, in its own commit, before milestone 1.
 
 Call the Skill tool with `tdd` and use it where possible, at pre-agreed seams.
@@ -27,4 +29,4 @@ After the last milestone, a fresh critic subagent runs `judo-review` on the whol
 
 Run until the plan is landed or blocked. When blocked, name each open milestone and its blocker.
 
-Report: what changed, every DoD command with its actual output, the final screenshots of every changed UI state, shown as [UI.md](UI.md) says, deviations from the plan, and follow-ups that belong to other plans.
+Report: what changed, every DoD command with its actual output, the final screenshots of every changed UI state, shown as [UI.md](UI.md) says, deviations from the plan, and the path of each other plan you edited with one line on what changed.
