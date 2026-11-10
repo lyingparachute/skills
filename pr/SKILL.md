@@ -88,6 +88,8 @@ Done when each check holds:
 
 ## Opening the PR
 
+Every push goes through [Updating the branch](#updating-the-branch), the first push included. Open the PR only once its done-criterion holds.
+
 Run the gate the repo's PR template or rules name (a `ci:local` script, a checklist command) before you open the PR, and tick only the boxes whose command you saw pass. A gate that is red or cannot finish here: fix it, or tell the user and leave the PR unopened. When the harness can link a PR to the thread, link every PR you open or push to. When it can watch a PR and the user asked you to monitor one, watch it instead of polling.
 
 ### Jira ticket to review
@@ -104,11 +106,11 @@ Done when the ticket shows the review status, read back from Jira.
 
 ## Updating the branch
 
-"Rebase and force push" means onto the PR's own base branch, which is often not `main`. Read the base from the host (`gh pr view --json baseRefName`, or the PR's destination branch on GitLab or Bitbucket), then:
+The base is the PR's target branch, which is often not `main`. For an open PR, read it from the host (`gh pr view --json baseRefName`, or the PR's destination branch on GitLab or Bitbucket). For a new PR, it is the branch the user names, else the repo's default (`develop` or `main`). Then:
 
-1. `git fetch`, then rebase onto `origin/<base>` and resolve conflicts.
+1. `git fetch origin <base>`, then rebase onto the fresh `origin/<base>` (a local `<base>` lags the remote) and resolve conflicts. Rebase with `--autostash`, so uncommitted changes outside the PR stay in the working tree.
 2. Run lint, type check, and the tests of the modules the rebase touched.
-3. Push with `git push --force-with-lease=<branch>:<sha>`, where `<sha>` is `origin/<branch>` as it was before your rebase.
+3. Push. A branch not yet on the remote: `git push -u origin <branch>`. Otherwise `git push --force-with-lease=<branch>:<sha>`, where `<sha>` is `origin/<branch>` as it was before your rebase.
 4. Check the branch is 0 commits behind `origin/<base>`. The base moved while you worked → repeat from step 1.
 
 Done when the push landed and the branch is 0 behind its base.
