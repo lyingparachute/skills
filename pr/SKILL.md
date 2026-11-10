@@ -90,6 +90,18 @@ Done when each check holds:
 
 Run the gate the repo's PR template or rules name (a `ci:local` script, a checklist command) before you open the PR, and tick only the boxes whose command you saw pass. A gate that is red or cannot finish here: fix it, or tell the user and leave the PR unopened. When the harness can link a PR to the thread, link every PR you open or push to. When it can watch a PR and the user asked you to monitor one, watch it instead of polling.
 
+### Jira ticket to review
+
+This step runs only when a Jira key (capital letters, a dash, digits: `CS-40635`) is already in the work: the user's words, the branch name, the commits, the PR title, or the plan. These are not keys: a placeholder (`NO-ISSUE`), a lowercase name (`plan-14`, `pr-703`), a GitHub issue (`#12`). No key there → the PR has no ticket; open it and skip this step, with no Jira search.
+
+With a key, move its ticket to the review status right after the PR opens:
+
+1. List the transitions Jira offers the ticket from its current status.
+2. Pick the transition whose target status means review, such as "In Review" or "Code Review", and apply it by its id.
+3. No review transition from the current status → tell the user the ticket's status and the transitions it offers. Leave the ticket as it is.
+
+Done when the ticket shows the review status, read back from Jira.
+
 ## Updating the branch
 
 "Rebase and force push" means onto the PR's own base branch, which is often not `main`. Read the base from the host (`gh pr view --json baseRefName`, or the PR's destination branch on GitLab or Bitbucket), then:
