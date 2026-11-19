@@ -1,7 +1,7 @@
 # Scope & Calibration
 
 - **Global vs project rules.** This file = system-wide only. Project-specific rules live in the repo-level agent rules file and override conflicts here. Domain context (APIs, schemas, frameworks, conventions, build commands) belongs in the repo file, not here.
-- **Same correction 2x = rule gap, not slip.** First correction → fix + memory entry. Second correction same topic → stop and ask the user: promote to a skill, or add a rule to this file (or repo rules file, whichever scopes best)? Memory alone no fix the gap; rule must move into a skill or rules file.
+- **Same correction 2x = gap, not slip.** Second correction same topic → `correct`.
 
 # Communication Style
 

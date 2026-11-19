@@ -34,6 +34,9 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 **Improve the agent's environment**
 `retro` [user] - after a session that went sideways, before you clear it.
 
+**Stop a repeated mistake**
+`correct` [model] - on the second correction of the same mistake. A mistake in a repo's code: it changes the repo (drives `codebase-design`, `type-system-discipline`, `tdd`, `domain-modeling`, `exec-plan` for a fix that needs a plan). A mistake in how the agent works: it asks whether the fix is a skill or a rule. `retro` reads session logs and changes the agent's setup; run it first when the repo's history shows too few corrections.
+
 **Author a new skill**
 `writing-great-skills` [user] (the bar every skill here meets)
 

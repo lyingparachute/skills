@@ -65,6 +65,14 @@ Rewritten, not copied whole, into `impeccable/reference/details/`:
 
 Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`.
 
+## Adapted from cursor/plugins pstack
+
+Upstream: <https://github.com/cursor/plugins>, `pstack/skills`, MIT.
+
+| Skill | Notes on the divergence |
+|---|---|
+| `correct` | Taken 2026-11-19 at commit `e5136d8`. Same idea and same order of levels. Rewritten as numbered steps with Done criteria. Lint split from types into its own rung, so the ladder has five. Each rung points at our skill for it: `codebase-design`, `type-system-discipline`, `tdd`, `domain-modeling`. A fix that needs a plan goes to `exec-plan`. Corrections found only in session logs go to `retro`. The rule table lives in `CODING_STANDARDS.md` first, not the agent rules file. "Operator" became "user". Model-invoked, with a description that says when to use it. The Agent mistakes branch is ours: it took over the detail of the "Same correction 2x" rule from `AGENTS.md`. |
+
 ## Ideas borrowed without the file
 
 Compared Cursor's `pstack` (<https://github.com/cursor/plugins>, `pstack/skills`) on 2026-08-21 at commit `46125561306434d8a1d7745d540d8932ab0cd2a2`.
