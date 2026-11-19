@@ -28,4 +28,5 @@ Twelve shapes from Fowler's catalogue, each with the move that resolves it. Wher
 The repo's own rule and `Default to no comment` in `AGENTS.md` set the bar. A comment that narrates, restates the code, carries `@param`/`@return` tags, a section banner, a removal marker, or change history is a finding. Two shapes those rules do not name:
 
 - **A long inline justification is a confession.** When a comment argues for why the code is shaped the way it is, the finding is the shape, not the comment. Ask for the reshape.
+- **A warning comment is an unenforced rule.** A comment that tells the next reader what to avoid, or which other file to keep in step, fails nothing when it is ignored. The finding is the missing enforcement: ask for the highest rung of `correct`'s ladder that works, and for the comment to go.
 - **A suppression is a claim, so check it.** `eslint-disable`, `@ts-ignore`, `@ts-expect-error` and their kin: read the rule being silenced. If it was protecting real correctness, the suppression is the finding.

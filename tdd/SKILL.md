@@ -27,6 +27,17 @@ Logic-free code (trivial CRUD passthroughs, getters/setters, DTO/field mapping, 
 
 Drive test cases from the user story's paths, not a line-coverage target. Per seam, cover the happy path plus each meaningful branch - error, empty, boundary, rejected input. One test per case, named for the case it proves (`checkout rejects an empty cart`). Coverage = every case in the story has a test that fails when that case regresses - not every line executed.
 
+## Properties beside examples
+
+When a rule holds for every input, also test it as a **property**: generated inputs, run through the repo's property-testing library. Four shapes cover most rules:
+
+- **Round trip**: parse then format returns the input.
+- **Parity**: two implementations of one rule agree.
+- **Idempotence**: applying it twice equals applying it once.
+- **Invariant**: a fact that survives every operation (slots never overlap, a total never goes negative).
+
+The examples still cover each case in the story; the property covers the inputs nobody listed. State the property without recomputing the result the way the code does, or it is tautological. When a generated input fails, pin it as an example test before the fix.
+
 ## Seams - where tests go
 
 A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.

@@ -20,7 +20,7 @@ Run impeccable's Setup steps in order on the first call: `<impeccable base dir>/
 
 ## Drive the app
 
-Drive the app with the harness's browser-preview tools when it has them, otherwise with your own browser tools. Their descriptions name each call. The jobs:
+Drive the app with the harness's browser-preview tools when it has them, otherwise with your own browser tools. Their descriptions name each call. When the repo has a **feature map** (its list of screens and controls as the user sees them), read it first and name every screen and control by it. When the repo has its own driver script for the app, use it for the jobs it covers. The jobs:
 
 - Open the dev server's port.
 - Set each width: a free width or a device preset.

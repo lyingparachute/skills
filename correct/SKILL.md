@@ -28,9 +28,9 @@ Design for this contributor: an agent that sees only the files it opened, copies
 
 ### The ladder
 
-1. **Architecture**: the mistake has nowhere to live. Give each piece of state one owner and each task one supported way. Hide internals so the wrong import fails. Replace hand-synced lists with a single source of truth. Delete the old ways and the dead code an agent would copy. For a new seam, call the Skill tool with `codebase-design`.
+1. **Architecture**: the mistake has nowhere to live. Give each piece of state one owner and each task one supported way. Hide internals so the wrong import fails. Wrap an API that takes nuance to use well (an effect hook, a timer, a raw query) in one owner module, and ban it everywhere else. Replace hand-synced lists with a single source of truth. Delete the old ways and the dead code an agent would copy. For a new seam, call the Skill tool with `codebase-design`.
 2. **Types**: the bad state does not compile. Call the Skill tool with `type-system-discipline`.
-3. **Check**: bad code still compiles, so a lint rule or CI check fails it, and its error message names the file, type, or function to use instead. Where the pattern is already common, make the check a **ratchet**: it fails only when a change adds more.
+3. **Check**: bad code still compiles, so a lint rule or CI check fails it, and its error message names the file, type, or function to use instead. Where the pattern is already common, make the check a **ratchet**: it fails only when a change adds more. A ratchet ships with a plan, per `exec-plan`, that takes its count to zero, because agents copy every case still standing.
 4. **Test**: the behavior is pinned. Fix or delete any test that still passes when its behavior breaks, or that fails when only the internals change. New tests follow `tdd`.
 5. **Rule**: a line in a durable doc, for judgement calls only, because nothing fails when an agent skips it. Call the Skill tool with `domain-modeling` and run its contest.
 
