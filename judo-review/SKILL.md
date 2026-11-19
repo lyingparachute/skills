@@ -104,7 +104,23 @@ Every finding gets one disposition. Fix now is the default; a follow-up plan is 
 - `merge-blocking`: the fix belongs in this change. This is every finding's starting disposition, including fixes that span several files or reshape a module the diff touches. Blocks approval.
 - `followup-execplan`: the user chose to defer it. Describe the move, why, and rough blast radius. Reported every time, and does not block approval by itself.
 
-Size alone never makes a finding `followup-execplan`. When a fix looks large, keep it `merge-blocking`, state its blast radius, and ask the user: fix it now in this change, or track it as a follow-up plan? Only their answer moves it to `followup-execplan`. As a reviewer subagent, leave it `merge-blocking` with the blast radius stated; the top agent asks.
+Size alone never makes a finding `followup-execplan`. When a fix looks large, keep it `merge-blocking` and state its blast radius. Only the user's answer to the [decision table](#decisions) moves it to `followup-execplan`.
+
+## Decisions
+
+The reviewer decides every judgment call and keeps reviewing. Each call lands as one row in a decision table after the verdict, and the user overrules from there:
+
+- a finding that reverses a decision the plan locked: keep it or drop it
+- a large fix: fix it now, or suggest a follow-up plan
+- two remedies that both hold: which one
+- a finding dropped for any reason other than failing step 5
+
+| Problem | Chosen and why | Rejected |
+|---|---|---|
+
+Problem is the question the decision answers, written for a reader who has not read the finding: what is wrong or unclear, and what turns on it. The user must understand the problem from that cell alone before they read the choice.
+
+As a reviewer subagent, return the rows; the top agent builds the table.
 
 ## Preferred Remedies
 
@@ -125,7 +141,7 @@ Push for remedies that reduce the number of concepts a reader must hold. Reach f
 
 When the real problem is structural, a rename or a tidier version of the same messy idea is not a remedy; name the structural move instead.
 
-When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - name the move and ask the user to fix it now. Offer to run the `improve-codebase` skill on the affected path, with the move as a suspect, and run it only after the user agrees. It becomes a `followup-execplan` only when the user defers it.
+When the structural problem is bigger than this diff - shallow modules, tangled callers, a missing seam across several files - name the move and give it a [decision](#decisions) row. Offer to run the `improve-codebase` skill on the affected path, with the move as a suspect, and run it only after the user agrees.
 
 ## Output
 
@@ -142,7 +158,7 @@ For each finding include:
 
 When a plan governs the change, the Spec section includes `PASS | FAIL | UNCLEAR - <Scope/DoD item> - <evidence>` for each relevant item.
 
-Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis.
+Include commands run with actual output, not assumptions. One verdict closes the review, after both sections: `APPROVE`, `CHANGES REQUESTED`, or `BLOCKED`, decided from `merge-blocking` findings on either axis. The [decision table](#decisions) follows the verdict.
 
 Report every finding that survives step 5, nits included, each with the cost it puts on a reader or the next change. If no issues meet the bar, say that clearly and mention any residual test or scope risk.
 
