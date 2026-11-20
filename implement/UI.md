@@ -24,7 +24,7 @@ Drive the app with the harness's browser-preview tools when it has them, otherwi
 
 - Open the dev server's port.
 - Set each width: a free width or a device preset.
-- Switch between light and dark themes.
+- Set the light theme before the first screenshot.
 - Read the page for element refs, then click, type, scroll, and press keys; wait until the state shows.
 - Save each screenshot to disk, for the Show step.
 - Record motion and multi-step flows.
@@ -33,13 +33,12 @@ Drive the app with the harness's browser-preview tools when it has them, otherwi
 
 ## Check each milestone
 
-Run the app, or Storybook only when the app cannot reach the state. Screenshot every changed state at every width the project's breakpoints or the plan name. Then break it with the `harden` call above: it maps every rendered value and loads impeccable's worst-case catalog. `+ fix` applies every clear fix without stopping. For each decision it lists with more than one right answer, take its recommendation and record it in the plan's Decision Log; ask the user only when the choice changes product behavior. Its worst-case fixture joins the milestone's tests or stories; a dev-only toggle it adds is removed before commit. On top of that, check this **break list**:
+Run the app, or Storybook only when the app cannot reach the state. Screenshot every changed state at every width the project's breakpoints or the plan name, in the light theme only: one screenshot per state and width, no dark-mode twin. This overrides impeccable's dark-mode views and any plan that asks for dark captures; take a dark screenshot only when the user asks for one. Then break it with the `harden` call above: it maps every rendered value and loads impeccable's worst-case catalog. `+ fix` applies every clear fix without stopping. For each decision it lists with more than one right answer, take its recommendation and record it in the plan's Decision Log; ask the user only when the choice changes product behavior. Its worst-case fixture joins the milestone's tests or stories; a dev-only toggle it adds is removed before commit. On top of that, check this **break list**:
 
 - empty, loading, error and overflow states
 - long text
 - narrow viewport
 - keyboard only
-- every theme
 
 Fix what you find and look again. The milestone's UI is done when every changed state has a screenshot at each of those widths, every break-list case was tried, and the last look found nothing to fix.
 
@@ -51,7 +50,7 @@ Show each final screenshot in chat as an image with its absolute path: `![<state
 
 A surface is complete when a user can use it end to end: a screen, a flow, or a component. A surface still waiting on a later milestone waits for its review; at the latest, the review runs after the last milestone. Start both reviews in the same step, except for a surface in a single app window (Electron, Tauri, native): there the audit runs first and the critique after it, since both drive that window.
 
-- A fresh UI critic subagent calls the Skill tool with `impeccable` and args `audit <surface>`, runs it against the running app, and runs the break list with the worst-case values from `reference/details/worst-case-catalog.md` in impeccable's base dir, changing no code. Its brief carries the surface, how to start the app, the break list, and the path to this file.
+- A fresh UI critic subagent calls the Skill tool with `impeccable` and args `audit <surface>`, runs it against the running app, and runs the break list, in the light theme only, with the worst-case values from `reference/details/worst-case-catalog.md` in impeccable's base dir, changing no code. Its brief carries the surface, how to start the app, the break list, and the path to this file.
 - You call the Skill tool with `impeccable` and args `critique <surface>`. Its two assessors are fresh sub-agents, so it is not self-review. Its design questions go to the user.
 
 Findings from both go through `receiving-code-review`, and their fixes land in the current milestone's commit.
