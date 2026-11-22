@@ -3,7 +3,7 @@ name: research
 description: "Use when the user wants a topic researched against primary sources, docs or API facts gathered into a Markdown file, or reading work handed to a background agent."
 ---
 
-Spin up a **background agent** to do the research, so you keep working while it reads.
+Spin up a **background agent** to do the research, so you keep working while it reads. Start it with a fresh context window.
 
 Its job:
 

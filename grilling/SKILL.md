@@ -25,6 +25,8 @@ Recommendation: <your recommended answer>
 Recommendation: <your recommended answer>
 ```
 
+Word each question so "yes" accepts your recommendation.
+
 A question the user leaves unanswered is answered by your recommendation. Unanswered means their reply does not address that number, and does not restate or change your recommendation. A bare "yes" or "ok" is an answer, not silence.
 
 Two guardrails hold this in place. A question whose answer is irreversible, touches production or a shared system, or spends money stays blocking, so re-ask it instead of adopting it. And silence is never confirmation: before the session is done, list every answer you adopted this way and get an explicit yes on the set. Where another round follows, name them at its top as well, so an adopted answer stays visible while it can still be overturned.
@@ -35,7 +37,7 @@ Each round of answers reshapes the tree - settled decisions push the frontier ou
 
 ## Facts vs decisions
 
-Finding **facts** is your job, never the user's. When a frontier question needs a fact from the environment (codebase, filesystem, tools, etc.), look it up - dispatch a sub-agent to find it - rather than asking the user for anything you could find yourself. Don't block the round on it: a running exploration is an **unsettled prerequisite**, so only questions downstream of it wait for the report; ask the rest of the frontier now.
+Finding **facts** is your job, never the user's. When a frontier question needs a fact from the environment (codebase, filesystem, tools, etc.), look it up - dispatch a sub-agent with a fresh context window to find it - rather than asking the user for anything you could find yourself. Don't block the round on it: a running exploration is an **unsettled prerequisite**, so only questions downstream of it wait for the report; ask the rest of the frontier now.
 
 The **decisions** are the user's - put each one to them and wait for their answer.
 

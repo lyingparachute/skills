@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # Flow
 
+Before stating what a skill does or recommending a step be skipped, read that skill's SKILL.md: the summaries here are for orientation only.
+
 The map of my skills and how they chain. `[user]` = invoked by typing it; `[model]` = invoked by me or reached for automatically.
 
 ## Chains

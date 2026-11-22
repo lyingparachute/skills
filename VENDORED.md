@@ -8,31 +8,31 @@ Not everything here was written here. Without this file, "what changed upstream 
 
 ## Adapted from mattpocock/skills
 
-Upstream: <https://github.com/mattpocock/skills>. Last compared: 2026-10-05, against commit `4588b32` (v1.3.1 plus docs).
+Upstream: <https://github.com/mattpocock/skills>. Last compared: 2026-11-22, against commit `abeeaf9` (after v1.3.1; previous compare `4588b32`).
 
 These started as his and have since diverged, some heavily. Diff against that commit before pulling anything new.
 
 | Skill | Notes on the divergence |
 |---|---|
-| `codebase-design` | Pruned: dropped duplicated seam rules, the Relationships recap, and generic testability samples. `DEEPENING.md` and `DESIGN-IT-TWICE.md` close to upstream. |
-| `diagnosing-bugs` | Plus Phase 0, redaction. |
+| `codebase-design` | Pruned: dropped duplicated seam rules, the Relationships recap, and generic testability samples. `DEEPENING.md` and `DESIGN-IT-TWICE.md` close to upstream, including fresh-context sub-agents. |
+| `diagnosing-bugs` | Plus Phase 0, redaction. Took the pristine-copy diff check for forced reds. |
 | `domain-modeling` | Diverged: durable-doc contest, tighter ADR and GLOSSARY rules, ADR examples cut to three. |
-| `grilling` | Round format taken from upstream. Silence-adopts-the-recommendation rule is ours. |
+| `grilling` | Round format taken from upstream. Silence-adopts-the-recommendation rule is ours. Took "word each question so yes accepts the recommendation" and fresh-context fact finders. |
 | `grill-with-docs` | Same composition as upstream. |
-| `handoff` | Close to upstream. |
+| `handoff` | Close to upstream, with his temp-dir resolution order (`$TMPDIR`, `/tmp`, `%TEMP%`). |
 | `implement` | Ours drives `judo-review` and `plan-retire`. |
 | `plan-retire` | Ours; his repo has no equivalent. Built on his ADR test. |
-| `research` | Close to upstream. |
-| `tdd` | Close to upstream, plus `tests.md` and `mocking.md`. |
+| `research` | Close to upstream, with his fresh-context rule. |
+| `tdd` | Close to upstream, with his catches-and-misses note per seam, plus `tests.md` and `mocking.md`. |
 | `wait-what` | Taken 2026-08-21. |
 | `pr` | Taken 2026-10-05. Voice moved to `no-ai-slop`. A repo PR template wins over ours. Sections are Why, What changed (one paragraph, plus a Before/After table when cases differ), and Risk, for a cold reader, with word caps in Done. Evidence section dropped. Door and blast radius replaced by Risk bullets: each says what goes wrong, who notices, and what they see, and only adds a consequence the table does not show. A revert bullet appears only when a revert leaves damage behind. The show-me visual menu (pseudocode, call trees, component trees, file trees, Mermaid, diffs) and `CREDITS.md` were removed. That menu came from [Dex Horthy](https://github.com/dexhorthy)'s [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) via Matt Pocock. Worked example kept. |
 | `retro` | Taken 2026-10-05. Points at `writing-great-skills` by file (user-invoked), names harness log paths, reads the log in a subagent, sends judgement calls to `CODING_STANDARDS.md` or `judo-review/STANDARDS.md`, and merges steering and no-op checks into one category. |
 | `writing-great-skills` | His `writing-for-agents`, renamed and reworked, with our `GLOSSARY.md`. |
-| `judo-review` | His `code-review`, renamed, then rewritten: two axes, `STANDARDS.md`, severity and disposition tags. |
-| `flow` | His `ask-matt`, renamed and rebuilt around our chains. |
+| `judo-review` | His `code-review`, renamed, then rewritten: two axes, `STANDARDS.md`, severity and disposition tags. Took fresh-context sub-agents. His foreground-dispatch and tracker-doc wording not taken: ours has no tracker doc. |
+| `flow` | His `ask-matt`, renamed and rebuilt around our chains. Took his read-the-SKILL.md-before-asserting line. |
 | `exec-plan` | Ours, replacing his `to-spec` and `to-tickets`. Its rules and `TEMPLATE.md` absorb what was kept from OpenAI's ExecPlan spec (`PLANS.md`, removed). |
 
-Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`implement` covers it), `chief-of-staff`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
+Selected skills deliberately not taken: `prototype`, `triage`, `teach`, `to-questionnaire`, `loop-me`, `implement-spec` (`implement` covers it), `chief-of-staff`, `wayfinder`, `software-factory`, `wizard`, the `writing-*` trio, and his setup skills. This list is not exhaustive.
 
 ## Third-party skills
 
@@ -52,18 +52,21 @@ Every `description` below was rewritten to say when to use the skill, not what i
 
 ## Folded into impeccable from emilkowalski/skills
 
-Upstream: <https://github.com/emilkowalski/skills>, MIT, Copyright (c) 2026 Emil Kowalski. Compared 2026-10-23 at commit `2d22863`.
+Upstream: <https://github.com/emilkowalski/skills>, MIT, Copyright (c) 2026 Emil Kowalski. Compared 2026-11-22 at commit `64eb3de` (last compared at `2d22863`, 2026-10-23).
 
 Rewritten, not copied whole, into `impeccable/reference/details/`:
 
 | Upstream skill | Lands in | Notes |
 |---|---|---|
 | `emil-design-eng`, `animate` (+ `RECIPES.md`), `review-animations` (+ `STANDARDS.md`) | `motion.md` | One gate, easing, duration, physical rules, recipes, and review table. Merged with our earlier `details/animations.md`. Exits use ease-out per Emil, not ease-in. The 0.25 icon-swap scale stays as a scoped exception. Stagger is Emil's 30-80ms per item, replacing the old 100ms between content groups. Review keeps the fix order and Block/Approve decision. |
-| `animation-performance` | `motion-performance.md` | Merged with our earlier `details/performance.md`. |
-| `break-ui` (+ `CATALOG.md`) | `worst-case.md`, `worst-case-catalog.md` | Catalog kept close to upstream. |
-| `mobile-native` | `mobile.md` | Only what `adapt.md` lacks; safe areas and touch targets stay in `adapt.md`. The phone app patterns in the same file come from the UI/UX video notes. |
+| `animation-performance` | `motion-performance.md` | Merged with our earlier `details/performance.md`. Motion 14.2 shorthand acceleration, the narrow composite tier, and the main-thread list follow the current upstream text. |
+| `choreograph` (+ `RECIPES.md`) | `choreography.md` | Rules, cast, relationships, timeline, and interruption rewritten. `RECIPES.md` code is not copied; `motion.md` keeps the CSS stagger. Product stagger totals about 300ms, replacing our 500ms; Persuade heroes keep wider steps. |
+| `gestures` | `gestures.md` (Build or reuse, Track then release) | Added to the owner's video-note patterns. Spring and bounce rules merged with ours. |
+| `remove-animations` | `motion.md` (Removing motion) | Reduce table, hazards, and cleanup. The tab-indicator recipe stays. |
+| `break-ui` (+ `CATALOG.md`) | `worst-case.md`, `worst-case-catalog.md` | Catalog kept close to upstream. Fixture-only `.test` emails, suffix-aware initials, and "no limit found" taken from the 2026-11 update. |
+| `mobile-native` | `mobile.md` | Only what `adapt.md` lacks; safe areas and touch targets stay in `adapt.md`. The phone app patterns in the same file come from the UI/UX video notes. Hover wording and status-bar notes updated 2026-11. |
 
-Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`.
+Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`, `ask-emil` (a router over Emil's own skills), `learn-taste` (a workflow for writing design rules from corrections, not a UI detail), `ui-cheatsheet.md` and `performance-cheatsheet.md` (already covered in `worst-case.md`, `typography.md`, `motion.md`, and `motion-performance.md`).
 
 ## Adapted from cursor/plugins pstack
 
