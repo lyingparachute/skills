@@ -43,7 +43,7 @@
 - **No magic literals.** Every number/string with meaning gets a named constant in the right module.
 - **Delete before add.** Best diff is negative.
 - **4x = wrong approach.** Solution ~4x bigger than its core (200 lines for what fits in 50, 5 abstractions where 1 works) → approach wrong. Stop, rewrite from scratch. Patching no fix bad shape.
-- **Boy Scout rule, bounded by file.** Leave every touched file cleaner than you found it, including lines the change did not need. Other files stay out of scope, except for red checks (see Done).
+- **Boy Scout rule, bounded by file.** Leave every touched file cleaner than you found it, including lines the change did not need. Other files stay out of scope, except for red checks (see Done) and a defect found in a touched file whose fix reaches them: fix that now too.
 
 ## Architecture
 
@@ -90,6 +90,7 @@ Rules and skills name the job; the harness's own instructions name the tool, sin
 
 - **Show, don't describe.** A trend, a comparison, a flow, an architecture, or a design's desired outcome reaches the user as a visual rendered in the conversation: chart, diagram, or screenshot. A file path, an ASCII sketch, or a prose description of a visual is not showing it.
 - **Drive the real app** in the harness's browser preview; native apps through its device tools. Steps: `implement/UI.md`.
+- **Screenshots are light mode only.** Set the light theme before the first capture. One screenshot per changed state, never a dark twin. This overrides any skill, plan, or reference that asks for dark-mode captures; dark mode gets a screenshot only when the user asks for it.
 - **Wait on background work** through the harness's wait, never `sleep` or polling loops.
 - **Clickable references.** Files by absolute path; threads and PRs in the link form the harness gives.
 
@@ -131,4 +132,4 @@ User phrases below activate specific workflows. Follow the protocol literally.
 ## Critic Subagents
 
 - **Findings block progress.** Plan BLOCKER/MAJOR and code `merge-blocking` findings block until fixed. Dismissal is only for a finding that fails confirmation against the source, or one the user dismisses, each written with its reason (for a user dismissal, their words are the reason); a confirmed finding is fixed, or deferred to a tracked plan when the user chooses. Quality bar: no code smell, no debt created, no debt left behind.
-- **Review rounds: min 1, max 2.** Round 1 clean → done. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 go in the report; no third round.
+- **Review rounds: 1 by default.** Round 1 with no BLOCKER/MAJOR → done, MINOR fixes included, no second round. Round 1 has BLOCKER/MAJOR → a second fresh critic verifies the fixes. Leftovers after round 2 go in the report; no third round.
