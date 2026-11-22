@@ -104,14 +104,13 @@ Every finding gets one disposition. Fix now is the default; a follow-up plan is 
 - `merge-blocking`: the fix belongs in this change. This is every finding's starting disposition, including fixes that span several files or reshape a module the diff touches. Blocks approval.
 - `followup-execplan`: the user chose to defer it. Describe the move, why, and rough blast radius. Reported every time, and does not block approval by itself.
 
-Size alone never makes a finding `followup-execplan`. When a fix looks large, keep it `merge-blocking` and state its blast radius. Only the user's answer to the [decision table](#decisions) moves it to `followup-execplan`.
+Size alone never makes a finding `followup-execplan`. When a fix looks large, keep it `merge-blocking` and state its blast radius. Only the user's own request to defer moves it to `followup-execplan`.
 
 ## Decisions
 
 The reviewer decides every judgment call and keeps reviewing. Each call lands as one row in a decision table after the verdict, and the user overrules from there:
 
 - a finding that reverses a decision the plan locked: keep it or drop it
-- a large fix: fix it now, or suggest a follow-up plan
 - two remedies that both hold: which one
 - a finding dropped for any reason other than failing step 5
 

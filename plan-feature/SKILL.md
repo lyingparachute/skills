@@ -22,10 +22,10 @@ Everything lives in a feature folder, `<plans-dir>/<feature>/`, as the `exec-pla
 - **Roadmap fit**: each related plan, its relation, and what was done about it.
 - **Prep candidates**: each prep sweep finding copied with every field, with the decision that took it or turned it down.
 - **New terms and ADR candidates**: domain terms, and decisions that pass the ADR test in `domain-modeling`. Each plan that introduces them ends with a milestone that writes them after its code exists, through the contest in `domain-modeling`.
-- **Build order**: plans by title, each with the plans it needs.
+- **Build order**: plans by repo-root path and title, each with the plans it needs.
 - **Questions for you**: every assumption with its chosen value and the decisions it drives, every open question, and every critic finding left open.
 
-Plans are referenced by title, never by path. Write the index and the decision page with `no-ai-slop` loaded. The run commits nothing.
+Plans are referenced by their path from the repository root (the repo's plan rules may fix the exact form), never by title or bare number alone, as in `exec-plan`. Write the index and the decision page with `no-ai-slop` loaded. The run commits nothing.
 
 ## Steps
 
@@ -65,7 +65,7 @@ Done when every walkthrough step and every area has its line, every row is compl
 
 Dispatch a fresh design critic with the index path. Its brief: verify claims against the code, and find missing decisions, weak option sets, hidden assumptions, scope creep, premature abstraction, roadmap relations that changed once the data model and API were chosen, and ADR conflicts. It returns typed findings with severity.
 
-Call the Skill tool with `receiving-code-review` and triage the findings yourself. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a finding that needs its own plan becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
+Call the Skill tool with `receiving-code-review` and triage the findings yourself. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a scope split the critic asks for, or a finding the user chose to defer, becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
 
 Done when a round ends with zero open BLOCKER or MAJOR findings, or after the second round.
 
