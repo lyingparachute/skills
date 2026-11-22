@@ -11,11 +11,11 @@ List every value the component renders:
 | Field | Source | Type | Limit | Optional? |
 | --- | --- | --- | --- | --- |
 | `name` | `member.name` | string | 120 (`schema.ts:14`) | No |
-| `email` | `member.email` | string | unbounded | Yes |
+| `email` | `member.email` | string | no limit found | Yes |
 
-Include the forgotten ones: counts in headers, relative timestamps, badge and status text, labels that come from data, tooltips, avatars, and the list length itself. Find limits in the validation schema, migrations, API types, and form `maxLength`. A frontend limit shorter than the column is a finding; imports and the API will exceed it. No limit anywhere is a finding too: write "unbounded" and test something long but believable.
+Include the forgotten ones: counts in headers, relative timestamps, badge and status text, labels that come from data, tooltips, avatars, and the list length itself. Find limits in the validation schema, migrations, API types, and form `maxLength`. A frontend limit shorter than the column is a finding; imports and the API will exceed it. No limit anywhere is a finding too: write "no limit found" and test something long but believable.
 
-Done when every rendered value has a row with a source and a limit or "unbounded".
+Done when every rendered value has a row with a source and a limit or "no limit found".
 
 ## 2. Build the worst case
 
@@ -25,7 +25,7 @@ The worst case enters through the same boundary the demo data does: fixture, moc
 
 ## 3. Wire the toggle
 
-A dev-only segmented control, **Demo / Worst case / Empty / One / 1,000 rows**, fixed bottom-center, plain gray chrome, no animation on switch. In a project with a dev server, read a `?data=worst` URL param where the fixture is chosen, or render each fixture on a prototype route; the URL keeps the state across reloads. With no project, one self-contained HTML file holds the component and every dataset. The toggle never ships to production.
+A dev-only segmented control, **Demo / Worst case / Empty / One / 1,000 rows**, fixed bottom-center, plain gray chrome, no animation on switch. In a project with a dev server, read a `?data=worst` URL param where the fixture is chosen, or render each fixture on a prototype route; the URL keeps the state across reloads. Done when every state renders its fixture and a reload keeps the selection. With no project, one self-contained HTML file holds the component and every dataset. The toggle never ships to production.
 
 ## 4. Break it
 
@@ -41,7 +41,7 @@ View every state at the component's real container width, at 320px, and at the w
 | Avatar adrift beside a three-line name | `align-items: center` with wrapping text | `align-items: flex-start` |
 | Last row cut mid-glyph | Fixed height with no scroll affordance | Visible scrollbar or a fade mask |
 | Heading breaks mid-word | `word-break: break-all` | `overflow-wrap: anywhere` |
-| Wrong initials (`J` for Jo, `CI` for "… III", `�` for an emoji-first name) | `.split(' ')[0][0]` | Grapheme clusters via `Intl.Segmenter`, first and last word, icon fallback |
+| Wrong initials (`CI` for "… Montgomery III", `�` for an emoji-first name) | `.split(' ')[0][0]` | Grapheme clusters via `Intl.Segmenter`, first and last word skipping suffixes (Jr, Sr, II, III), icon fallback |
 | Orphaned `-` or blank line for a missing field | Placeholder for optional data | Omit the line, or reserve its height on purpose |
 | "1 members", "0 member" | Hardcoded plural | ICU plurals in the message catalog or `Intl.PluralRules` |
 | Numbers jitter or columns misalign | Proportional figures | `font-variant-numeric: tabular-nums` |
@@ -58,7 +58,7 @@ Choose per field, not globally:
 - **Wrap** what identifies something: names, titles in a detail view.
 - **Truncate at the end** secondary metadata whose start carries the meaning, always with a way to see the full value.
 - **Truncate in the middle** values that differ at the end: file names, emails on a shared domain, paths, IDs.
-- **Clamp** multi-line previews in cards so heights stay predictable.
+- **Clamp** multi-line previews in cards so heights stay predictable: `-webkit-line-clamp: 2` with `display: -webkit-box`, `-webkit-box-orient: vertical`, and `overflow: hidden` (Tailwind `line-clamp-2`).
 - **Give room** to numbers, amounts, dates, and anything users compare; never truncate them.
 
 Done when every applicable catalog row was tried at every width and environment above, and every break has a signature, a cause, and a fix.

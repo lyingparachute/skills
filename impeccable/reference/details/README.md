@@ -9,6 +9,7 @@ Concrete values and fixes that sit below the command references. A command refer
 | [interaction.md](interaction.md) | Wiring clicks, menus, tooltips, deletes, saves, or choosing between popover, modal, toast, and page |
 | [gestures.md](gestures.md) | Building swipe, drag, sheet, long-press, carousel, or pull-to-refresh behavior |
 | [charts.md](charts.md) | Drawing any chart, KPI, or data visualization in the UI |
+| [choreography.md](choreography.md) | Several elements animate on one event: a stagger, a hero entrance, a view swap, an exit that closes a gap, a multi-step flow |
 | [color-values.md](color-values.md) | Setting surface, text, state, semantic, or dark-mode color values, or placing text over images |
 | [ai-interface.md](ai-interface.md) | Building an AI product surface: prompt entry, streaming, sources, memory, history, cost |
 | [macos.md](macos.md) | Building a macOS app window or utility |
@@ -20,4 +21,4 @@ Concrete values and fixes that sit below the command references. A command refer
 | [typography.md](typography.md) | Type scale, font count and roles, line-height, tracking, fluid type, text wrapping, font smoothing, tabular numbers |
 | [worst-case.md](worst-case.md) | Stress-testing a component with realistic worst-case data behind a toggle |
 
-Motion, motion performance, worst-case data, and the web half of mobile guidance are adapted from [emilkowalski/skills](https://github.com/emilkowalski/skills) (MIT, Copyright (c) 2026 Emil Kowalski). Landing, product, interaction, gesture, chart, color, AI-interface, macOS, and phone-app patterns come from the owner's UI/UX video notes. They were checked against NN/g, WCAG, Apple HIG, Material, Carbon, Radix, Datawrapper, shapeof.ai, Cloudscape, Google PAIR, OpenAI, and other design systems, and a line names its source where one exists. A video number with no outside source is marked as a starting value.
+Motion, choreography, motion performance, gesture mechanics, worst-case data, and the web half of mobile guidance are adapted from [emilkowalski/skills](https://github.com/emilkowalski/skills) (MIT, Copyright (c) 2026 Emil Kowalski). Landing, product, interaction, gesture, chart, color, AI-interface, macOS, and phone-app patterns come from the owner's UI/UX video notes. They were checked against NN/g, WCAG, Apple HIG, Material, Carbon, Radix, Datawrapper, shapeof.ai, Cloudscape, Google PAIR, OpenAI, and other design systems, and a line names its source where one exists. A video number with no outside source is marked as a starting value.

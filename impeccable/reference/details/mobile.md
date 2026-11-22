@@ -85,11 +85,11 @@ The structure rules below are Operate. Feed and story formats are Read.
 
 ## Fixes
 
-**Sticky hover.** Touch applies `:hover` on the first tap and keeps it. `(hover: hover)` alone lets through styluses and some Android devices; `(pointer: fine)` rules them out. Touch users get press feedback through `:active`.
+**Sticky hover.** Touch applies `:hover` on the first tap and keeps it. `(hover: hover)` alone lets through touchscreens that claim hover with a coarse pointer (some Android devices); `(pointer: fine)` rules them out. Touch users get press feedback through `:active`.
 
 **Tap highlight.** Set `-webkit-tap-highlight-color: transparent` once on `html`. That removes the only feedback the browser gave, so every tappable element needs its own `:active` state in the same change.
 
-**Viewport height.** `100vh` on mobile is the largest viewport, with the browser chrome collapsed, so it overflows on load. `100dvh` tracks the visible area and suits app shells, drawers, and bottom-pinned UI. `100svh` is the smallest viewport and never shifts mid-scroll, which suits heroes and first screens. Add `interactive-widget=resizes-content` to the viewport meta so the Android keyboard shrinks the layout the way iOS does.
+**Viewport height.** `100vh` on mobile is the largest viewport, with the browser chrome collapsed, so it overflows on load. `100dvh` tracks the visible area and suits app shells, drawers, and bottom-pinned UI. `100svh` is the smallest viewport and never shifts mid-scroll, which suits heroes and first screens. Add `interactive-widget=resizes-content` to the viewport meta so the Android keyboard shrinks the layout (`100dvh` and bottom-pinned inputs then react to it).
 
 **Input zoom.** iOS Safari zooms into any focused input under 16px and does not zoom back. Fix the font size (`@media (pointer: coarse)` when desktop needs smaller inputs); zoom stays enabled, because `user-scalable=no` and `maximum-scale=1` fail accessibility. Set the keyboard while there: `inputmode="numeric"` for codes, `inputmode="decimal"` for amounts, `type="email"` and `type="tel"`, `autocapitalize="none"` and `autocorrect="off"` on usernames and codes, `enterkeyhint` naming what return does.
 
@@ -101,7 +101,7 @@ The structure rules below are Operate. Feed and story formats are Read.
 
 **Gesture axes.** `touch-action` names what the browser may still do. A horizontal carousel takes `pan-y` (the browser keeps vertical scroll); a vertical sheet handle takes `pan-x`; a surface whose gesture owns every axis takes `none`, and only that surface. A native-scroll carousel needs none of this: `scroll-snap-type: x mandatory` on the track and `scroll-snap-align: start` on slides use the browser's own physics.
 
-**Status bar.** One `theme-color` per scheme, matching the color at the very top of the page (the header, not the brand color), plus `<meta name="color-scheme" content="light dark">`. In Next.js, use the `viewport` export's `themeColor` array. A class-based theme switch updates the tag on toggle. A PWA makes the same decision in the manifest's `theme_color` and `background_color`.
+**Status bar.** One `theme-color` per scheme, matching the color at the very top of the page (the header, not the brand color), plus `<meta name="color-scheme" content="light dark">`. In Next.js, use the `viewport` export's `themeColor` array. A class-based theme switch updates the tag on toggle. A PWA sets the manifest's `theme_color` and `background_color` to the same colors, and `apple-mobile-web-app-status-bar-style` picks `default`, `black`, or `black-translucent`.
 
 ## Baseline
 

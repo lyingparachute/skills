@@ -2,7 +2,7 @@
 
 Concrete values for building and reviewing web motion. [animate.md](../animate.md) decides what earns motion; this file decides how it is built. Its values are narrower than animate.md's ranges and replace its example curve; when both apply, use these. They are still defaults: the project's DESIGN.md, its motion tokens, and a pinned brief win over them. A product register limited to opacity and transform stays limited, even where a recipe below uses clip-path or blur.
 
-Gesture mechanics (swipe, drag, sheets, long-press, carousels) live in [gestures.md](gestures.md).
+Gesture mechanics (swipe, drag, sheets, long-press, carousels) live in [gestures.md](gestures.md). Several elements moving on one event (stagger, view swaps, exits that close a gap) live in [choreography.md](choreography.md).
 
 ## The gate
 
@@ -63,7 +63,7 @@ Take any other curve from [easing.dev](https://easing.dev/) or [easings.co](http
 | Modal, drawer | 200-500ms |
 | Marketing, explanatory focal entrance | Up to 800ms |
 
-UI motion stays under 300ms unless it moves something large. Exit is faster than entry. Slow where the user is deciding, fast where the system responds: a hold-to-confirm fill runs 2s linear, the release snaps back in 200ms ease-out.
+UI motion stays under 300ms. Modals, drawers, sheets, and toasts are the documented exceptions, because they move something large or match a component's personality. Exit is faster than entry. Slow where the user is deciding, fast where the system responds: a hold-to-confirm fill runs 2s linear, the release snaps back in 200ms ease-out.
 
 Speed is perceived performance. A 180ms select feels more responsive than a 400ms one, and a faster spinner makes the same load feel shorter.
 
@@ -92,11 +92,11 @@ Speed is perceived performance. A 180ms select feels more responsive than a 400m
 
 ## Stagger
 
-Stagger a group entrance that the user sees occasionally, never a list they scroll past all day. 30-80ms between items, capped so the whole group lands within about 500ms. Stagger never blocks interaction.
+Stagger a group entrance that the user sees occasionally, never a list they scroll past all day. 30-80ms between items, with the whole group landing by about 300ms in product UI. A Persuade hero may use 100-150ms steps (see [choreography.md](choreography.md#stagger)). Give the delays different sizes, not one equal step, and animate a container's entrance or its children's, never both. Stagger never blocks interaction.
 
 ```css
-/* set style="--i: 0", "--i: 1", ... on each item */
-.item { animation: enter 300ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 50ms); }
+/* set style="--delay: 0ms", "--delay: 50ms", "--delay: 90ms", ... on each item */
+.item { animation: enter 300ms var(--ease-out) both; animation-delay: var(--delay, 0ms); }
 @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
 ```
 
@@ -106,15 +106,16 @@ Both ship with the animation, in the same change.
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .element { animation: fade 200ms ease; }
+  .element { animation-name: fade; }
 }
+@keyframes fade { from { opacity: 0; } }
 
 @media (hover: hover) and (pointer: fine) {
   .element:hover { transform: scale(1.02); }
 }
 ```
 
-Reduced motion keeps opacity and color changes that carry meaning and removes movement. Touch fires a hover on tap and leaves it stuck, so hover motion lives behind the capability query. Tailwind v4's `hover:` variant already compiles to `@media (hover: hover)`.
+Reduced motion keeps opacity and color changes that carry meaning and removes movement; the swap above keeps the element's own duration and curve and changes only the keyframe. Touch fires a hover on tap and leaves it stuck, so hover motion lives behind the capability query. Tailwind v4's `hover:` variant already compiles to `@media (hover: hover)`.
 
 ## Recipes
 
@@ -215,7 +216,7 @@ Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Rea
 
 - **Floating margin assets enter on a spring or ease-out (Persuade).** Stagger their entrances, and never ease them linearly.
 - **Hero to section (Persuade).** Slide the hero's floating assets off, fade the hero text (no blur), and slide the next section over the hero. Reverse the transition for the bottom CTA.
-- **Soft edge (Persuade).** Fade the hero bottom into the next section with a gradient mask, not a hard edge.
+- **Soft edge (Persuade).** Fade the hero bottom into the next section with a gradient mask, not a hard edge. A two-stop gradient leaves a visible band at its edge; add extra color stops placed along an ease curve for a soft fade (also for marquee edge masks).
 - **Product reveal (Persuade).** Never delay the product reveal with a scroll effect. As the user scrolls, fade the hero text and slide the product UI into view.
 - **No scrolljacking.** Scroll-linked motion never takes control of scroll speed or locks the page (NN/g).
 - **Media morph (Persuade).** Morph a media container's shape on load, or into oversized type on scroll. Keep the scale moderate, because large resizes drop frames.
@@ -226,6 +227,35 @@ Each recipe names its mode: Persuade (landing, marketing), Operate (app UI), Rea
 - **Centerpiece.** Pair a 3D centerpiece with a quiet surround. The centerpiece carries the motion, so no other loop runs beside it.
 - **Build in code.** Build the moment in CSS, SVG, or code. A raster video export blurs when scaled on high-density screens. A vector Lottie stays sharp but adds a player runtime, so use it only when code cannot draw the motion.
 - **404 page.** A 404 may hold a small interactive, such as a mini-game that redirects when it ends, and a real character illustration. It names the way back.
+
+## Removing motion
+
+When the interface feels slow or over-animated, subtract only. Run every animation through the gate above and delete or reduce what fails. Never add or retune motion in the same pass; list badly built animations that stay for the review below.
+
+Reduce means a smaller version of the same motion. If it would stop carrying its purpose, delete it.
+
+| Today | Reduced to |
+| --- | --- |
+| Hover with scale, lift, or shadow growth | Color or opacity change, 150ms or less, same curve |
+| Slide or scale entrance on a frequent surface | Opacity only, 150ms |
+| UI animation over 300ms (not a modal, drawer, sheet, or toast) | 200-250ms, same curve |
+| Stagger over 80ms per item, or over 300ms total | 30ms per item, or fade the group as one |
+| Infinite loop (pulse, shimmer, glow) on a persistent element | Run once, or keep the static end state |
+
+Classes that rarely pass the gate: shortcut-opened menus and dialogs with enter and exit motion, tab-content and sidebar switches, in-app route transitions, hover transforms on rows, fade-in-on-scroll on every section, charts that redraw from zero on every mount, numbers that count up on load instead of on a change, table rows that animate in, spinners or skeleton shimmer on content that loads in under 300ms (the flash reads as a glitch), and `transition: all`. Marketing pages keep one explanation or hero entrance; repeated scroll reveals still fail.
+
+Check what depends on the animation before deleting it:
+
+- **Hidden start states.** `opacity: 0` from `initial`, a reveal class, or a keyframe with `fill-mode: forwards`. Remove the start state with the animation, or the element stays invisible.
+- **Code that waits for the animation.** `onAnimationEnd`, `transitionend`, `onExitComplete`, and `setTimeout` sized to a duration. Delete the wait too.
+- **Exits that delay unmount.** `AnimatePresence` holds a node until its exit ends. Move work from `onExitComplete` to the point where the node closes.
+- **Layout animations hiding a jump.** If removing `layout` or a FLIP animation exposes a layout shift, keep the animation and report the shift.
+- **Focus timed after motion.** Move focus immediately once the animation is gone.
+- **Tests and selectors** that wait for animation classes or durations.
+
+Then clean up what was orphaned: unused `@keyframes` and animation utilities, `motion.div` with no motion props left (back to `div`), empty `AnimatePresence` wrappers, unused variants and imports, and unreferenced animation tokens. If no file imports the motion library any more, propose removing the dependency and leave the lockfile to the owner.
+
+In the report, list what you kept and the purpose that saved it, so the pass is not "delete every transition".
 
 ## Review
 
@@ -245,14 +275,14 @@ Check every animation in scope against this list:
 | `scale(0)` entrance | `scale(0.95)` plus `opacity: 0` |
 | ease-in on UI | ease-out or a strong custom curve |
 | Built-in `ease-out` on deliberate motion | `--ease-out` token |
-| UI duration over 300ms with no reason | 150-250ms |
+| UI duration over 300ms with no reason (modals, drawers, sheets, and toasts excepted) | 150-250ms |
 | Exit as slow as or slower than entry | Faster exit |
 | Popover scaling from center | Trigger-origin variable (modals exempt) |
 | Keyframes on toasts, toggles, rapid triggers | Transitions |
 | Layout properties animated (`width`, `height`, `margin`, `padding`, `top`, `left`), outside the accordion recipe | Transform or opacity ([motion-performance.md](motion-performance.md)) |
 | Ungated `:hover` motion | `(hover: hover) and (pointer: fine)` |
 | No reduced-motion path | Gentler variant, not zero |
-| Whole group appears at once, or stagger over 80ms per item | 30-80ms stagger |
+| Whole group appears at once, or stagger over 80ms per item (Persuade hero excepted) | 30-80ms stagger, uneven steps ([choreography.md](choreography.md)) |
 | Values outside the project's motion tokens | The tokens |
 
 Propose fixes in this order, earlier before later: delete the animation; reduce it (shorter, smaller, fewer properties); fix the easing; fix origin and physicality; make it interruptible; move it to compositor properties; make timing asymmetric; polish (blur seam, stagger, `@starting-style`, springs); then reduced motion, hover gating, and fit to the product's personality.

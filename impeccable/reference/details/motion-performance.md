@@ -9,9 +9,9 @@ The bar is a mid-range phone on a 120Hz screen: an 8ms frame budget, not the 16.
 | What the user sees | Fix |
 | --- | --- |
 | Animation stutters | Animate `transform` and `opacity`, not `width`, `height`, `top`, `margin` |
-| Shadow animation is choppy | Animate `filter: drop-shadow()`, or fade a pseudo-element that holds the shadow |
-| Jank only during navigation or loading | Move the animation to CSS or WAAPI so it runs off the main thread |
-| Motion `x` / `y` drops frames under load | Animate the full `transform` string |
+| Shadow animation is choppy | Fade a pseudo-element that holds the shadow, or animate `filter: drop-shadow()` (Chrome composites `filter`; measure in other engines) |
+| Jank only during navigation or loading | Move the animation to CSS or WAAPI, on `transform` or `opacity`, so it runs on the compositor |
+| Motion `x` / `y` drops frames under load | Upgrade to `motion` 14.2 or later, or animate the full `transform` string |
 | Hand-rolled animation drops frames in React | Write to `ref.current.style` or a motion value, not state |
 | Drag gets slower as the list grows | Stop animating an inherited CSS variable; set `transform` on the element |
 | Blur transition lags, especially in Safari | Animated `blur()` under 20px; 2-5px is enough to soften a crossfade |
@@ -22,28 +22,30 @@ The bar is a mid-range phone on a 120Hz screen: an 8ms frame budget, not the 16.
 
 | Tier | Properties | Cost |
 | --- | --- | --- |
-| Composite only | `transform`, `opacity`; in current Chrome and Firefox also `filter`, `clip-path`, `background-color`, with uneven support, so test them | Cheapest |
+| Composite only | `transform`, `opacity`. Support for `filter`, `clip-path`, and `background-color` is uneven across engines, so measure them before relying on it | Cheapest |
 | Paint and composite | `box-shadow`, `border-radius`, `color` | Redraws every frame |
 | Layout, paint, composite | `width`, `height`, `padding`, `margin`, `top`, `left`, `border-width` | Re-measures the page; one growing element moves its neighbours |
 
-Swap down a tier: `scale()` for size, `translate()` for position, `opacity` for `display` and `visibility`, `drop-shadow()` for `box-shadow`. A layout animation sometimes looks fine on an isolated element, but `scale()` produces the same picture and cannot regress on a slower device. A sidebar opening by `margin-left` re-lays out the whole page beside it every frame; `translateX` does not.
+Swap down a tier: `scale()` for size, `translate()` for position, `opacity` for `display` and `visibility` (then `visibility: hidden` at the end, so the faded element stops taking clicks), `drop-shadow()` for `box-shadow` (measure outside Chrome). A layout animation sometimes looks fine on an isolated element. When `scale()` gives the look you want (it scales the children too and keeps the layout space), it cannot regress on a slower device, so pick it. A sidebar opening by `margin-left` re-lays out the whole page beside it every frame; `translateX` does not.
 
 ## Where it runs
 
 | Driver | Thread |
 | --- | --- |
-| `requestAnimationFrame` loops, GSAP, Motion components animating shorthand props (`x`, `y`, `scale`) | Main thread, always |
-| WAAPI, Motion's `animate()`, Motion components animating a full `transform` string | Can run off the main thread |
-| CSS transitions and keyframes | Can run off the main thread |
+| `requestAnimationFrame` loops, GSAP, Motion layout animations | Main thread, always |
+| WAAPI, Motion's `animate()`, Motion components (`transform`, `opacity`, `clip-path`, `filter`; `x`, `y`, `scale`, `rotate` from `motion` 14.2) | Can run off the main thread |
+| CSS transitions and keyframes on `transform` and `opacity` | Can run on the compositor |
 
 Main-thread animation only suffers when the page is busy during it: route changes, tab indicators during navigation, motion that plays alongside fetching or hydration. A shared-layout tab indicator dropped frames at Vercel for exactly this reason, and a CSS animation fixed it.
 
-Motion's `x`, `y`, `scale`, and `rotate` shorthands go through CSS variables, which are not accelerated. Keep them by default for readability, and switch to the string form when the animation must survive a busy main thread:
+From `motion` 14.2, the `x`, `y`, `scale`, and `rotate` shorthands on an HTML element merge into one accelerated `transform` animation, so keep them. On older versions they go through CSS variables, which are not accelerated; upgrade, or use the string form when the animation must survive a busy main thread:
 
 ```jsx
-<motion.div animate={{ x: 100 }} />
-<motion.div animate={{ transform: "translateX(100px)" }} />
+<motion.div animate={{ x: 100 }} />                          // accelerated from 14.2
+<motion.div animate={{ transform: "translateX(100px)" }} /> // accelerated in every version
 ```
+
+In every version these stay on the main thread: layout animations (`layout`, `layoutId`), `onUpdate`, `transformTemplate`, inertia, and values a motion value drives every frame (drag, `useTransform`).
 
 Acceleration is a best-effort grant from the browser and changes between versions. Which properties you animate is under your control; spend effort there. Percentage transforms (`translateY(100%)`) stay correct for elements of unknown size even where a browser declines to accelerate them.
 
@@ -67,7 +69,7 @@ It is the last step, not the first. Browsers already promote elements animating 
 ## Diagnose
 
 1. List every animation in scope with its driver, its real properties (expand `transition: all` and Motion shorthands), and what else happens while it plays.
-2. Work down the causes in order of frequency: layout properties, then paint properties; a busy main thread; per-frame React state; cost that grows with content; animated CSS variables; blur over 20px; only then `will-change`.
+2. Work down the causes in order of frequency: layout properties, then paint properties; a busy main thread; per-frame React state; cost that grows with content; animated CSS variables (or Motion shorthands on a version before 14.2); blur over 20px; only then `will-change`.
 3. Confirm with a recording: the DevTools Performance panel for dropped frames and long tasks, the Animations panel to slow motion down, a real mid-range phone over remote debugging. Desktop CPU throttling models a slow CPU, not a weak GPU.
 
 Report each finding as element and `file:line`, cause, before, after, and "verified from code" or "needs a device recording". Order by cost: layout before paint, busy main thread before idle.

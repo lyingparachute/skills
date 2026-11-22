@@ -66,7 +66,7 @@ Rewritten, not copied whole, into `impeccable/reference/details/`:
 | `break-ui` (+ `CATALOG.md`) | `worst-case.md`, `worst-case-catalog.md` | Catalog kept close to upstream. Fixture-only `.test` emails, suffix-aware initials, and "no limit found" taken from the 2026-11 update. |
 | `mobile-native` | `mobile.md` | Only what `adapt.md` lacks; safe areas and touch targets stay in `adapt.md`. The phone app patterns in the same file come from the UI/UX video notes. Hover wording and status-bar notes updated 2026-11. |
 
-Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`, `ask-emil` (a router over Emil's own skills), `learn-taste` (a workflow for writing design rules from corrections, not a UI detail), `ui-cheatsheet.md` and `performance-cheatsheet.md` (already covered in `worst-case.md`, `typography.md`, `motion.md`, and `motion-performance.md`).
+Deliberately not taken: `prototype` (impeccable `generate` covers it), `apple-design`, `find-animation-opportunities`, `improve-animations`, `animation-vocabulary`, `pick-ui-library`, `ask-sonner`, `animate-expo`, `write-swift`, `ask-emil` (a router over Emil's own skills), `learn-taste` (a workflow for writing design rules from corrections, not a UI detail), `ui-cheatsheet.md` and `performance-cheatsheet.md` (covered in `worst-case.md`, `typography.md`, `motion.md`, and `motion-performance.md`; the eased-gradient tip went into `motion.md`).
 
 ## Adapted from cursor/plugins pstack
 
