@@ -5,7 +5,7 @@ description: "Use when writing, folding into, or revising an execution plan, wri
 
 # Exec Plan
 
-Author plans as self-contained briefs, alone or in a feature folder (see Feature folder), then gate them through **1–2 fresh-context critic rounds** (min 1, hard cap 2) before execution. A plan with zero critic rounds is a draft, not a plan.
+Author plans as self-contained briefs, alone or in a feature folder (see Feature folder), then gate them through **one fresh-context critic round** before execution; a second round runs only when round 1 found a BLOCKER or MAJOR, to verify those fixes. A plan with zero critic rounds is a draft, not a plan.
 
 `<plans-dir>` is wherever the project keeps plans (e.g. `.agents/plans/`, `docs/plans/`).
 
@@ -28,7 +28,7 @@ A plan is a brief for a senior dev with zero background. Required sections:
 - **DoD** - binary checkboxes, each with an exact verification command + expected output
 
 Rules:
-- **Novice reader.** The implementer has only the working tree and this one file: no memory, no earlier plans, no chat. Repeat every assumption, define every term that is not ordinary English where it first appears, and embed needed outside knowledge in your own words, never as a link. A checked-in plan it builds on is named by title; an unchecked one is summarized in Background.
+- **Novice reader.** The implementer has only the working tree and this one file: no memory, no earlier plans, no chat. Repeat every assumption, define every term that is not ordinary English where it first appears, and embed needed outside knowledge in your own words, never as a link. A checked-in plan it builds on is named by its path from the repository root (the repo's plan rules may fix the exact form, such as a leading slash); never by title or bare number alone. An unchecked one is summarized in Background.
 - **Outcome first, decided, in prose.** Lead with what a user can do afterwards and how to see it. Resolve every ambiguity in the plan and say why; leave the implementer tactics only. Write prose; lists only where they are the content (Progress, DoD, user stories).
 - **Living document.** Progress is updated at every stopping point, with partly done items split into done and remaining. Every decision goes to the Decision Log with its rationale, every surprise to Surprises & Discoveries with short evidence, and the Outcomes & Retrospective is written at completion. Each revision updates every section it touches and adds a dated note at the bottom saying what changed and why. Restarting from only the plan must always work.
 - **Prototype the unknowns.** A risky unknown (a library's behavior, feasibility, performance) gets its own milestone labeled prototyping, with how to run it and the criteria to promote or discard it, before the milestones that depend on it.
@@ -49,7 +49,7 @@ Rules:
 - **Fold:** update every touched section, add a Decision Log entry and a revision note. Target in a feature folder → update every index section that names it. `Status: draft`, critic gate from round 1, critics attack new milestones, seams, and any section that still reads as before the fold. Tell user which plan changed.
 - **No fit:** new plan, candidates read + reason under Alternatives considered, or "none found".
 
-Depends on another plan → name it by title while checked in, else say in Background what it changed.
+Depends on another plan → name it by its repo-root path while checked in, else say in Background what it changed.
 
 Done when work sits in exactly one plan, the gate ran on it, and it records the fold in its Decision Log or the candidates (or "none found") in Alternatives considered.
 
@@ -64,10 +64,10 @@ Done when work sits in exactly one plan, the gate ran on it, and it records the 
 
 One plan, no feature folder → `<plans-dir>/<date>-<topic>.md`.
 
-## Critic Gate (mandatory: min 1, max 2 rounds)
+## Critic Gate (mandatory: 1 round; a 2nd only after a round-1 BLOCKER or MAJOR)
 
 1. Dispatch a skeptical fresh-context plan-critic (never the writer). Brief: **attack, don't validate**, across two passes.
-   - **Rigor pass:** verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps, missing edge cases, hidden coupling, untested assumptions, and steps that over-constrain the implementer.
+   - **Rigor pass:** verify every claim against the repo (`git grep`/read source), check AC are binary, flag scope creep, false completeness claims, premature abstraction, dangling citations, vague steps, missing edge cases, hidden coupling, untested assumptions, and steps that over-constrain the implementer. Every proof must be able to fail: a DoD command names a test or path that exists or that a milestone creates, and a regression test records its red run (fails without the fix, passes with it).
    - **Architecture pass:** first call the Skill tool with `zoom-out` to map the planned change against existing modules, callers, and domain concepts, then call it with `judo-review` and apply the code-judo lens to the plan's Locked decisions and boundaries. Hunt the design-judo move to make before code exists: a layer or abstraction the plan invents that could be deleted, a concern the plan puts in the wrong module, bespoke logic duplicating a canonical domain concept, or a state model that will spawn conditionals. Prefer the design that feels inevitable in hindsight and holds the fewest concepts (deep-module vocabulary: /codebase-design).
 
    Typed findings only: `{location, issue, severity, suggested fix}`.

@@ -12,7 +12,14 @@
 #      "**M2.**", "M2,", "1. ..."). A bare "Milestone 2 Title" line counts
 #      before the first heading, and after it only for a number no heading has
 #      opened yet; "Milestone 1 needs X." under a later heading is prose.
-#   6. With --since REF: at most 3% of the words in the file at REF are gone,
+#   6. A "Status: ready" line whose note says the critic gate is still open
+#      fails (no critic round, zero critic rounds, a critic or numbered round
+#      directly marked pending, awaited or not run, unreviewed, not yet
+#      reviewed, TODO/TBD/WIP): that plan is a draft. "Round 2 fixes not
+#      re-reviewed" passes, since the two-round cap allows it, and so do owner
+#      and other reviews ("owner review pending") and a recorded owner
+#      override ("owner instructed", "owner waived").
+#   7. With --since REF: at most 3% of the words in the file at REF are gone,
 #      so a format conversion cannot silently drop content.
 # Fenced code blocks are ignored.
 #
@@ -34,6 +41,24 @@ BARE_FORM = re.compile(r"^(Milestone|Task|Step|Phase)[ \t]+(M?\d+[a-z]?|[A-Z])[ 
 FENCE = re.compile(r"^[ \t]*(```|~~~)")
 WORD = re.compile(r"[A-Za-z0-9_]+")
 MAX_REMOVED_SHARE = 0.03
+STATUS_LINE = re.compile(r"^Status:\s*(.*)$")
+OPEN_GATE_PATTERNS = [
+    r"todo",
+    r"tbd",
+    r"wip",
+    r"unreviewed",
+    r"not (?:yet )?(?:critic-)?reviewed",
+    r"no critic (?:round|pass|review)s?",
+    r"(?:zero|0) critic rounds?",
+    r"ha(?:s|ve) not had a critic",
+    r"critic gate not run",
+    r"no critic yet",
+    r"needs? (?:a )?critic",
+    r"(?:(?:first|second) )?(?:critic|round[- ]\d+)(?: round(?: \d+)?| critic)? \(?(?:is |still )?(?:pending|awaiting|not yet run|not run)",
+    r"(?:pending|awaiting|waiting for) (?:a |the )?(?:(?:first|second) )?(?:round[- ]\d+ )?critic",
+]
+OWNER_OVERRIDE = re.compile(r"\bowner (?:instructed|waived|dismissed|set it ready|told)\b", re.IGNORECASE)
+OPEN_GATE = re.compile("|".join(rf"\b{x}\b" for x in OPEN_GATE_PATTERNS), re.IGNORECASE)
 
 
 def is_unopened_bare_milestone(bare, nums):
@@ -47,6 +72,27 @@ def is_unopened_bare_milestone(bare, nums):
 
 def words(text):
     return Counter(w.lower() for w in WORD.findall(text))
+
+
+def status_errors(text):
+    infence = False
+    for i, line in enumerate(text.splitlines(), 1):
+        if FENCE.match(line):
+            infence = not infence
+            continue
+        if infence:
+            continue
+        m = STATUS_LINE.match(line)
+        if not m:
+            continue
+        note = m.group(1)
+        if not re.match(r"ready\b", note):
+            return []
+        if OWNER_OVERRIDE.search(note):
+            return []
+        gate = OPEN_GATE.search(note)
+        return [f'{i}: Status says ready but the gate is open ("{gate.group(0)}"); use draft'] if gate else []
+    return []
 
 
 def format_errors(text):
@@ -113,7 +159,7 @@ def main(argv):
     failing = 0
     for path in argv:
         text = open(path, encoding="utf-8").read()
-        errs = format_errors(text)
+        errs = format_errors(text) + status_errors(text)
         if since:
             errs += content_loss(path, text, since)
         if errs:
