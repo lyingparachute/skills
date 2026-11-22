@@ -53,4 +53,4 @@ A surface is complete when a user can use it end to end: a screen, a flow, or a 
 - A fresh UI critic subagent calls the Skill tool with `impeccable` and args `audit <surface>`, runs it against the running app, and runs the break list, in the light theme only, with the worst-case values from `reference/details/worst-case-catalog.md` in impeccable's base dir, changing no code. Its brief carries the surface, how to start the app, the break list, and the path to this file.
 - You call the Skill tool with `impeccable` and args `critique <surface>`. Its two assessors are fresh sub-agents, so it is not self-review. Its design questions go to the user.
 
-Findings from both go through `receiving-code-review`, and their fixes land in the current milestone's commit.
+Findings from both go through `receiving-code-review`, and their fixes land as their own commits, each after its focused checks pass.
