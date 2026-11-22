@@ -6,7 +6,7 @@
 -description: "Use when the user wants to design, redesign, shape, critique, audit, polish, simplify, harden, animate, or otherwise improve a frontend interface: websites, landing pages, dashboards, product UI, components, forms, settings, onboarding, empty states, and native iOS or Android screens. Handles UX review, hierarchy, layout, typography, color, motion, UX copy, accessibility, responsive behavior, edge cases, and capturing or documenting design systems (DESIGN.md, tokens). Also for making bland UI bolder, loud UI quieter, or ambitious visual effects. Not for backend-only or non-UI tasks."
 +description: "Use when the user wants to design, redesign, critique, audit, polish, simplify, harden, animate, or otherwise improve a frontend interface (websites, landing pages, dashboards, product UI, components, forms, onboarding, empty states, native iOS or Android screens), asks about its UX, layout, typography, color, motion, copy, accessibility, or responsive behavior, wants UI made bolder or quieter, or wants a design system captured (DESIGN.md, tokens). Not for backend-only work."
  metadata:
-   version: 4.8.0
+   version: 4.10.0
  ---
 --- a/reference/adapt.md
 +++ b/reference/adapt.md
@@ -103,7 +103,7 @@
 +Landing-page hero layouts, spacing starting values, and section patterns live in [details/landing.md](details/landing.md).
 --- a/reference/onboard.md
 +++ b/reference/onboard.md
-@@ -232,3 +232,5 @@
+@@ -233,3 +233,5 @@
  - **Time to value**: How long until users get first value?
  
  When users hit the aha moment fast and don't drop off, hand off to `$impeccable polish` for the final pass.
