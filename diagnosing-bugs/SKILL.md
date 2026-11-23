@@ -105,6 +105,8 @@ If you cannot state the prediction, the hypothesis is a vibe - discard or sharpe
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it - proceed with your ranking if the user is AFK.
 
+Seed the list from the area's git log, blame, and PR discussion.
+
 ## Phase 4 - Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
@@ -117,9 +119,16 @@ Tool preference:
 
 **Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
 
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second. Before you trust or report any number it gives, run `benchmark-checklist`.
 
 ## Phase 5 - Fix + regression test
+
+Fix the root cause, not the place it surfaced:
+
+- Ask whether the state that triggered the symptom is legitimate. If it is, handle it where the code broke. If it should never exist, a check there hides the bug, so find what produced it. Guards, retries, swallowed errors, and clamps are the usual ways to hide a bug.
+- Fix the pattern, not the instance. Find every site with the same fault.
+- When evidence refutes a hypothesis, revert what it motivated.
+- When a check fails or passes too easily, suspect the observation method before the system.
 
 Write the regression test **before the fix** - but only if there is a **correct seam** for it.
 
@@ -134,6 +143,10 @@ If a correct seam exists:
 3. Apply the fix.
 4. Watch it pass.
 5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+
+### Back to Phase 3
+
+After two fixes fail the same gate, stop fixing. Write the premise they share in one sentence and test it before a third fix: find an observation that comes out differently if the premise is false. Look at how the failures are distributed, not only how large they are. If one part always lands on the losing side, change what puts it there instead of adding a mechanism that cleans up after it.
 
 ## Phase 6 - Cleanup + post-mortem
 

@@ -44,7 +44,7 @@ Each option rejected, and why.
 
 ## Invariants, risks and open questions
 
-Invariants that must hold throughout. Risks with their mitigation and a safe retry or rollback path; steps are safe to run twice. Open questions with the assumption the plan proceeds on.
+Invariants that must hold throughout. Risks with their mitigation and a safe retry or rollback path; steps are safe to run twice. Each risk names the fact it is safe because of. A fact backed only by assertion or a code read gets a prototyping milestone (see Prototype the unknowns in SKILL.md). Open questions with the assumption the plan proceeds on.
 
 ## Milestones
 

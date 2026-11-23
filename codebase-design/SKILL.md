@@ -43,5 +43,6 @@ Use these terms exactly - don't substitute "component," "service," "API," or "bo
 
 ## Going deeper
 
+- **Refactoring an existing structure** - see [REFACTORING.md](REFACTORING.md): pin, subtract, small steps, commit order.
 - **Deepening a cluster given its dependencies** - see [DEEPENING.md](DEEPENING.md): dependency categories and replace-don't-layer testing.
 - **Exploring alternative interfaces** - see [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.

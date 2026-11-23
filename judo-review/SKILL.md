@@ -34,9 +34,10 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 
 3. **Read the diff and source.**
    - Read the full diff and enough surrounding code to understand the changed flow.
-   - Check focused call sites or contracts only when a concrete risk requires it.
+   - Check focused call sites or contracts only when a concrete risk requires it. Look where grep stops: wire formats, DB columns, feature flags, pinned library versions, and teardown or microtask timing.
    - Do not trust summaries, test claims, or author rationale without evidence.
    - Done when every changed hunk is accounted for: each one either produced a finding or you can say in one sentence why it is clean.
+   - Take the one or two facts the change depends on as far down the evidence ladder as is cheap, and say where it stopped: 1. said so (worthless alone), 2. pointed at `file:line` or library source, 3. walked the failure and it cannot reach, 4. ran it, 5. reproduced in the running app. Rung 4 is a command, a focused test, or an inline one-liner that writes no file. A load-bearing fact that stops below rung 3 is marked unproven.
 
 4. **Review on both axes**, keeping their findings apart.
    - Prioritize structural findings over local polish.
@@ -76,7 +77,7 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 4. **Boundaries and types**: flag feature logic in shared paths, implementation details leaking through APIs, unnecessary `any` / `unknown` / casts / optionality, and silent fallback hiding unclear invariants.
 5. **Canonical ownership**: prefer existing utilities, helpers, packages, services, and domain concepts over bespoke near-duplicates or logic in the wrong layer.
 6. **Over-engineering**: hunt thin wrappers, identity abstractions, pass-through helpers, speculative flexibility, generic magic, unnecessary dependencies, and hand-rolled standard-library/native behavior.
-7. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious.
+7. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious. For a state-changing operation, ask whether it converges if it runs twice or the last run crashed at any point.
 8. **File size and decomposition**: the limit is the repo's own file-size check when it has one (a lint `max-lines` rule, a file-size check script, a rule in its agent rules), else 400 lines. If a change pushes a file from below the limit to above it, or toward twice the limit, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
 
 ## Approval Bar

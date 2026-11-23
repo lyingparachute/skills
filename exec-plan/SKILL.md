@@ -37,7 +37,7 @@ Rules:
 - Every cited `file:line` verified against current repo state at write time AND again at execution time.
 - Vague AC ("should work correctly") is not an AC.
 - Acceptance greps: use `git grep -P`, not `-E "\b"` (silently matches nothing here).
-- **Wide refactors break vertical slicing.** A mechanical change with cross-codebase blast radius (rename a column, retype a shared symbol) can't land green as one tracer bullet. Sequence expand–contract: first a milestone that adds the new form beside the old (nothing breaks); then migrate call sites in batches sized to the blast radius (per package/dir), each its own milestone, CI green throughout because the old form stays; finally a contract milestone that removes the old form once no caller remains.
+- **Wide refactors break vertical slicing.** A mechanical change with cross-codebase blast radius (rename a column, retype a shared symbol) can't land green as one tracer bullet. Sequence expand–contract: first a milestone that adds the new form beside the old (nothing breaks); then migrate call sites in batches sized to the blast radius (per package/dir), each its own milestone, CI green throughout because the old form stays; finally a contract milestone that removes the old form once no caller remains. Do the first unit by hand, then script the mechanical migration (a codemod) and rerun it.
 
 ## Fold before you write
 

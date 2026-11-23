@@ -7,6 +7,8 @@ Mock at **system boundaries** only:
 - Time/randomness
 - File system (sometimes)
 
+What an external service receives is behavior, so assert on it. A call to an internal helper is not.
+
 Don't mock:
 
 - Your own classes/modules

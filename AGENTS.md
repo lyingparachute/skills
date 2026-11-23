@@ -62,7 +62,7 @@
 
 ## API & Error Handling
 
-- **Backward compatibility by default.** Additions safe; removals/renames break. Version or deprecate before removing.
+- **Backward compatibility by default.** Additions safe; removals/renames break. Version or deprecate before removing. An internal API (all callers in this repo): migrate callers and delete the old API in the same change or plan, leaving no lasting shim. Tests follow the new contract; delete tests that only pin old internals.
 - **Typed error models, not exceptions for control flow.** Exceptions = unexpected system failure. Business outcomes never live as exceptions.
 
 ## Planning
@@ -73,7 +73,7 @@
 
 - **Done = ask met (and plan met and reviewed, when there is a plan), verified output, not assertion.** "80% working" = 0% shipped. Before claiming complete/fixed/passing, and before every `git commit`: lint green, type check green, focused tests green. Actual output, not assumption. No green = no claim. A red check you did not cause is still yours: fix it when you meet it, as a direct change in its own commit, even outside the files you touched. A fix big enough to need its own plan: name it in the report and keep going on the task.
 - **Commit message = one line**, per `caveman-commit`. Details go in the PR description.
-- **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself.
+- **Verify the outcome, not the enabling change.** "Submit the eval job" is done when the job is submitted and accepted, not when the code that submits it looks right. Same for pushes, PRs, deploys, and answers to questions: check the thing itself. Drive the real user path and check side effects (rows, files, messages). Observe what a dry run skips. Cleanup keeps the evidence and never kills by process name.
 - **Proxy signals are not proof.** A green build, a passing suite, or hours of effort count only where they cover every item the user asked for. Restate the asks as a checklist, including the non-code ones (operational, research, Q&A), and account for each.
 - **Nothing gets deferred back that you could do.** Printing instructions for the user to run a command you have the tools to run is an unfinished task, not a handoff. A gate, a red check, or a critic finding is work to do, not a place to stop and report: fix it and continue until the ask is met or a real user decision blocks you.
 - **Test coverage is non-negotiable.** Every feature ships with tests. Untested code = unfinished code.

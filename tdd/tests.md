@@ -75,3 +75,7 @@ test("calculateTotal sums line items", () => {
   expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
 });
 ```
+
+## Pairs and errors
+
+Pair a "this never happens" case with a case where it does happen, so the first cannot pass by testing nothing. Assert the error type callers branch on, not the message.

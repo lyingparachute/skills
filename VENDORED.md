@@ -74,7 +74,8 @@ Upstream: <https://github.com/cursor/plugins>, `pstack/skills`, MIT.
 
 | Skill | Notes on the divergence |
 |---|---|
-| `correct` | Taken 2026-11-19 at commit `e5136d8`, checked 2026-11-22 (no upstream change since). Same idea and same order of levels. Rewritten as numbered steps with Done criteria. Lint split from types into its own rung, so the ladder has five. Each rung points at our skill for it: `codebase-design`, `type-system-discipline`, `tdd`, `domain-modeling`. A fix that needs a plan goes to `exec-plan`. Corrections found only in session logs go to `retro`. The rule table lives in `CODING_STANDARDS.md` first, not the agent rules file. "Operator" became "user". Model-invoked, with a description that says when to use it. The Agent mistakes branch is ours: it took over the detail of the "Same correction 2x" rule from `AGENTS.md`. |
+| `benchmark-checklist` | Taken 2026-11-23 at commit `7a58391`. Merges pstack's `benchmark-checklist` and `principle-explain-the-number`: the seven questions, the named-limiter rule, the performance mantras from `perf-issue.md`, and a short report. Model-invoked, with a description that says when to use it. Rewritten in our voice, with no links to Cursor's playbooks, and the eval-result line cut to one sentence. |
+| `correct` | Taken 2026-11-19 at commit `e5136d8` (dated 2026-10-14), checked 2026-11-22 (no upstream change since). Same idea and same order of levels. Rewritten as numbered steps with Done criteria. Lint split from types into its own rung, so the ladder has five. Each rung points at our skill for it: `codebase-design`, `type-system-discipline`, `tdd`, `domain-modeling`. A fix that needs a plan goes to `exec-plan`. Corrections found only in session logs go to `retro`. The rule table lives in `CODING_STANDARDS.md` first, not the agent rules file. "Operator" became "user". Model-invoked, with a description that says when to use it. The Agent mistakes branch is ours: it took over the detail of the "Same correction 2x" rule from `AGENTS.md`. |
 
 ## Ideas borrowed without the file
 
@@ -82,3 +83,15 @@ Compared Cursor's `pstack` (<https://github.com/cursor/plugins>, `pstack/skills`
 
 We borrowed the slop-tell catalogue for `no-ai-slop`.
 The Fowler smell baseline and comment rules informed `judo-review/STANDARDS.md`.
+
+On 2026-11-23, at commit `7a58391`, we took ideas from more `pstack` skills, rewritten in our words:
+
+- `blast-radius`: the five-rung evidence ladder, "name the fact it is safe because of", and "look where grep stops" went to `judo-review/SKILL.md` (step 3). The exec-plan risks line says a fact backed only by assertion or a code read gets a prototyping milestone.
+- `principle-attack-the-premise`: `diagnosing-bugs/SKILL.md`, a back-edge from Phase 5 to Phase 3. `principle-fix-root-causes`, `poteto-mode/playbooks/bug-fix.md`, and `principle-prove-it-works`: the root-cause rules at the top of Phase 5. `why`: the git log, blame, and PR line in Phase 3.
+- `principle-test-behavior-not-implementation`: only the never-happens pairing and the error-type rule, in `tdd/tests.md`. The two-edit test was already in `tdd/SKILL.md`. The external-service line went to `tdd/mocking.md`.
+- `poteto-mode/playbooks/refactoring.md`: `codebase-design/REFACTORING.md`, linked from `codebase-design`, `tdd`, and `improve-codebase`. `principle-build-the-lever`: the codemod clause in `exec-plan/SKILL.md`.
+- `poteto-mode/playbooks/perf-issue.md`: the performance mantras (seven, with "do it when nobody is waiting"), in `benchmark-checklist`.
+- `technical-writing` and `unslop` rules 3, 5, 7, 11, 12, and 33: `no-ai-slop/SKILL.md`. Rule 33 applies to written artifacts, never to caveman replies. Not taken: rule 13 and tab indentation. Diataxis is one sentence.
+- `create-verification-skill`, Evidence standards: two sentences in `AGENTS.md` (Verify the outcome).
+- `principle-make-operations-idempotent`: one clause in `judo-review/SKILL.md`, orchestration and atomicity pass.
+- `principle-migrate-callers-then-delete-legacy-apis`: `AGENTS.md`, Backward compatibility, tied to `exec-plan`'s expand-contract.
