@@ -54,6 +54,7 @@
 
 ## Design & Style
 
+- **Question inherited constraints before designing.** A ticket, linter, reviewer, or old code is a source, not a reason: find why it exists. The decision table lists any constraint you dropped.
 - **Shape first, flat, no unearned indirection.** Fix the data shape before the algorithm. Flat data over deep hierarchies. Indirection with no name that justifies it → remove. Check production open-source before inventing architecture.
 - **Refactor in small, safe steps.** Each step leaves code working. Rewrite and refactor never in the same commit.
 - **Evolutionary design.** Design for next concrete requirement, not every hypothetical future. Extend when needed.
