@@ -65,9 +65,9 @@ Done when every walkthrough step and every area has its line, every row is compl
 
 Dispatch a fresh design critic with the index path. Its brief: verify claims against the code, and find missing decisions, weak option sets, hidden assumptions, scope creep, premature abstraction, roadmap relations that changed once the data model and API were chosen, and ADR conflicts. It returns typed findings with severity.
 
-Call the Skill tool with `receiving-code-review` and triage the findings yourself. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a scope split the critic asks for, or a finding the user chose to defer, becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. A round with open BLOCKER or MAJOR findings gets a second, fresh critic. Stop after two rounds; leftovers go to Questions for you.
+Call the Skill tool with `receiving-code-review` and triage the findings yourself. In every triage of this run, each point where that skill asks, stops, or offers another skill becomes an entry in Questions for you, and a scope split the critic asks for, or a finding the user chose to defer, becomes a Build order entry. Rework steps 1-3 for what they touch, re-mapping any new module and re-checking any new plan relation. If round 1 reports a BLOCKER or MAJOR, start round 2 even after you fix it. Round 2 uses a new critic with a fresh context and round 1's brief, pointed at the updated design. It never gets round 1's findings, the fixes, or a list of what changed. Write round 1's Questions for you entries into the index only after round 2 ends, so the file the critic reads holds none of them. Stop after two rounds; leftovers go to Questions for you.
 
-Done when a round ends with zero open BLOCKER or MAJOR findings, or after the second round.
+Done when round 1 reports no BLOCKER or MAJOR, or after the second round.
 
 ### 5. Write the plans
 

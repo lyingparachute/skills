@@ -5,7 +5,7 @@ description: "Use when writing, folding into, or revising an execution plan, wri
 
 # Exec Plan
 
-Author plans as self-contained briefs, alone or in a feature folder (see Feature folder), then gate them through **one fresh-context critic round** before execution; a second round runs only when round 1 found a BLOCKER or MAJOR, to verify those fixes. A plan with zero critic rounds is a draft, not a plan.
+Author plans as self-contained briefs, alone or in a feature folder (see Feature folder), then gate them through **one fresh-context critic round** before execution. A second round runs only when round 1 found a BLOCKER or MAJOR. The Critic Gate below sets how it runs. A plan with zero critic rounds is a draft, not a plan.
 
 `<plans-dir>` is wherever the project keeps plans (e.g. `.agents/plans/`, `docs/plans/`).
 
@@ -72,7 +72,7 @@ One plan, no feature folder → `<plans-dir>/<date>-<topic>.md`.
 
    Typed findings only: `{location, issue, severity, suggested fix}`.
 2. Fix findings. Dismissals require an explicit written reason.
-3. Round 1 had BLOCKER/MAJOR findings → dispatch a SECOND fresh critic to verify the fixes. Round 1 clean → done after one round.
+3. Round 1 had BLOCKER/MAJOR findings → dispatch a SECOND fresh critic with round 1's goal, rules and review instructions, plus the current full plan. Never pass it round 1's findings, the fixes, or a list of what changed. It reviews the whole plan from scratch. Round 1 clean → done after one round.
 4. **Hard cap: 2 rounds.** Findings still open after round 2 → list them in the plan's Status/notes for the owner and stop; no endless review loops. Set `Status: ready` when open BLOCKER/MAJOR = zero OR the leftovers are explicitly owner-dismissed.
 
 Why min 1 fresh round: single self-review has approved BLOCKERs (a DoD "last duplicate" completeness claim that grep-refuted with 9 hits). Why max 2: unbounded iterate-to-zero loops stall agents.
