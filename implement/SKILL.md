@@ -11,7 +11,7 @@ Keep the plan current as you go: it is the cross-session source of truth, so tic
 
 Work or facts you find that belong to another plan go into that plan's file now, per /exec-plan: new work is a fold, a changed fact (a renamed field, a moved file, a check that now waits) is a revision. Commit the edit with the slice that found it. Done when the other plan reads correct on its own, with no note left in your report for anyone to carry over. A landed or deleted plan owns nothing: that work goes to `receiving-code-review`'s fix-now rule.
 
-Before milestone 1, run the repo's lint, type check, and the tests of the area the plan touches. A red check you did not cause is still yours: fix it now, in its own commit, before milestone 1.
+Before milestone 1, run the repo's lint, type check, and the tests of the area the plan touches. Fix a red check you did not cause now, before milestone 1, as a direct change per the global rules file's red-check rule. If commits are authorized, the fix gets its own commit.
 
 Call the Skill tool with `tdd` and use it where possible, at pre-agreed seams.
 

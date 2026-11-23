@@ -21,6 +21,9 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test, `benchmark-checklist` for a perf number) → `judo-review` [model]
 
+**Verify work done without a plan**
+`self-verify` [model] - fresh verifier subagent, PASS or FAIL per ask. Plan-based work goes to `judo-review`.
+
 **Audit security**
 `security-audit` [user] - hunt vulnerabilities in a repo or named scope. Confirmed findings → `exec-plan`.
 

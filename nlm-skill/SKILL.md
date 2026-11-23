@@ -35,6 +35,15 @@ elif has_cli:
 
 Check the active account before a mutation when more than one profile is saved: `nlm login profile list` shows accounts, and `nlm config get auth.default_profile` shows the MCP default. CLI commands can use `--profile <name>`. MCP tools use the active profile: call the `profile` tool (`action=list`, then `action=switch` with `name=...`) to change it for this MCP server until it restarts (add `make_default=true` only when the user asks to change their default). While a switch is active, tool results carry `active_profile_note`; tell the user which account is in use. `usage_get(profile=...)` is an account-specific read and does not switch other MCP tools.
 
+## Existing notebooks
+
+Check these before deep research; the global rules file points here.
+
+- `DDD`: Domain-Driven Design.
+- `AI_DEVS`: building AI agents, agentic workflows.
+
+Use `nlm` for new external deep research only if no existing notebook fits.
+
 ## Quick Reference
 
 **Run `nlm --ai` to get comprehensive AI-optimized documentation** - this provides a complete view of all CLI capabilities.
