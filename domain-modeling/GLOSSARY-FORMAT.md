@@ -46,9 +46,9 @@ _Avoid_: Client, buyer, account
 
 ## Relationships
 
-- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
-- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
-- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
+- **Ordering → Fulfillment**: a placed order starts picking in Fulfillment
+- **Fulfillment → Billing**: a dispatched shipment starts its invoice in Billing
+- **Ordering ↔ Billing**: both use the same customer and money concepts
 ```
 
 The skill infers which structure applies:

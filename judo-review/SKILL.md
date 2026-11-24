@@ -29,7 +29,7 @@ If running as a reviewer subagent, stay readonly and leaf-only: do not edit file
 2. **Load governing context.**
    - Read repo instructions and rule files relevant to touched code before judging style, architecture, tests, security, or domain constraints.
    - When a plan, issue, or PR description governs the change, use it as intent and acceptance context.
-   - Do not review plan/admin/doc hygiene unless explicitly asked, or unless it makes a false claim about shipped code or verification.
+   - Plans and admin files stay out of scope unless asked, or unless they make a false claim about shipped code or verification. Comments and durable docs (README, `GLOSSARY.md`, `AGENTS.md`, `docs/`, ADRs) are in scope as pass 9 defines.
    - Done when every rule file governing a touched path has been read, and the governing intent for each task cluster is named or recorded as absent.
 
 3. **Read the diff and source.**
@@ -79,6 +79,10 @@ The Standards axis applies these passes in order. Requirement fit belongs to the
 6. **Over-engineering**: hunt thin wrappers, identity abstractions, pass-through helpers, speculative flexibility, generic magic, unnecessary dependencies, and hand-rolled standard-library/native behavior.
 7. **Orchestration and atomicity**: flag independent async work serialized for no reason, or related updates that can leave half-applied state when a cleaner atomic structure is obvious. For a state-changing operation, ask whether it converges if it runs twice or the last run crashed at any point.
 8. **File size and decomposition**: the limit is the repo's own file-size check when it has one (a lint `max-lines` rule, a file-size check script, a rule in its agent rules), else 400 lines. If a change pushes a file from below the limit to above it, or toward twice the limit, treat it as a presumptive blocker and ask whether it should be decomposed first. Waive only for a compelling structural reason and a still-scannable file.
+9. **Comments and docs**, in two scopes:
+   - Lines the diff adds or edits, plus the rest of each doc section it touches. Judge comments by the Comments section of [`STANDARDS.md`](STANDARDS.md). For durable-doc lines, call the Skill tool with `domain-modeling` and apply contest steps 1, 2, 3 and 6. Each failing line is a finding.
+   - Everything else. Grep comments and durable docs for every name the diff renames, moves, or deletes, and read the comments on code the diff changes. A line the change made false is a finding: ask to fix or delete it. A line that is still true stays out of the review.
+   - Done when every added or edited line has a verdict and every grep hit is checked.
 
 ## Approval Bar
 
@@ -94,6 +98,7 @@ A green test run is not approval, and neither is behavior that seems correct. Tr
 - Logic duplicates a canonical helper or lives outside the layer that owns the concept.
 - Related updates can leave half-applied state where an atomic structure is obvious.
 - Tests are missing, circular, over-mocked, or fail to cover the behavior being changed.
+- A comment or doc line the diff adds or edits restates the code or drifts, or any line went false with this change.
 - The review found named smells but no judo move, on a diff where a better shape is visible.
 
 A large fix is still a fix in this change, never a waiver. [Disposition](#disposition) decides when it may wait.
