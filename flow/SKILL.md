@@ -21,6 +21,9 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 **Fix a bug**
 `diagnosing-bugs` [model] (drives `tdd` for the regression test, `benchmark-checklist` for a perf number) → `judo-review` [model]
 
+**Understand a PR before reviewing it**
+`explain-pr` [model] (drives `zoom-out`) - one briefing page: goal, merge danger, before/after, risks, where to read first. Folds in `judo-review` findings when they exist.
+
 **Verify work done without a plan**
 `self-verify` [model] - fresh verifier subagent, PASS or FAIL per ask. Plan-based work goes to `judo-review`.
 

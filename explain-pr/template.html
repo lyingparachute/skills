@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PR title}}</title>
+<style>
+:root {
+	color-scheme: light dark;
+	--ep-fg: var(--foreground, #1f2328);
+	--ep-muted: var(--muted-foreground, #59636e);
+	--ep-line: var(--border, #d1d9e0);
+	--ep-card: var(--card, #f6f8fa);
+	--ep-code: var(--code-background, #eff2f5);
+	--ep-accent: var(--primary, #0969da);
+	--ep-danger: var(--destructive, #cf222e);
+	--ep-warn: var(--warning, #9a6700);
+	--ep-ok: var(--success, #1a7f37);
+	--ep-radius: var(--radius, 8px);
+	--ep-sans: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
+	--ep-mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--ep-fg: var(--foreground, #e6edf3);
+		--ep-muted: var(--muted-foreground, #9198a1);
+		--ep-line: var(--border, #3d444d);
+		--ep-card: var(--card, #151b23);
+		--ep-code: var(--code-background, #1f2630);
+		--ep-accent: var(--primary, #4493f8);
+		--ep-danger: var(--destructive, #f85149);
+		--ep-warn: var(--warning, #d29922);
+		--ep-ok: var(--success, #3fb950);
+	}
+}
+.ep { color: var(--ep-fg); font: 15px/1.55 var(--ep-sans); max-width: 760px; }
+.ep h1 { font-size: 22px; line-height: 1.3; margin: 0 0 4px; overflow-wrap: anywhere; }
+.ep h2 { font-size: 17px; margin: 28px 0 8px; }
+.ep p { margin: 0 0 8px; }
+.ep a { color: var(--ep-accent); }
+.ep code, .ep pre { font-family: var(--ep-mono); font-size: 13px; }
+.ep code { background: var(--ep-code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.ep .meta { color: var(--ep-muted); font-size: 13px; overflow-wrap: anywhere; }
+.ep .goal { font-size: 17px; margin: 14px 0 10px; }
+.ep .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; margin-right: 6px; }
+.ep .tag.one-way { color: var(--ep-danger); }
+.ep .tag.two-way { color: var(--ep-ok); }
+.ep .tag.radius { color: var(--ep-muted); }
+.ep .card { background: var(--ep-card); border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 12px 16px; margin: 0 0 10px; }
+.ep .kind { font-size: 12px; font-weight: 600; color: var(--ep-muted); text-transform: uppercase; letter-spacing: .04em; }
+.ep .row { display: grid; grid-template-columns: 64px 1fr; gap: 2px 12px; margin-top: 6px; }
+.ep .row span { min-width: 0; }
+.ep .row b { color: var(--ep-muted); font-weight: 600; font-size: 13px; }
+.ep .note { color: var(--ep-muted); }
+.ep pre.tree { background: var(--ep-code); border-radius: var(--ep-radius); padding: 12px 16px; overflow-x: auto; margin: 0 0 8px; }
+.ep pre.tree .add { color: var(--ep-ok); }
+.ep pre.tree .del { color: var(--ep-danger); }
+.ep .risk.p0 { border-left: 3px solid var(--ep-danger); }
+.ep .risk.p1 { border-left: 3px solid var(--ep-warn); }
+.ep .risk.p2 { border-left: 3px solid var(--ep-line); }
+.ep .rank { font-weight: 700; margin-right: 6px; }
+.ep .status { font-size: 12px; color: var(--ep-muted); }
+.ep ol, .ep ul { margin: 0 0 8px; padding-left: 22px; }
+.ep li { margin-bottom: 4px; }
+.ep details { border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 8px 16px; margin-top: 8px; }
+.ep summary { cursor: pointer; font-weight: 600; }
+@media (max-width: 520px) { .ep .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="ep">
+
+<h1>{{PR title}}</h1>
+<p class="meta"><a href="{{PR URL}}">{{repo}}#{{number}}</a> by {{author}} · <code>{{base SHA, 7 chars}}</code>..<code>{{head SHA, 7 chars}}</code>{{extras: draft, into branch, stacked on PR; empty when none apply}}</p>
+
+<p class="goal">{{Goal sentence}}</p>
+<p>
+	<span class="tag {{one-way | two-way}}">{{One-way door | Two-way door}}</span>
+	<span class="tag radius">Blast radius: {{local | service | cross-service | customers}}</span>
+</p>
+<p class="note">{{One sentence: why the door is one-way or two-way.}}</p>
+
+<h2>Before / After</h2>
+<!-- One card per change. -->
+<div class="card">
+	<div class="kind">{{New | Modified | Removed}}</div>
+	<div class="row">
+		<b>Before</b><span>{{old behavior, read at the base}}</span>
+		<b>Now</b><span>{{new behavior}}</span>
+		<b>Matters</b><span>{{why a reviewer cares}}</span>
+	</div>
+</div>
+<!-- Optional. -->
+<p><b>Unchanged:</b> {{behavior a reviewer might think changed, and did not}}</p>
+<!-- Optional. -->
+<p><b>Also changed:</b> {{short phrases, comma separated}}</p>
+
+<!-- Optional. -->
+<h2>How it fits</h2>
+<pre class="tree">{{structure view, one node per line, indented two spaces per level. Wrap a whole added line as <span class="add">+ node</span> and a removed one as <span class="del">- node</span>}}</pre>
+<p class="note">{{One sentence on what moved.}}</p>
+
+<h2>Safe because</h2>
+<p>{{the one fact the change depends on}} <span class="tag radius">{{stated | cited | traced | ran | unproven}}</span></p>
+
+<h2>Risks</h2>
+<!-- One card per risk, P0 first. -->
+<div class="card risk {{p0 | p1 | p2}}">
+	<p><span class="rank">{{P0 | P1 | P2}}</span>{{risk in one line}} <span class="status">· {{confirmed | hypothesis | unknown}}</span></p>
+	<div class="row">
+		<b>When</b><span>{{trigger, then what breaks, for whom}}</span>
+		<b>Where</b><span><code>{{path:Lx-y (head)}}</code></span>
+		<b>Verify</b><span>{{how the reviewer checks it}}</span>
+	</div>
+</div>
+<p class="note">{{Cleared: risks checked and ruled out, one short phrase each. Or: "No material risk found in the paths read."}}</p>
+
+<!-- Optional. -->
+<h2>Open threads</h2>
+<ul>
+	<li><b>{{who}}</b>: {{what they asked}} - {{answer so far, or "no answer yet"}}</li>
+</ul>
+
+<h2>Tests</h2>
+<p>{{what the tests prove}}</p>
+<p>{{what they miss}}</p>
+<!-- Optional. -->
+<ul>
+	<li>{{changed or deleted assertion, in words, with its file}}</li>
+</ul>
+
+<h2>Read first</h2>
+<ol>
+	<li><code>{{path:Lx-y}}</code> - {{what reading it unlocks}}</li>
+</ol>
+
+<!-- Optional. -->
+<details>
+	<summary>Review findings ({{count}})</summary>
+	<ul>
+		<li>{{Standards | Spec}} · {{severity}}: {{finding}}</li>
+	</ul>
+</details>
+
+<p class="meta">Coverage: {{N of M files read in full; skimmed with the pattern checked; not read}}</p>
+
+</main>
+</body>
+</html>
