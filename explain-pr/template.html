@@ -19,6 +19,11 @@
 	--ep-radius: var(--radius, 8px);
 	--ep-sans: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
 	--ep-mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+	--ep-danger-bg: color-mix(in srgb, var(--ep-danger) 12%, transparent);
+	--ep-warn-bg: color-mix(in srgb, var(--ep-warn) 14%, transparent);
+	--ep-ok-bg: color-mix(in srgb, var(--ep-ok) 12%, transparent);
+	--ep-accent-bg: color-mix(in srgb, var(--ep-accent) 12%, transparent);
+	--ep-muted-bg: color-mix(in srgb, var(--ep-muted) 14%, transparent);
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -41,30 +46,57 @@
 .ep code, .ep pre { font-family: var(--ep-mono); font-size: 13px; }
 .ep code { background: var(--ep-code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
 .ep .meta { color: var(--ep-muted); font-size: 13px; overflow-wrap: anywhere; }
-.ep .goal { font-size: 17px; margin: 14px 0 10px; }
-.ep .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; margin-right: 6px; }
-.ep .tag.one-way { color: var(--ep-danger); }
-.ep .tag.two-way { color: var(--ep-ok); }
-.ep .tag.radius { color: var(--ep-muted); }
-.ep .card { background: var(--ep-card); border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 12px 16px; margin: 0 0 10px; }
-.ep .kind { font-size: 12px; font-weight: 600; color: var(--ep-muted); text-transform: uppercase; letter-spacing: .04em; }
-.ep .row { display: grid; grid-template-columns: 64px 1fr; gap: 2px 12px; margin-top: 6px; }
-.ep .row span { min-width: 0; }
-.ep .row b { color: var(--ep-muted); font-weight: 600; font-size: 13px; }
+.ep .goal { font-size: 17px; margin: 14px 0 2px; }
+.ep .source { color: var(--ep-muted); font-size: 13px; margin-bottom: 12px; }
+.ep table.ba { width: 100%; border-collapse: collapse; margin: 0 0 10px; }
+.ep table.ba th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ep-muted); text-transform: uppercase; letter-spacing: .04em; padding: 6px 10px; border-bottom: 1px solid var(--ep-line); }
+.ep table.ba td { vertical-align: top; padding: 10px; border-bottom: 1px solid var(--ep-line); overflow-wrap: anywhere; }
+.ep table.ba td:first-child { width: 32%; padding-left: 0; }
+.ep table.ba .kind { margin-bottom: 4px; }
+.ep table.ba td.before { color: var(--ep-muted); }
+.ep table.ba .why { display: block; color: var(--ep-muted); font-size: 13px; margin-top: 4px; }
+.ep .tag { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.6; padding: 0 9px; border-radius: 999px; margin-right: 6px; white-space: nowrap; }
+.ep .danger { color: var(--ep-danger); background: var(--ep-danger-bg); }
+.ep .need { color: var(--ep-warn); background: var(--ep-warn-bg); }
+.ep .good { color: var(--ep-ok); background: var(--ep-ok-bg); }
+.ep .info { color: var(--ep-accent); background: var(--ep-accent-bg); }
+.ep .plain { color: var(--ep-muted); background: var(--ep-muted-bg); }
+.ep .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 4px 0 0; }
+.ep .tile { background: var(--ep-card); border: 1px solid var(--ep-line); border-top: 3px solid var(--ep-line); border-radius: var(--ep-radius); padding: 8px 12px; }
+.ep .tile b { display: block; font-size: 12px; font-weight: 600; color: var(--ep-muted); text-transform: uppercase; letter-spacing: .04em; }
+.ep .tile span { font-size: 16px; font-weight: 600; }
+.ep .tile.is-danger { border-top-color: var(--ep-danger); }
+.ep .tile.is-need { border-top-color: var(--ep-warn); }
+.ep .tile.is-good { border-top-color: var(--ep-ok); }
+.ep .tile.is-plain { border-top-color: var(--ep-muted); }
+.ep ol.flow { list-style: none; counter-reset: step; padding: 0; margin: 0 0 8px 14px; }
+.ep ol.flow li { counter-increment: step; position: relative; padding: 8px 12px 8px 30px; margin: 0; border-left: 2px solid var(--ep-line); }
+.ep ol.flow li::before { content: counter(step); position: absolute; left: -14px; top: 8px; width: 26px; height: 26px; border-radius: 50%; background: var(--ep-card); border: 2px solid var(--ep-line); text-align: center; font: 600 13px/22px var(--ep-sans); color: var(--ep-muted); }
+.ep ol.flow li.this { background: color-mix(in srgb, var(--ep-ok) 9%, transparent); border-left-color: var(--ep-ok); border-radius: 0 var(--ep-radius) var(--ep-radius) 0; }
+.ep ol.flow li.this::before { border-color: var(--ep-ok); color: var(--ep-ok); }
+.ep ol.flow li.next { color: var(--ep-muted); }
+.ep pre.example { background: var(--ep-code); border-radius: var(--ep-radius); padding: 10px 16px; overflow-x: auto; margin: 0 0 8px; line-height: 1.5; }
+.ep pre.example .add { display: block; margin: 0 -16px; padding: 0 16px; color: var(--ep-ok); background: var(--ep-ok-bg); }
+.ep pre.example .del { display: block; margin: 0 -16px; padding: 0 16px; color: var(--ep-danger); background: var(--ep-danger-bg); }
+.ep .cleared { border-left: 3px solid var(--ep-ok); padding-left: 12px; color: var(--ep-muted); }
+.ep .card { background: var(--ep-card); border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 10px 16px; margin: 0 0 10px; }
+.ep .card p:last-child { margin: 0; }
 .ep .note { color: var(--ep-muted); }
-.ep pre.tree { background: var(--ep-code); border-radius: var(--ep-radius); padding: 12px 16px; overflow-x: auto; margin: 0 0 8px; }
-.ep pre.tree .add { color: var(--ep-ok); }
-.ep pre.tree .del { color: var(--ep-danger); }
-.ep .risk.p0 { border-left: 3px solid var(--ep-danger); }
-.ep .risk.p1 { border-left: 3px solid var(--ep-warn); }
-.ep .risk.p2 { border-left: 3px solid var(--ep-line); }
-.ep .rank { font-weight: 700; margin-right: 6px; }
-.ep .status { font-size: 12px; color: var(--ep-muted); }
+.ep .risk.p0 { border-left: 4px solid var(--ep-danger); }
+.ep .risk.p1 { border-left: 4px solid var(--ep-warn); }
+.ep .risk.p2 { border-left: 4px solid var(--ep-muted); }
+.ep .risk .title { font-weight: 600; }
+.ep .status { font-size: 12px; font-weight: 400; color: var(--ep-muted); }
 .ep ol, .ep ul { margin: 0 0 8px; padding-left: 22px; }
 .ep li { margin-bottom: 4px; }
 .ep details { border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 8px 16px; margin-top: 8px; }
 .ep summary { cursor: pointer; font-weight: 600; }
-@media (max-width: 520px) { .ep .row { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+	.ep table.ba thead { display: none; }
+	.ep table.ba tr { display: block; padding: 8px 0; border-bottom: 1px solid var(--ep-line); }
+	.ep table.ba td, .ep table.ba td:first-child { display: block; width: auto; padding: 4px 0; border: 0; }
+	.ep table.ba td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; font-weight: 600; color: var(--ep-muted); }
+}
 </style>
 </head>
 <body>
@@ -73,48 +105,56 @@
 <h1>{{PR title}}</h1>
 <p class="meta"><a href="{{PR URL}}">{{repo}}#{{number}}</a> by {{author}} · <code>{{base SHA, 7 chars}}</code>..<code>{{head SHA, 7 chars}}</code>{{extras: draft, into branch, stacked on PR; empty when none apply}}</p>
 
-<p class="goal">{{Goal sentence}}</p>
-<p>
-	<span class="tag {{one-way | two-way}}">{{One-way door | Two-way door}}</span>
-	<span class="tag radius">Blast radius: {{local | service | cross-service | customers}}</span>
-</p>
-<p class="note">{{One sentence: why the door is one-way or two-way.}}</p>
+<p class="goal">{{Goal: what someone sees change, then what this part adds}}</p>
+<p class="source">{{Source: PR description | Source: ticket KEY | Source: commit message | Why: not stated}}</p>
+<!-- Tile tones: Undo is-danger for Hard to undo, is-good for Revert undoes it. Blast radius is-good for local, is-need for service, is-danger for cross-service or customers. Worst risk is-danger for P0, is-need for P1, is-plain for P2, is-good for None found. Tests is-good for pass, is-need otherwise. -->
+<div class="tiles">
+	<div class="tile {{tone}}"><b>Undo</b><span>{{Hard to undo | Revert undoes it}}</span></div>
+	<div class="tile {{tone}}"><b>Blast radius</b><span>{{local | service | cross-service | customers}}</span></div>
+	<div class="tile {{tone}}"><b>Worst risk</b><span>{{P1 · 3 found | None found}}</span></div>
+	<div class="tile {{tone}}"><b>Tests</b><span>{{Added | Changed | None changed}} · {{not run | pass}}</span></div>
+</div>
+
+<h2>How it works</h2>
+<ol class="flow">
+	<!-- One step per li. class="this" for steps this PR changes, class="next" for steps a linked ticket or PR will change, no class for context. -->
+	<li>{{context step}}</li>
+	<li class="this">{{what this step does}} <span class="tag good">This PR</span><br>{{what is different now}}</li>
+	<li class="next">{{what this step does}} <span class="tag plain">Next: {{ticket or PR}}</span><br>{{what will change}}</li>
+</ol>
+
+<h2>{{Why it is hard to undo | Why a revert undoes it}}</h2>
+<p>{{1 to 3 sentences: what a revert leaves behind and who notices, or why nothing stays}}</p>
 
 <h2>Before / After</h2>
-<!-- One card per change. -->
-<div class="card">
-	<div class="kind">{{New | Modified | Removed}}</div>
-	<div class="row">
-		<b>Before</b><span>{{old behavior, read at the base}}</span>
-		<b>Now</b><span>{{new behavior}}</span>
-		<b>Matters</b><span>{{why a reviewer cares}}</span>
-	</div>
-</div>
+<table class="ba">
+	<thead><tr><th>Change</th><th>Before</th><th>Now</th></tr></thead>
+	<tbody>
+		<!-- One row per change. -->
+		<tr>
+			<td><span class="tag kind {{good for New | info for Modified | danger for Removed}}">{{New | Modified | Removed}}</span><br>{{change in a few words}}<span class="why">{{why a reviewer cares}}</span></td>
+			<td class="before" data-label="Before">{{old behavior, read at the base}}</td>
+			<td data-label="Now">{{new behavior}}</td>
+		</tr>
+	</tbody>
+</table>
+<!-- Optional. -->
+<pre class="example">{{short sample at the head. Wrap a whole added line as <span class="add">+ line</span> and a removed one as <span class="del">- line</span>}}</pre>
 <!-- Optional. -->
 <p><b>Unchanged:</b> {{behavior a reviewer might think changed, and did not}}</p>
 <!-- Optional. -->
 <p><b>Also changed:</b> {{short phrases, comma separated}}</p>
 
-<!-- Optional. -->
-<h2>How it fits</h2>
-<!-- Optional. -->
-<pre class="tree">{{structure view, one node per line, indented two spaces per level. Wrap a whole added line as <span class="add">+ node</span> and a removed one as <span class="del">- node</span>}}</pre>
-<p class="note">{{One sentence on what moved, or the whole view when it is a straight line.}}</p>
-
 <h2>Safe because</h2>
-<p>{{the one fact the change depends on}} <span class="tag radius">{{stated | cited | traced | ran | unproven}}</span></p>
+<p>{{the one fact the change depends on}} <span class="tag {{danger for unproven | need for stated | good for cited, traced, ran}}">{{stated | cited | traced | ran | unproven}}</span></p>
 
 <h2>Risks</h2>
 <!-- Optional. One card per risk, P0 first. -->
 <div class="card risk {{p0 | p1 | p2}}">
-	<p><span class="rank">{{P0 | P1 | P2}}</span>{{risk in one line}} <span class="status">· {{confirmed | hypothesis | unknown}}</span></p>
-	<div class="row">
-		<b>When</b><span>{{trigger, then what breaks, for whom}}</span>
-		<b>Where</b><span><code>{{path:Lx-y (head)}}</code></span>
-		<b>Verify</b><span>{{how the reviewer checks it}}</span>
-	</div>
+	<p><span class="tag {{danger for P0 | need for P1 | plain for P2}}">{{P0 | P1 | P2}}</span><span class="title">{{what goes wrong}}</span> <span class="status">· {{confirmed | hypothesis | unknown}}</span></p>
+	<p>{{2 to 4 sentences: trigger, what breaks, for whom, how the reviewer checks it}}</p>
 </div>
-<p class="note">{{Cleared: risks checked and ruled out, one short phrase each. Or: "No material risk found in the paths read."}}</p>
+<p class="cleared">{{Cleared: risks checked and ruled out, one short phrase each. Or: "No material risk found in the paths read."}}</p>
 
 <!-- Optional. -->
 <h2>Open threads</h2>
@@ -132,7 +172,8 @@
 
 <h2>Read first</h2>
 <ol>
-	<li><code>{{path:Lx-y}}</code> - {{what reading it unlocks}}</li>
+	<!-- Link to the host's file view at the head commit when the host has one; otherwise a bare <code>. Risk places start with their rank tag. -->
+	<li><a href="{{file URL at head}}"><code>{{path:Lx-y}}</code></a> - {{what reading it unlocks}}</li>
 </ol>
 
 <!-- Optional. -->
