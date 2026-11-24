@@ -81,7 +81,6 @@
 .ep .cleared { border-left: 3px solid var(--ep-ok); padding-left: 12px; color: var(--ep-muted); }
 .ep .card { background: var(--ep-card); border: 1px solid var(--ep-line); border-radius: var(--ep-radius); padding: 10px 16px; margin: 0 0 10px; }
 .ep .card p:last-child { margin: 0; }
-.ep .note { color: var(--ep-muted); }
 .ep .risk.p0 { border-left: 4px solid var(--ep-danger); }
 .ep .risk.p1 { border-left: 4px solid var(--ep-warn); }
 .ep .risk.p2 { border-left: 4px solid var(--ep-muted); }
@@ -107,7 +106,7 @@
 
 <p class="goal">{{Goal: what someone sees change, then what this part adds}}</p>
 <p class="source">{{Source: PR description | Source: ticket KEY | Source: commit message | Why: not stated}}</p>
-<!-- Tile tones: Undo is-danger for Hard to undo, is-good for Revert undoes it. Blast radius is-good for local, is-need for service, is-danger for cross-service or customers. Worst risk is-danger for P0, is-need for P1, is-plain for P2, is-good for None found. Tests is-good for pass, is-need otherwise. -->
+<!-- Tile tones: Undo is-danger for Hard to undo, is-good for Revert undoes it. Blast radius is always is-plain: it is scope, not danger. Worst risk is-danger for P0, is-need for P1, is-plain for P2, is-good for None found. Tests is-good for pass, is-plain otherwise. -->
 <div class="tiles">
 	<div class="tile {{tone}}"><b>Undo</b><span>{{Hard to undo | Revert undoes it}}</span></div>
 	<div class="tile {{tone}}"><b>Blast radius</b><span>{{local | service | cross-service | customers}}</span></div>
@@ -125,6 +124,10 @@
 
 <h2>{{Why it is hard to undo | Why a revert undoes it}}</h2>
 <p>{{1 to 3 sentences: what a revert leaves behind and who notices, or why nothing stays}}</p>
+
+<!-- Optional. -->
+<h2>Rollout</h2>
+<p>{{what must ship or run first, and any flag. Add "Order: not stated" when no source states it}}</p>
 
 <h2>Before / After</h2>
 <table class="ba">
@@ -167,7 +170,7 @@
 <p>{{what they miss}}</p>
 <!-- Optional. -->
 <ul>
-	<li>{{changed or deleted assertion, in words, with its file}}</li>
+	<li>{{changed or deleted assertion, in words, with the test class name in <code>}}</li>
 </ul>
 
 <h2>Read first</h2>
