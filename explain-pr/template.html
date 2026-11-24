@@ -72,8 +72,8 @@
 .ep ol.flow { list-style: none; counter-reset: step; padding: 0; margin: 0 0 8px 14px; }
 .ep ol.flow li { counter-increment: step; position: relative; padding: 8px 12px 8px 30px; margin: 0; border-left: 2px solid var(--ep-line); }
 .ep ol.flow li::before { content: counter(step); position: absolute; left: -14px; top: 8px; width: 26px; height: 26px; border-radius: 50%; background: var(--ep-card); border: 2px solid var(--ep-line); text-align: center; font: 600 13px/22px var(--ep-sans); color: var(--ep-muted); }
-.ep ol.flow li.this { background: color-mix(in srgb, var(--ep-ok) 9%, transparent); border-left-color: var(--ep-ok); border-radius: 0 var(--ep-radius) var(--ep-radius) 0; }
-.ep ol.flow li.this::before { border-color: var(--ep-ok); color: var(--ep-ok); }
+.ep ol.flow li.this { background: color-mix(in srgb, var(--ep-accent) 9%, transparent); border-left-color: var(--ep-accent); border-radius: 0 var(--ep-radius) var(--ep-radius) 0; }
+.ep ol.flow li.this::before { border-color: var(--ep-accent); color: var(--ep-accent); }
 .ep ol.flow li.next { color: var(--ep-muted); }
 .ep pre.example { background: var(--ep-code); border-radius: var(--ep-radius); padding: 10px 16px; overflow-x: auto; margin: 0 0 8px; line-height: 1.5; }
 .ep pre.example .add { display: block; margin: 0 -16px; padding: 0 16px; color: var(--ep-ok); background: var(--ep-ok-bg); }
@@ -110,7 +110,7 @@
 <div class="tiles">
 	<div class="tile {{tone}}"><b>Undo</b><span>{{Hard to undo | Revert undoes it}}</span></div>
 	<div class="tile {{tone}}"><b>Blast radius</b><span>{{local | service | cross-service | customers}}</span></div>
-	<div class="tile {{tone}}"><b>Worst risk</b><span>{{P1 · 3 found | None found}}</span></div>
+	<div class="tile {{tone}}"><b>Worst risk</b><span>{{P1 · 3 risks | None found}}</span></div>
 	<div class="tile {{tone}}"><b>Tests</b><span>{{Added | Changed | None changed}} · {{not run | pass}}</span></div>
 </div>
 
@@ -118,7 +118,7 @@
 <ol class="flow">
 	<!-- One step per li. class="this" for steps this PR changes, class="next" for steps a linked ticket or PR will change, no class for context. -->
 	<li>{{context step}}</li>
-	<li class="this">{{what this step does}} <span class="tag good">This PR</span><br>{{what is different now}}</li>
+	<li class="this">{{what this step does}} <span class="tag info">This PR</span><br>{{what is different now}}</li>
 	<li class="next">{{what this step does}} <span class="tag plain">Next: {{ticket or PR}}</span><br>{{what will change}}</li>
 </ol>
 
