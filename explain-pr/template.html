@@ -106,12 +106,11 @@
 
 <p class="goal">{{Goal: what someone sees change, then what this part adds}}</p>
 <p class="source">{{Source: PR description | Source: ticket KEY | Source: commit message | Why: not stated}}</p>
-<!-- Tile tones: Undo is-danger for Hard to undo, is-good for Revert undoes it. Blast radius is always is-plain: it is scope, not danger. Worst risk is-danger for P0, is-need for P1, is-plain for P2, is-good for None found. Tests is-good for pass, is-plain otherwise. -->
+<!-- Tile tones: Undo is-danger for Hard to undo, is-good for Revert undoes it. Blast radius is always is-plain: it is scope, not danger. Worst risk is-danger for P0, is-need for P1, is-plain for P2, is-good for None found. -->
 <div class="tiles">
 	<div class="tile {{tone}}"><b>Undo</b><span>{{Hard to undo | Revert undoes it}}</span></div>
 	<div class="tile {{tone}}"><b>Blast radius</b><span>{{local | service | cross-service | customers}}</span></div>
 	<div class="tile {{tone}}"><b>Worst risk</b><span>{{P1 · 3 risks | None found}}</span></div>
-	<div class="tile {{tone}}"><b>Tests</b><span>{{Added | Changed | None changed}} · {{not run | pass}}</span></div>
 </div>
 
 <h2>How it works</h2>
