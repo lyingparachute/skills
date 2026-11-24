@@ -102,7 +102,7 @@
 <main class="ep">
 
 <h1>{{PR title}}</h1>
-<p class="meta"><a href="{{PR URL}}">{{repo}}#{{number}}</a> by {{author}} · <code>{{base SHA, 7 chars}}</code>..<code>{{head SHA, 7 chars}}</code>{{extras: draft, into branch, stacked on PR; empty when none apply}}</p>
+<p class="meta"><a href="{{PR URL}}">{{repo}}#{{number}}</a> by {{author}} · <code>{{base SHA, 7 chars}}</code>..<code>{{head SHA, 7 chars}}</code> · {{N files, +A -D}}{{extras: draft, into branch, stacked on PR; empty when none apply}}</p>
 
 <p class="goal">{{Goal: what someone sees change, then what this part adds}}</p>
 <p class="source">{{Source: PR description | Source: ticket KEY | Source: commit message | Why: not stated}}</p>
@@ -141,7 +141,7 @@
 	</tbody>
 </table>
 <!-- Optional. -->
-<pre class="example">{{short sample at the head. Wrap a whole added line as <span class="add">+ line</span> and a removed one as <span class="del">- line</span>}}</pre>
+<pre class="example">{{short sample at the head. Wrap a whole added line as <span class="add">+ line</span> and a removed one as <span class="del">- line</span>, with no newline after the span: the span already ends the line}}</pre>
 <!-- Optional. -->
 <p><b>Unchanged:</b> {{behavior a reviewer might think changed, and did not}}</p>
 <!-- Optional. -->
