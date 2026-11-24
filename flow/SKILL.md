@@ -19,7 +19,7 @@ The map of my skills and how they chain. `[user]` = invoked by typing it; `[mode
 `plan-feature` [model] (drives `zoom-out`, `improve-codebase` as prep sweep, `impeccable`, `codebase-design`, `domain-modeling`, `receiving-code-review`, `exec-plan`), then hand its plans to `implement`
 
 **Fix a bug**
-`diagnosing-bugs` [model] (drives `tdd` for the regression test, `benchmark-checklist` for a perf number) → `judo-review` [model]
+`diagnosing-bugs` [model] (drives `tdd` for the regression test, `benchmark-checklist` for a perf number) → `judo-review` [model] (drives `zoom-out` for its fact trace)
 
 **Understand a PR before reviewing it**
 `explain-pr` [model] (drives `zoom-out`) - one briefing page: goal, merge danger, before/after, risks, where to read first. Folds in `judo-review` findings when they exist.
