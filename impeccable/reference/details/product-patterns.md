@@ -32,7 +32,8 @@ Patterns for Operate surfaces: app navigation, actions, lists, cards, forms, sea
 
 ## Account menu
 
-- Put Settings, Billing, and Usage inside an account card popover, not a gradient letter-circle avatar.
+- Open the account menu from an account card popover, not a gradient letter-circle avatar.
+- Fill it from what this product's user does with their account, such as setting a status, pausing notifications, switching workspace, or reaching Settings and Billing. Show the email only when one person can hold several accounts, so it names the active one.
 - Keep a permanent shortcut cheat sheet in the settings menu.
 
 ## Icon-only controls and labels
@@ -129,6 +130,7 @@ Patterns for Operate surfaces: app navigation, actions, lists, cards, forms, sea
 - Show the active option of a segmented toggle as an inner pill.
 - Put a form inline in the surface that holds its data: a settings list, a table card, or a non-modal side panel.
 - Put a Log in link on the first sign-up screen for returning users.
+- Date input: never split it into day, month, and year dropdowns. For a date within about a year, such as a deadline or a booking, show a calendar that marks today, and accept a typed date too. For a known date, such as a birthday, use typed fields with no calendar. Accept any common separator.
 
 ## Search
 
@@ -160,7 +162,10 @@ Patterns for Operate surfaces: app navigation, actions, lists, cards, forms, sea
 
 ## Flows and next steps
 
+- Keep an element only when it answers a question this product's user has. A pattern copied from another app brings that app's reason with it. Check that the reason holds here before you keep the pattern.
 - Map each screen by asking how the user arrived and what they need next.
+- On a detail page, every named record links to its own page: the project, the owner, the parent item. Pages link to each other, not only to the sidebar.
+- On pointer devices, hovering a record link shows a preview card. The card holds only the fields the current page needs, such as the assignees and status of the linked project from a task page. Touch devices open the page on tap and get no preview.
 - After a creation step, chain to the next step, such as adding members, with a Skip option.
 - Chain related decisions into one flow, in order. For example: reach out, choose a template, then decide on batch sends.
 - Before building a flow, list its micro-utilities: a filter in the search bar, a top Save button, nav links, and hidden states.
