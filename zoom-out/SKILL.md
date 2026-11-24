@@ -7,4 +7,8 @@ Go up a layer of abstraction. Map the relevant modules and their callers, using 
 
 Use `graphify-out/` as the map when the graph was built after the last commit touching the area: compare the graph's `manifest.json` modification time with `git log -1 --format=%ct -- <area>`. Otherwise read the code.
 
-When the map feeds a judgment of a diff, named code, or a plan, also trace every fact that scope adds, changes, or owns and that it stores, sends, exposes, or configures: a column, a field on a stored or wire type, an event, an endpoint, a port, a config key or flag. Types private to one module are out of scope. For each fact, name its writers, its readers, and every other carrier of the same fact with that carrier's readers. A search that finds nothing records its scope, as in "no reader in <repo>". Readers past a process or repo boundary you did not search are "unknown", not "none". Done when every such fact has one line: name, writers, readers, other carriers.
+When the caller asks for a **fact trace**, add one:
+
+1. **Inventory.** List every fact the scope stores, sends, exposes, or configures: a column, a field on a stored or wire type, an event, an endpoint, a port, a config key or flag. For a diff, read both base and head, so the list holds what the diff adds, changes, and removes. For named code, list what it owns. A fact that never leaves one module is out of scope.
+2. **Trace.** For each fact, name its writers, its readers, and every other carrier of the same fact with that carrier's readers, each with a `file:line`. Every search records its scope, as in "no reader in <repo>". Readers past a process or repo boundary you did not search are "unknown", not "none".
+3. Done when every inventory entry has a trace row, and every "none" names the scope it searched.
