@@ -1,6 +1,6 @@
 ---
 name: graphify
-description: "Use for questions about a codebase's architecture, file relationships, or content, first of all when graphify-out/ exists, or when the user wants a knowledge graph built from code, docs, papers, images, or videos."
+description: "Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question should be treated as a graphify query first. Turns any input (code, docs, papers, images, videos) into a persistent knowledge graph with god nodes, community detection, and query/path/explain tools."
 ---
 
 # /graphify
@@ -275,28 +275,23 @@ Load files from `graphify-out/.graphify_uncached.txt`. Split into chunks bounded
 
 Both bounds matter. The line bound is not only about the 2000-line Read cap: a subagent holding 25 files splits its attention across all of them and skims the dense ones, and a 590-line plan can come back with zero nodes that way. Bounding content as well as file count is what keeps a chunk's coverage honest (#2225).
 
-**Step B2 - Dispatch ALL subagents in a single message**
+**Step B2 - Dispatch ALL subagents in a single message (OpenCode)**
 
-> Uses the `Task` tool for parallel subagent dispatch.
-> Call `Task` once per chunk — ALL in the same response so they run in parallel.
+> **OpenCode platform:** Uses `@mention` dispatch instead of the Agent tool. All mentions in a single message run in parallel.
 
-Pass the extraction prompt as the task description:
+Dispatch one `@mention` per chunk — ALL in the same response:
 
 ```
-Task(description="Your task is to perform the following. Follow the instructions below exactly.\n\n<agent-instructions>\n[extraction prompt, with FILE_LIST, CHUNK_NUM, TOTAL_CHUNKS, DEEP_MODE substituted]\n</agent-instructions>\n\nExecute this now. Output ONLY the structured JSON response.")
+@agent Chunk CHUNK_NUM of TOTAL_CHUNKS: [extraction prompt with FILE_LIST, CHUNK_NUM, TOTAL_CHUNKS, DEEP_MODE substituted]
+
+@agent Chunk 2 of TOTAL_CHUNKS: [next chunk]
 ```
 
-Each subagent writes its result to its own `graphify-out/.graphify_chunk_NN.json`. Collect results as each `Task` completes and parse each as JSON.
-
-CHUNK_PATH must be an **absolute** path — derive it before dispatching:
-```bash
-PROJECT_ROOT=$(pwd)  # cwd — where Part C globs graphify-out/ (NOT .graphify_root/scan dir, #1392)
-# Then for chunk N: CHUNK_PATH="${PROJECT_ROOT}/graphify-out/.graphify_chunk_0N.json"
-```
+Wait for all agents to return. Parse each response as JSON. Accumulate nodes/edges/hyperedges across all results and write to `graphify-out/.graphify_semantic_new.json`. If the `@agent` path cannot write chunk files, fall back to the serial path that writes each `graphify-out/.graphify_chunk_NN.json` before merge.
 
 Subagent prompt template:
 
-See `references/extraction-spec.md` for the exact subagent prompt (JSON schema, node-ID rules, confidence rubric, hyperedge, and vision rules). Load it only here, only when at least one chunk holds a doc, paper, or image; a pure-code corpus has skipped Part B and never reads it. Pass each subagent that prompt verbatim with FILE_LIST, CHUNK_NUM, TOTAL_CHUNKS, DEEP_MODE, and CHUNK_PATH substituted, and have it write the result to CHUNK_PATH.
+See `references/extraction-spec.md` for the exact subagent prompt (JSON schema, node-ID rules, confidence rubric, hyperedge, and vision rules). Load it only here, only when at least one chunk holds a doc, paper, or image; a pure-code corpus has skipped Part B and never reads it. Pass each agent that prompt verbatim with FILE_LIST, CHUNK_NUM, TOTAL_CHUNKS, and DEEP_MODE substituted.
 
 **Step B3 - Collect, cache, and merge**
 
@@ -793,9 +788,9 @@ Neither is part of the default build. When the user runs `/graphify add <url>` t
 
 ---
 
-## For the commit hook and native AGENTS.md integration
+## For the commit hook and native CLAUDE.md integration
 
-When the user asks to install the post-commit auto-rebuild hook or wire graphify into a project's AGENTS.md, see `references/hooks.md`.
+When the user asks to install the post-commit auto-rebuild hook or wire graphify into a project's CLAUDE.md, see `references/hooks.md`.
 
 ---
 
